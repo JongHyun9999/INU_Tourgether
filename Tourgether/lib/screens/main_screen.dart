@@ -41,7 +41,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void dispose() {
     // 컨트롤러를 사용한 뒤, 메모리 누수 방지를 위해 dispose()로 정리함.
-    print("disposed...");
+    // print("disposed...");
     authorController.dispose();
     contentController.dispose();
     latitudeController.dispose();
@@ -68,16 +68,16 @@ class _MainScreenState extends State<MainScreen> {
                     // 모든 내용이 정확히 기입되었는지 확인 필요.
                     // 즉, Null Checking이 필요하다.
 
-                    this.author = authorController.text;
-                    this.content = contentController.text;
-                    this.latitude = latitudeController.text;
-                    this.longitude = longitudeController.text;
+                    author = authorController.text;
+                    content = contentController.text;
+                    latitude = latitudeController.text;
+                    longitude = longitudeController.text;
 
                     MessageModel messageData = MessageModel.fromData(
-                      this.author,
-                      this.content,
-                      this.latitude,
-                      this.longitude,
+                      author,
+                      content,
+                      latitude,
+                      longitude,
                     );
 
                     isPostSucceed =
@@ -86,9 +86,9 @@ class _MainScreenState extends State<MainScreen> {
                     // 전송에 성공했으면 isPostSucceed flag를 false로 바꿈.
                     if (isPostSucceed) isPostSucceed = false;
                   },
-                  child: Icon(Icons.add),
+                  child: const Icon(Icons.add),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 10,
                 ),
                 ElevatedButton(
@@ -96,43 +96,43 @@ class _MainScreenState extends State<MainScreen> {
                     // 현재 작성된 글 리스트를 출력하기 위해 페이지 이동
                     Navigator.pushNamed(context, "/messages");
                   },
-                  child: Icon(Icons.list),
+                  child: const Icon(Icons.list),
                 ),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               width: 15,
             ),
             TextField(
               controller: authorController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "Author",
               ),
             ),
-            SizedBox(
+            const SizedBox(
               width: 15,
             ),
             TextField(
               controller: contentController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "Content",
               ),
             ),
-            SizedBox(
+            const SizedBox(
               width: 15,
             ),
             TextField(
               controller: latitudeController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "Latitude",
               ),
             ),
-            SizedBox(
+            const SizedBox(
               width: 15,
             ),
             TextField(
               controller: longitudeController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "Longitude",
               ),
             )

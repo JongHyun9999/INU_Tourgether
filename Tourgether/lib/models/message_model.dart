@@ -25,22 +25,22 @@ class MessageModel {
   // 2023.07.09, jdk
   // 현재 전달된 argument에 대한 Null Checking이 없으므로 주의해야 함.
   factory MessageModel.fromData(
-    String _author,
-    String _content,
-    String _latitude,
-    String _longitude,
+    String authorArg,
+    String contentArg,
+    String latitudeArg,
+    String longitudeArg,
   ) {
     // 전달받은 데이터 중, latitude와 longitude는 double 형식으로 변경
-    final latitudeString = _latitude;
-    final longitudeString = _longitude;
+    final latitudeString = latitudeArg;
+    final longitudeString = longitudeArg;
 
     final latitudeDouble = double.tryParse(latitudeString);
     final longitudeDouble = double.tryParse(longitudeString);
 
     // 객체로 반환
     return MessageModel(
-      author: _author,
-      content: _content,
+      author: authorArg,
+      content: contentArg,
       latitude: latitudeDouble!,
       longitude: longitudeDouble!,
     );

@@ -21,8 +21,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: Text("Messages"),
+          title: const Text("Messages"),
         ),
-        body: Column());
+        body: const Column());
   }
 }

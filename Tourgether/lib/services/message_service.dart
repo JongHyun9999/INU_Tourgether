@@ -46,7 +46,7 @@ Future<bool> postMessageData({required MessageModel messageData}) async {
 // 현재는 게시글이 많이 존재하지 않기 때문에 모든 게시글을 불러와도 문제가 없지만,
 // 게시글이 많아질 경우 한번에 출력할 게시글의 개수를 조정하여 불러올 수 있어야 한다.
 Future<MessageModel?> getMessageData() async {
-  MessageModel? messageData = null;
+  MessageModel? messageData;
 
   try {
     // 2023.07.09, jdk

@@ -8,22 +8,24 @@ import 'package:tourgether/screens/messages_screen.dart';
 // 로컬에서 테스트했기 때문에 아래의 IP 주소는 개인의 것으로 수정해야함.
 // ipconfig -> IPv4 주소 기입.
 // AWS EC2에 서버를 올릴경우 public ip 설정을 해줘야할듯.
-final String myIp = "192.168.219.101";
+const String myIp = "192.168.219.101";
 
 // 2023.07.08, jdk
 // 프로그램의 메인 진입점
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       initialRoute: '/main',
       routes: {
-        "/main": (context) => MainScreen(),
-        "/messages": (context) => MessagesScreen()
+        "/main": (context) => const MainScreen(),
+        "/messages": (context) => const MessagesScreen()
       },
       title: "TourGather",
       debugShowCheckedModeBanner: false, // debug banner를 띄우지 않음.
