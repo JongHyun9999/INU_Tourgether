@@ -1,6 +1,8 @@
 // jsonEncode() 사용하기 위함.
 import 'package:flutter/material.dart';
+import 'package:tourgether/screens/login_screen.dart';
 import 'package:tourgether/screens/main_screen.dart';
+import 'package:tourgether/screens/map_screen.dart';
 import 'package:tourgether/screens/messages_screen.dart';
 
 // 2023.07.08, pjh
@@ -22,10 +24,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: '/main',
+      initialRoute: "/login",
       routes: {
+        "/login": (context) => const LoginScreen(),
         "/main": (context) => const MainScreen(),
-        "/messages": (context) => const MessagesScreen()
+        "/messages": (context) => const MessagesScreen(),
+        "/map": (context) => const MapScreen(),
       },
       title: "TourGather",
       debugShowCheckedModeBanner: false, // debug banner를 띄우지 않음.

@@ -38,7 +38,6 @@ const params = {
   ACL: 'public-read', // set the file to be publicly accessible
 };
 
-
 app.post('/api/upload', async (req, res) => {
   // const fileContent = fs.readFileSync(req.file.path);
   // console.log(req);

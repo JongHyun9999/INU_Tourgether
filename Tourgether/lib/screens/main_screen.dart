@@ -59,81 +59,99 @@ class _MainScreenState extends State<MainScreen> {
       body: Center(
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    // 작성된 내용을 바탕으로 서버에 데이터 전송
-                    // 모든 내용이 정확히 기입되었는지 확인 필요.
-                    // 즉, Null Checking이 필요하다.
+            Expanded(
+              flex: 1,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      // 2023.07.09, jdk
+                      // GPS 지도 띄우기
+                      Navigator.pushNamed(context, "/map");
+                    },
+                    child: const Icon(Icons.map_outlined),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      // 작성된 내용을 바탕으로 서버에 데이터 전송
+                      // 모든 내용이 정확히 기입되었는지 확인 필요.
+                      // 즉, Null Checking이 필요하다.
 
-                    author = authorController.text;
-                    content = contentController.text;
-                    latitude = latitudeController.text;
-                    longitude = longitudeController.text;
+                      author = authorController.text;
+                      content = contentController.text;
+                      latitude = latitudeController.text;
+                      longitude = longitudeController.text;
 
-                    MessageModel messageData = MessageModel.fromData(
-                      author,
-                      content,
-                      latitude,
-                      longitude,
-                    );
+                      MessageModel messageData = MessageModel.fromData(
+                        author,
+                        content,
+                        latitude,
+                        longitude,
+                      );
 
-                    isPostSucceed =
-                        await postMessageData(messageData: messageData);
+                      isPostSucceed =
+                          await postMessageData(messageData: messageData);
 
-                    // 전송에 성공했으면 isPostSucceed flag를 false로 바꿈.
-                    if (isPostSucceed) isPostSucceed = false;
-                  },
-                  child: const Icon(Icons.add),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    // 현재 작성된 글 리스트를 출력하기 위해 페이지 이동
-                    Navigator.pushNamed(context, "/messages");
-                  },
-                  child: const Icon(Icons.list),
-                ),
-              ],
-            ),
-            const SizedBox(
-              width: 15,
-            ),
-            TextField(
-              controller: authorController,
-              decoration: const InputDecoration(
-                labelText: "Author",
+                      // 전송에 성공했으면 isPostSucceed flag를 false로 바꿈.
+                      if (isPostSucceed) isPostSucceed = false;
+                    },
+                    child: const Icon(Icons.add),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      // 현재 작성된 글 리스트를 출력하기 위해 페이지 이동
+                      Navigator.pushNamed(context, "/messages");
+                    },
+                    child: const Icon(Icons.list),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(
-              width: 15,
-            ),
-            TextField(
-              controller: contentController,
-              decoration: const InputDecoration(
-                labelText: "Content",
-              ),
-            ),
-            const SizedBox(
-              width: 15,
-            ),
-            TextField(
-              controller: latitudeController,
-              decoration: const InputDecoration(
-                labelText: "Latitude",
-              ),
-            ),
-            const SizedBox(
-              width: 15,
-            ),
-            TextField(
-              controller: longitudeController,
-              decoration: const InputDecoration(
-                labelText: "Longitude",
+            Expanded(
+              flex: 4,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                    child: TextField(
+                      controller: authorController,
+                      decoration: const InputDecoration(
+                          border: OutlineInputBorder(), hintText: "Author"),
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                    child: TextField(
+                      controller: contentController,
+                      decoration: const InputDecoration(
+                          border: OutlineInputBorder(), hintText: "Content"),
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                    child: TextField(
+                      controller: latitudeController,
+                      decoration: const InputDecoration(
+                          border: OutlineInputBorder(), hintText: "Latitude"),
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                    child: TextField(
+                      controller: longitudeController,
+                      decoration: const InputDecoration(
+                          border: OutlineInputBorder(), hintText: "Longitude"),
+                    ),
+                  ),
+                ],
               ),
             )
           ],

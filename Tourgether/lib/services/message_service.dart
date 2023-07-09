@@ -21,7 +21,7 @@ Future<bool> postMessageData({required MessageModel messageData}) async {
 
   try {
     await http
-        .post(Uri.parse("http://localhost:3000/api/postMessages"),
+        .post(Uri.parse("http://localhost:3000/api/postMessage"),
             headers: {"Content-Type": "application/json"},
             body: jsonEncode(json))
         .then((response) {
@@ -50,8 +50,8 @@ Future<MessageModel?> getMessageData() async {
 
   try {
     // 2023.07.09, jdk
-    // API path 수정 필요. 이후에 전역 변수를 모아두는 Data Class를 생성하여
-    // path를 끌어다 쓰도록 하고, String Interpolation을 통해 상세 path를 조정한다.
+    // API URI 수정 필요. 이후에 전역 변수를 모아두는 Data Class를 생성하여
+    // URI를 끌어다 쓰도록 하고, String Interpolation을 통해 상세 URI를 조정한다.
     await http.get(
       Uri.parse("http://localhost:3000/api/getMessages"),
       headers: {"Content-Type": "application/json"},

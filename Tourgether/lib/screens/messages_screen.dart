@@ -19,10 +19,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: const Text("Messages"),
-        ),
-        body: const Column());
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text("Messages"),
+      ),
+      body: const Column(),
+    );
   }
 }
