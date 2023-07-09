@@ -1,15 +1,17 @@
-import 'dart:convert'; // jsonEncode() 사용하기 위함.
-import 'dart:io';
+// jsonEncode() 사용하기 위함.
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
+import 'package:tourgether/screens/main_screen.dart';
+import 'package:tourgether/screens/messages_screen.dart';
 
+// 2023.07.08, pjh
 // nodejs 서버가 작동하고 있는 PC의 IP를 적어야한다.
 // 로컬에서 테스트했기 때문에 아래의 IP 주소는 개인의 것으로 수정해야함.
 // ipconfig -> IPv4 주소 기입.
 // AWS EC2에 서버를 올릴경우 public ip 설정을 해줘야할듯.
 final String myIp = "192.168.219.101";
 
+// 2023.07.08, jdk
+// 프로그램의 메인 진입점
 void main() {
   runApp(MyApp());
 }
@@ -18,15 +20,21 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter with Node.js',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Flutter with Node.js'),
+      initialRoute: '/main',
+      routes: {
+        "/main": (context) => MainScreen(),
+        "/messages": (context) => MessagesScreen()
+      },
+      title: "TourGather",
+      debugShowCheckedModeBanner: false, // debug banner를 띄우지 않음.
+      // home: MainScreen(), // MainScreen을 home widget으로 설정.
     );
   }
 }
 
+/*
+// 2023.07.08, jdk
+// 홈 화면에 출력될 메인 화면 widget
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key? key, required this.title}) : super(key: key);
 
@@ -39,8 +47,10 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final _textController = TextEditingController();
   File? _image;
-  // Uint8List? imageBytes;
+  Uint8List? imageBytes;
 
+  // 2023.07.08, jdk
+  // 메인 화면의 이미지 추가 버튼(+)에 대한 콜백 함수(private)
   Future<void> _getImage() async {
     final pickedFile =
         await ImagePicker().getImage(source: ImageSource.gallery);
@@ -49,10 +59,12 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  // 2023.07.08, jdk
+  // 추가된 이미지를 HTTP 통신을 통해 서버에 전달하는 콜백 함수(private)
   Future<void> _sendMessage() async {
     String base64Image = base64Encode(_image!.readAsBytesSync());
-    // List<int> imageBytes = await _image!.readAsBytesSync();
-    // print('imageBytes: $imageBytes');
+    List<int> imageBytes = await _image!.readAsBytesSync();
+    print('imageBytes: $imageBytes');
     final json = {"message": _textController.text, "image": base64Image};
 
     await http
@@ -99,3 +111,4 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+*/
