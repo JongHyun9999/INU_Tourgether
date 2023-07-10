@@ -64,22 +64,38 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                           children: [
                             RichText(
                               text: TextSpan(
-                                  text: 'Welcome to',
+                                  text: 'Welcome',
                                   style: const TextStyle(
                                       letterSpacing: 1.0,
                                       fontSize: 25,
                                       color: Colors.white),
                                   children: [
                                     TextSpan(
-                                      text: isSignUpScreen
-                                          ? ' Tourgether!'
-                                          : ' back!',
+                                      text: isSignUpScreen ? ' ' : ' back!',
                                       style: const TextStyle(
                                           letterSpacing: 1.0,
                                           fontSize: 25,
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold),
-                                    )
+                                    ),
+                                    if (isSignUpScreen)
+                                      const TextSpan(
+                                        text: 'to ',
+                                        style: TextStyle(
+                                          letterSpacing: 1.0,
+                                          fontSize: 25,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    if (isSignUpScreen)
+                                      const TextSpan(
+                                        text: 'Tourgether!',
+                                        style: TextStyle(
+                                            letterSpacing: 1.0,
+                                            fontSize: 25,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold),
+                                      ),
                                   ]),
                             ),
                             const SizedBox(
