@@ -1,5 +1,7 @@
 // jsonEncode() 사용하기 위함.
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:tourgether/providers/gps_provider.dart';
 import 'package:tourgether/screens/login_screen.dart';
 import 'package:tourgether/screens/main_screen.dart';
 import 'package:tourgether/screens/map_screen.dart';
@@ -23,17 +25,29 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      initialRoute: "/login",
-      routes: {
-        "/login": (context) => const LoginScreen(),
-        "/main": (context) => const MainScreen(),
-        "/messages": (context) => const MessagesScreen(),
-        "/map": (context) => const MapScreen(),
-      },
-      title: "TourGather",
-      debugShowCheckedModeBanner: false, // debug banner를 띄우지 않음.
-      // home: MainScreen(), // MainScreen을 home widget으로 설정.
+    // 2023.07.10, jdk
+    // MultiProvider를 적용하기 위해 앱 최상단에 MultiProvider Widget으로 감싸줌.
+    // 현재는 GPSProvider 하나만 적용된 상황.
+    // 이후에는 GPSProvider가 필요한 부분에만 적용될 수 있도록 위치 조정이 필요함.
+    // (현재는 마치 전역변수처럼 아무곳에서나 접근 가능하도록 설정해놓은 상태임)
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => GPSProvider(),
+        ),
+      ],
+      child: MaterialApp(
+        initialRoute: "/login",
+        routes: {
+          "/login": (context) => const LoginScreen(),
+          "/main": (context) => const MainScreen(),
+          "/messages": (context) => const MessagesScreen(),
+          "/map": (context) => const MapScreen(),
+        },
+        title: "TourGather",
+        debugShowCheckedModeBanner: false, // debug banner를 띄우지 않음.
+        // home: MainScreen(), // MainScreen을 home widget으로 설정.
+      ),
     );
   }
 }

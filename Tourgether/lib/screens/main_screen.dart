@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:tourgether/models/message_model.dart';
+import 'package:tourgether/providers/gps_provider.dart';
 import 'package:tourgether/services/message_service.dart';
 
 class MainScreen extends StatefulWidget {
@@ -86,6 +88,14 @@ class _MainScreenState extends State<MainScreen> {
                       latitude = latitudeController.text;
                       longitude = longitudeController.text;
 
+                      /* 2023.07.10, jdk
+                      // Null Checking 용 print
+                      print("author : $author");
+                      print("content : $content");
+                      print("latitude : $latitude");
+                      print("longitude : $longitude");
+                      */
+
                       MessageModel messageData = MessageModel.fromData(
                         author,
                         content,
@@ -151,6 +161,29 @@ class _MainScreenState extends State<MainScreen> {
                           border: OutlineInputBorder(), hintText: "Longitude"),
                     ),
                   ),
+                  // 2023.07.10, jdk
+                  // MapScreen에서 GPS callback을 켜면
+                  // 들어오는 GPS 데이터에 따라 계속해서
+                  // 데이터를 갱신하는 부분.
+                  Container(
+                    margin: const EdgeInsets.only(
+                      top: 100,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Latitude : ${Provider.of<GPSProvider>(context).gpsModel.latitude}",
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        Text(
+                          "Longitude : ${Provider.of<GPSProvider>(context).gpsModel.longitude}",
+                        ),
+                      ],
+                    ),
+                  )
                 ],
               ),
             )
