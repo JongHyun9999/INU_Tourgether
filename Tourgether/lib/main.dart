@@ -3,18 +3,21 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:tourgether/screens/loginPage.dart';
 
 // nodejs 서버가 작동하고 있는 PC의 IP를 적어야한다.
 // 로컬에서 테스트했기 때문에 아래의 IP 주소는 개인의 것으로 수정해야함.
 // ipconfig -> IPv4 주소 기입.
 // AWS EC2에 서버를 올릴경우 public ip 설정을 해줘야할듯.
-final String myIp = "192.168.219.101";
+const String myIp = "192.168.219.101";
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -22,13 +25,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter with Node.js'),
+      home: const LoginSignupScreen(),
+      //MyHomePage(title: 'Flutter with Node.js'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
@@ -73,25 +77,25 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextFormField(
               controller: _textController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Enter your message',
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _getImage,
-              child: Text('Choose an image'),
+              child: const Text('Choose an image'),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _sendMessage,
-              child: Text('Send'),
+              child: const Text('Send'),
             ),
           ],
         ),
