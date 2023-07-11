@@ -89,7 +89,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                       ),
                                     if (isSignUpScreen)
                                       const TextSpan(
-                                        text: 'Tourgether!',
+                                        text: 'Tourgather!',
                                         style: TextStyle(
                                             letterSpacing: 1.0,
                                             fontSize: 25,
