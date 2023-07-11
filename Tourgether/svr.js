@@ -28,55 +28,91 @@ app.use(express.static(path.join(__dirname, '')));
 let pool = mysql.createPool(dbconfig);
 // ====================== MySQL ======================
 // MySQL connection test
-function mySQL_connection_test(){
-  var connection = mysql.createConnection({
-    host :'localhost',
-    user: 'root',
-    password: '1111',
-    database: 'Tourgather'
-  });
+// function mySQL_connection_test(){
+//   var connection = mysql.createConnection({
+//     host :'localhost',
+//     user: 'root',
+//     password: '1111',
+//     database: 'Tourgather'
+//   });
   
-  connection.connect();
-  var sqlQuery = 'SELECT * FROM `Tourgather`';
-  connection.query(sqlQuery, function(err, rows, cols){
-    if(err){
-      console.log('에러발생: ', err);
-    }
-    console.log('rows: ', rows);
-    console.log('cols: ', cols);
-  });
+//   connection.connect();
+//   var sqlQuery = 'SELECT * FROM `Tourgather`';
+//   connection.query(sqlQuery, function(err, rows, cols){
+//     if(err){
+//       console.log('에러발생: ', err);
+//     }
+//     console.log('rows: ', rows);
+//     console.log('cols: ', cols);
+//   });
   
-  connection.end();
-}
+//   connection.end();
+// }
 
 
 // MySQL postMessageData
-function mySQL_post_Data(date, userName, messages, image, latitude, longtitude){
-  var connection = mysql.createConnection({
-    host :'localhost',
-    user: 'root',
-    password: '1111',
-    database: 'Tourgather'
-  });
-  connection.connect();
-  var sqlQuery = 'INSERT INTO `INU_Tourgather`.`Tourgather` (`reg.date`, `userName`, `messages`, `image`, `location`) VALUES (?,?,?,?,POINT(?,?))';
-  var params = [date, userName, messages, image, latitude, longtitude];
-  connection.query(sqlQuery, params, function(err, data){
-    if(err){
-      console.log('에러발생: ', err);
-    }
-    else{
-      console.log(`File uploaded successfully. ${data.Location}`);
-    }
-  });
+// function mySQL_post_Data(date, userName, messages, image, latitude, longtitude){
+//   var connection = mysql.createConnection({
+//     host :'tourgether.cgiwkp4xlwro.ap-northeast-2.rds.amazonaws.com',
+//     user: 'avengers',
+//     password: 'avengers2023!!',
+//     database: 'Tourgather'
+//   });
+//   connection.connect();
+//   var sqlQuery = 'INSERT INTO `INU_Tourgather`.`Tourgather` (`reg.date`, `userName`, `messages`, `image`, `location`) VALUES (?,?,?,?,POINT(?,?))';
+//   var params = [date, userName, messages, image, latitude, longtitude];
+//   connection.query(sqlQuery, params, function(err, data){
+//     if(err){
+//       console.log('에러발생: ', err);
+//     }
+//     else{
+//       console.log(`File uploaded successfully. ${data.Location}`);
+//     }
+//   });
   
-  connection.end();
-}
+//   connection.end();
+// }
+app.post('/api', async (req, res) => {
+
+  const userName = req.body.author
+  const image = req.body.image;
+  const messages = req.body.content
+  const latitude = req.body.latitude
+  const longtitude = req.body.longtitude
+
+  pool.getConnection((err, conn) => {
+      if (err) {
+          console.log(err);
+          res.send('DB connection error');
+          return;
+      }
+      const sqlQuery = 'INSERT INTO `INU_Tourgather`.`Tourgather` (`userid`, `text_content`, `image_content`, `location`) VALUES (?,?,?,POINT(?,?))';
+      const params = [userName, messages, image, latitude, longtitude];
+      conn.query(sqlQuery, params, (err, rows) => {
+          if (err) {
+              conn.release();
+              console.log(err);
+              res.send('DB query error');
+              return;
+          }
+
+          if(rows.affectedRows){
+              console.log('affectedRows : ' + rows.affectedRows);
+          }
+          else{
+              console.log('affectedRows : 0');
+          }
+          conn.release();
+          res.send(rows.affectedRows);
+      });
+  });
+});
 
 // 서버연결 테스트 및 데이터 query문 전송
 mySQL_connection_test();
-mySQL_post_Data(date, userName, messages, image, latitude, longtitude);
-
+//mySQL_post_Data(date, userName, messages, image, latitude, longtitude);
+mySQL_post_Data('2023-07-11 13:00:00', 'sally', 'hello', 'null', '1', '2');
+mySQL_connection_test();
 // ====================== AWS S3 ======================
 const s3 = new AWS.S3();
 
