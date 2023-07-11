@@ -4,11 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
-// nodejs 서버가 작동하고 있는 PC의 IP를 적어야한다.
-// 로컬에서 테스트했기 때문에 아래의 IP 주소는 개인의 것으로 수정해야함.
-// ipconfig -> IPv4 주소 기입.
-// AWS EC2에 서버를 올릴경우 public ip 설정을 해줘야할듯.
-final String myIp = "192.168.219.101";
+// AWS EC2의 public ip + port
+final String myIp = "15.164.62.89";
+final String myPort = "3000";
 
 void main() {
   runApp(MyApp());
@@ -56,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final json = {"message": _textController.text, "image": base64Image};
 
     await http
-        .post(Uri.parse('http://$myIp:3000/api/upload'),
+        .post(Uri.parse('http://$myIp:$myPort/api/upload'),
             headers: {"Content-Type": "application/json"},
             body: jsonEncode(json))
         .then((response) {
