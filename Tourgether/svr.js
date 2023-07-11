@@ -26,6 +26,56 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, '')));
 
 let pool = mysql.createPool(dbconfig);
+// ====================== MySQL ======================
+// MySQL connection test
+function mySQL_connection_test(){
+  var connection = mysql.createConnection({
+    host :'localhost',
+    user: 'root',
+    password: '1111',
+    database: 'Tourgather'
+  });
+  
+  connection.connect();
+  var sqlQuery = 'SELECT * FROM `Tourgather`';
+  connection.query(sqlQuery, function(err, rows, cols){
+    if(err){
+      console.log('에러발생: ', err);
+    }
+    console.log('rows: ', rows);
+    console.log('cols: ', cols);
+  });
+  
+  connection.end();
+}
+
+
+// MySQL postMessageData
+function mySQL_post_Data(date, userName, messages, image, latitude, longtitude){
+  var connection = mysql.createConnection({
+    host :'localhost',
+    user: 'root',
+    password: '1111',
+    database: 'Tourgather'
+  });
+  connection.connect();
+  var sqlQuery = 'INSERT INTO `INU_Tourgather`.`Tourgather` (`reg.date`, `userName`, `messages`, `image`, `location`) VALUES (?,?,?,?,POINT(?,?))';
+  var params = [date, userName, messages, image, latitude, longtitude];
+  connection.query(sqlQuery, params, function(err, data){
+    if(err){
+      console.log('에러발생: ', err);
+    }
+    else{
+      console.log(`File uploaded successfully. ${data.Location}`);
+    }
+  });
+  
+  connection.end();
+}
+
+// 서버연결 테스트 및 데이터 query문 전송
+mySQL_connection_test();
+mySQL_post_Data(date, userName, messages, image, latitude, longtitude);
 
 // ====================== AWS S3 ======================
 const s3 = new AWS.S3();
@@ -38,7 +88,7 @@ const params = {
   ACL: 'public-read', // set the file to be publicly accessible
 };
 
-
+// API 입력 데이터 
 app.post('/api/upload', async (req, res) => {
   // const fileContent = fs.readFileSync(req.file.path);
   // console.log(req);
