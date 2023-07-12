@@ -69,13 +69,13 @@ class _MapScreenState extends State<MapScreen> {
                     Row(
                       children: [
                         Text(
-                          "Latitude : ${Provider.of<GPSProvider>(context).gpsModel.latitude}",
+                          "Latitude : ${Provider.of<GPSProvider>(context).latitude}",
                         ),
                         const SizedBox(
                           width: 20,
                         ),
                         Text(
-                          "Longitude : ${Provider.of<GPSProvider>(context).gpsModel.longitude}",
+                          "Longitude : ${Provider.of<GPSProvider>(context).longitude}",
                         ),
                       ],
                     ),
@@ -84,7 +84,18 @@ class _MapScreenState extends State<MapScreen> {
                         top: 20,
                       ),
                       child: Text(
-                        "Interval : ${Provider.of<GPSProvider>(context).streamInterval.toString()}",
+                        "Interval : ${Provider.of<GPSProvider>(context).streamInterval}",
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(
+                        top: 20,
+                      ),
+                      child: Text(
+                        "Accuracy : ${Provider.of<GPSProvider>(context).accuracy}",
                       ),
                     ),
                   ],

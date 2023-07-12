@@ -13,12 +13,20 @@ import 'package:tourgether/models/gps_model.dart';
 class GPSProvider with ChangeNotifier {
   // 2023.07.10, jdk
   // 초기에는 GPSModel에 null값을 넣어둔다.
-  GPSModel gpsModel = GPSModel(null, null);
+  GPSModel gpsModel = GPSModel(null, null, null);
   Position? currentPosition;
 
   DateTime? startTime;
   DateTime? endTime;
+
+  // 2023.07.12, jdk
+  // 현재 이슈 : streamInterval은 Provider에 의해 데이터가 변화된것이 표시되나,
+  // gpsModel은 표시되지 않고 있음. 새로운 객체를 넣어보기도 했으나 바뀌지 않음.
+  // 내가 모르는 다른 문제가 있는 것으로 생각된다.
   Duration? streamInterval;
+  double? latitude;
+  double? longitude;
+  double? accuracy;
 
   bool _serviceEnabled = false;
   StreamSubscription<Position>? _positionStream;
@@ -86,7 +94,12 @@ class GPSProvider with ChangeNotifier {
           gpsModel.changeGPSData(
             currentPosition!.latitude,
             currentPosition!.longitude,
+            currentPosition!.accuracy,
           );
+
+          latitude = currentPosition!.latitude;
+          longitude = currentPosition!.longitude;
+          accuracy = currentPosition!.accuracy;
 
           // 새로운 Position 데이터가 들어왔으므로, 구독자들에게 알려주어야 함.
           notifyListeners();
@@ -111,6 +124,10 @@ class GPSProvider with ChangeNotifier {
                 print("new latitude : ${currentPosition!.latitude}");
                 print("new latitude : ${currentPosition!.longitude}");
                 print("Accuracy : ${currentPosition!.accuracy}");
+
+                latitude = currentPosition!.latitude;
+                longitude = currentPosition!.longitude;
+                accuracy = currentPosition!.accuracy;
 
                 notifyListeners();
                 startTime = DateTime.now();
@@ -137,11 +154,15 @@ class GPSProvider with ChangeNotifier {
       await _positionStream!.cancel();
       _positionStream = null;
 
-      gpsModel.changeGPSData(null, null);
+      gpsModel.changeGPSData(null, null, null);
 
       startTime = null;
       endTime = null;
       streamInterval = null;
+
+      latitude = null;
+      longitude = null;
+      accuracy = null;
 
       notifyListeners();
     }
