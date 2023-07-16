@@ -1,4 +1,4 @@
-# tourgether
+# mytourgether
 
 A new Flutter project.
 
