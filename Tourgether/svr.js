@@ -9,6 +9,7 @@ const fs = require('fs');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 const sharp = require('sharp');
+const bodyParser = require('body-parser');
 
 const dbconfig = require('./cfg/dbconfig.json');
 let pool = mysql.createPool(dbconfig);
@@ -144,3 +145,69 @@ app.post('/postMessageData', async (req, res)=>{
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
+
+// 2023.07.25, jdk /get API
+app.get('/get', (req, res) => {
+
+  pool.getConnection((err, conn) => {
+    if (err) {
+      res.statusMessage(404).send('Database Connection error')
+    }
+
+    let query = 'select * from User_Info';
+
+    conn.query(query, (err, response, fields) => {
+
+      if(err) {
+        console.log('failed to get a connection from DB');
+        console.log(err);
+        return;
+      }
+
+      console.log("DB query succesfully");
+
+      if (response) {
+        res.status(200).json({
+          user_info: response
+        });
+      }
+      else {
+        console.log('can not receive response');
+      }
+    })
+  })
+})
+
+// 2023.07.25, jke
+// app.get('/get', function(req, res){
+//   pool.getConnection((err, conn)=>{
+//     if(err) {
+//       res.statusMessage(404).send('Database Connection error')
+//     }
+//     let sql = 'select * User_Info';
+//     conn.query(sql, (err, id, fields) => {
+//       if(err){
+//         console.log('failed to get a connection from DB');
+//         console.log(err);
+//         return;
+//       }
+//       console.log("DB query succesfully");
+//       var user_id = req.params.id;
+//      
+//       if(id){
+//         var sql= 'select * from User_Info';
+//         conn.query(sql, function(err, id, fields){
+//           if(err){
+//             console.log(err);
+//           }
+//           else{
+//             res.json(id);
+//             console.log('users:', user_id);
+//             console.log('users:', fields);
+//           }
+//         })
+//       }
+//     })
+//   })
+// })

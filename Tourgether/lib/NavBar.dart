@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tourgether/network.dart';
+import 'dart:convert';
 
 class NarBar extends StatefulWidget {
   const NarBar({super.key});
@@ -9,22 +11,38 @@ class NarBar extends StatefulWidget {
 
 class _NarBarState extends State<NarBar> {
   bool onlineSwitch = false;
+
+  late String userMajor = '';
+  late String userName = '';
+  late String userNum = '';
+  late String userEmail = '';
+
   @override
+  void initState() {
+    super.initState();
+    print("jdk test");
+    getTestData();
+  }
+
+  getTestData() async {
+    Network network = Network('http://10.0.2.2:3000/get');
+    // Network 객체 생성 완료.
+
+    // network 통신 실시.
+    var jsonData = await network.getJsonData();
+
+    userMajor = await jsonData['user_info'][0]["user_major"];
+    userName = await jsonData['user_info'][0]["user_name"];
+    userNum = await jsonData['user_info'][0]['user_schoolnum'].toString();
+    setState(() {});
+  }
+
   Widget build(BuildContext context) {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           UserAccountsDrawerHeader(
-            // 학과, 학번, 이름
-            accountName: const Text(
-              "임베디드시스템공학과",
-              style: TextStyle(fontSize: 15),
-            ),
-            accountEmail: const Text(
-              "202201676 장경은",
-              style: TextStyle(fontSize: 15),
-            ),
             // 프로필 사진
             currentAccountPicture: CircleAvatar(
               child: ClipOval(
@@ -35,6 +53,15 @@ class _NarBarState extends State<NarBar> {
                   fit: BoxFit.cover,
                 ),
               ),
+            ),
+            // 학과, 학번, 이름
+            accountName: Text(
+              '${userMajor}',
+              style: TextStyle(fontSize: 15),
+            ),
+            accountEmail: Text(
+              "${userNum} ${userName}",
+              style: TextStyle(fontSize: 15),
             ),
             // 배경 이미지
             decoration: const BoxDecoration(
@@ -71,6 +98,7 @@ class _NarBarState extends State<NarBar> {
                   setState(() {
                     onlineSwitch = value;
                   });
+                  print("switch 동작함");
                 },
                 activeColor: Colors.green,
               ),
