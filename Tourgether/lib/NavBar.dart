@@ -132,20 +132,14 @@ class _NarBarState extends State<NarBar> {
                     ),
                   ),
                   otherAccountsPictures: [
-                    CircleAvatar(
-                      //backgroundImage: AssetImage('image/userInfo_profile.jpg'),
-                      backgroundColor: Colors.blueAccent,
-                      radius: 5,
+                    Image(
+                      image: AssetImage('image/running-shoes.png'),
                     ),
-                    CircleAvatar(
-                      //backgroundImage: AssetImage('image/userInfo_profile.jpg'),
-                      backgroundColor: Colors.lightGreenAccent,
-                      radius: 5,
+                    Image(
+                      image: AssetImage('image/badgeTest1.png'),
                     ),
-                    CircleAvatar(
-                      //backgroundImage: AssetImage('image/userInfo_profile.jpg'),
-                      backgroundColor: Colors.pinkAccent,
-                      radius: 5,
+                    Image(
+                      image: AssetImage('image/best-seller.png'),
                     ),
                   ],
                   // 학과, 학번, 이름
