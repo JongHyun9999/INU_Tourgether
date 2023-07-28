@@ -40,6 +40,8 @@ dependencies:
   scroll_snap_list: ^0.9.1
   like_button: ^2.0.5
   flutter_speed_dial: ^7.0.0
+  geolocator: ^9.0.2
+  provider: ^6.0.5
 
 dev_dependencies:
   flutter_test:
