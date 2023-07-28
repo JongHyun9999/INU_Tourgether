@@ -194,11 +194,11 @@ class _NarBarState extends State<NarBar> {
                     Switch(
                       value: onlineSwitch,
                       onChanged: (value) {
-                        print(value);
+                        //print(value);
                         onlineSwitch = value;
                         // 활동 상태 업데이트 함수 호출
                         updateUserStatus();
-                        print("switch 동작함");
+                        //print("switch 동작함");
                       },
                       activeColor: Colors.green,
                     ),
@@ -235,14 +235,6 @@ class _NarBarState extends State<NarBar> {
                       icon: Icon(Icons.star),
                       onPressed: () {},
                     ),
-                    // IconButton(
-                    //   icon: Icon(Icons.star),
-                    //   onPressed: () {},
-                    // ),
-                    // IconButton(
-                    //   icon: Icon(Icons.description),
-                    //   onPressed: () {},
-                    // ),
                     IconButton(
                       icon: Icon(Icons.settings),
                       onPressed: () {},

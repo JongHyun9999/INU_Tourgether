@@ -33,7 +33,7 @@ class Network {
   Future<dynamic> updateUserStatus(Map<String, String> data) async {
     // body부분에 json 데이터를 보낸다.
     // map형으로 가져와서 jsonEncode 명령어를 이용해서 json형으로 바꾼 후 보내도 된다.
-    print("send!");
+    //print("send!");
     print(data);
 
     // --------------------------------------------------------
@@ -51,15 +51,15 @@ class Network {
     // });
     // --------------------------------------------------------
 
-    print(data['user_schoolnum']);
-    print(data['user_status']);
+    //print(data['user_schoolnum']);
+    //print(data['user_status']);
 
     var response = await http.post(Uri.parse(url), body: {
       'user_schoolnum': data['user_schoolnum'],
       'user_status': data['user_status']
     });
 
-    print("received!");
+    //print("received!");
 
     // check the status code for the result
     if (response.statusCode == 201) {
