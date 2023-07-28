@@ -148,7 +148,7 @@ app.listen(port, () => {
 
 
 // 2023.07.25, jdk /get API
-app.get('/get', (req, res) => {
+app.get('/getUserInfo', (req, res) => {
 
   pool.getConnection((err, conn) => {
     if (err) {
@@ -179,6 +179,55 @@ app.get('/get', (req, res) => {
   })
 })
 
+app.post('/updateUserStatus', async (req, res) => {
+  console.log('check');
+  const user_schoolnum = req.body.user_schoolnum;
+  const user_status = parseInt(req.body.user_status);
+  
+  console.log(`user_schoolnum : ${user_schoolnum}`);
+  console.log(`user_status : ${user_status}`);
+
+  let conn = null;
+
+  // ------------------------
+  // 2023.07.29, jdk
+  // try/catch
+  // try는 시도하는 부분, catch는 에러를 처리하는 부분이다.
+  // try 부분에서 에러가 발생하면, catch로 넘어가게 된다.
+  // 이때 catch에서 error message에 대한 내용을 인자로 받게 되고
+  // 이를 출력해 볼수도 있다.
+  // ------------------------
+
+  try {
+    let QUERY_STR = null;
+    if(req.body.user_schoolnum){
+      QUERY_STR = `UPDATE User_Info SET user_status = '${user_status}' WHERE user_schoolnum = '${user_schoolnum}';`
+    }
+  
+  // Promise가 무엇인지 잘 알아보기!
+  conn = await new Promise((resolve, reject) => {
+    pool.getConnection((err, connection) => {
+      if (err) reject(err);
+      resolve(connection);
+    });
+  }).catch((err) => {
+    throw err;
+  })
+  const [rows] = await conn.promise().query(QUERY_STR)
+    res.status(200).json(rows);
+  }
+  catch (err) {
+
+    console.log('error content'); 
+    console.log(err);
+
+    res.status(404).json({
+      error: "An error occurred while updateUserStatus"
+    });
+  } finally {
+    if (conn) conn.release();
+  }
+})
 // 2023.07.25, jke
 // app.get('/get', function(req, res){
 //   pool.getConnection((err, conn)=>{

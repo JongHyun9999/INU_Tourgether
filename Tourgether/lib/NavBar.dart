@@ -18,7 +18,6 @@ class NarBar extends StatefulWidget {
 class _NarBarState extends State<NarBar> {
   bool onlineSwitch = false;
   bool friendRequest = true;
-
   late String userMajor = '';
   late String userName = '';
   late String userNum = '';
@@ -32,6 +31,7 @@ class _NarBarState extends State<NarBar> {
     getTestData();
   }
 
+  Map<String, String> updateUserStatusData = {};
   // --- 개념 ---
   // async: promise를 반환
   // promise: js 비동기 처리에 사용되는 객체
@@ -43,10 +43,31 @@ class _NarBarState extends State<NarBar> {
 
   // 테스트 데이터를 가져옴
   getTestData() async {
+    // 2023.07.29, comjke33
     // network 객체 생성
     // 애뮬레이터 실습 시에는 localHost를 사용할 수 없다.
     // 아래와 같은 주소를 url을 이용해서 http 통신 시도
-    Network network = Network('http://10.0.2.2:3000/get');
+
+    // -------------------------------------------------------------------------
+    // 2023.07.29, jdk
+    // 1. API별 URL은 별도의 Utility Data Class를 만들어서 저장해 둘 것.
+    // 현재는 하드코딩 방식으로 되어 있어서 코드의 유연성이 부족하다고 할 수 있음.
+    // uilities(이름은 바꿔도 됨) 폴더를 만들고, 거기에 data class를 만들어서
+    // API URL들을 String으로 정리해보자.
+    // => Data Class 공부해보기.
+
+    // 2. Network Class를 Singleton Class로 생성하기.
+    // 전역 변수를 예시로 생각해보자. 현재 getTestData() 메서드와
+    // updateUserStatus 메서드는 각 메서드 내에서 Network의 객체를 새롭게 생성하고 있다.
+    // 이것은 메서드가 실행될 때마다 새로운 객체를 만들고 메서드의 실행이 끝나면
+    // 해당 객체들의 할당을 해제하는 방식이므로, 다소 비효율적이라고 할 수 있다.
+    // 따라서 Network Class를 전역적인 변수(OOP에서는 Singleton Pattern 이라고 함.)로 생성,
+    // API 요청을 처리해주는 단일 전역 객체를 생성해보자.
+    // => Singleton Pattern, static 키워드 공부해보기.
+
+    // -------------------------------------------------------------------------
+
+    Network network = Network('http://10.0.2.2:3000/getUserInfo');
 
     // network 통신 실시.
     var jsonData = await network.getJsonData();
@@ -59,6 +80,25 @@ class _NarBarState extends State<NarBar> {
     // 새로고침
     setState(() {});
   }
+
+  updateUserStatus() async {
+    Network network = Network('http://10.0.2.2:3000/updateUserStatus');
+    final s = onlineSwitch ? 1 : 0;
+    updateUserStatusData = {
+      "user_status": s.toString(),
+      "user_schoolnum": userNum
+    };
+    network.updateUserStatus(updateUserStatusData);
+
+    setState(() {});
+  }
+
+  // ---> 친구 요청
+  // updateFriendBadge() async {
+  //   Network network = Network('http://10.0.2.2:3000/updateFriendBadge');
+  //   final friendData = await network.getFriendData();
+  //   userF
+  // }
 
   // 위젯 모양
   Widget build(BuildContext context) {
@@ -145,7 +185,7 @@ class _NarBarState extends State<NarBar> {
                       width: 10,
                     ),
                     const Text(
-                      "활동 상태",
+                      "활동 공개",
                       style: TextStyle(fontSize: 16),
                     ),
                     const SizedBox(
@@ -154,9 +194,10 @@ class _NarBarState extends State<NarBar> {
                     Switch(
                       value: onlineSwitch,
                       onChanged: (value) {
-                        setState(() {
-                          onlineSwitch = value;
-                        });
+                        print(value);
+                        onlineSwitch = value;
+                        // 활동 상태 업데이트 함수 호출
+                        updateUserStatus();
                         print("switch 동작함");
                       },
                       activeColor: Colors.green,
@@ -191,66 +232,23 @@ class _NarBarState extends State<NarBar> {
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.favorite),
-                      onPressed: () {},
-                    ),
-                    IconButton(
                       icon: Icon(Icons.star),
                       onPressed: () {},
                     ),
-                    IconButton(
-                      icon: Icon(Icons.description),
-                      onPressed: () {},
-                    ),
+                    // IconButton(
+                    //   icon: Icon(Icons.star),
+                    //   onPressed: () {},
+                    // ),
+                    // IconButton(
+                    //   icon: Icon(Icons.description),
+                    //   onPressed: () {},
+                    // ),
                     IconButton(
                       icon: Icon(Icons.settings),
                       onPressed: () {},
                     ),
                   ],
                 )
-
-                // 메뉴
-                // ListTile(
-                //   leading: const Icon(Icons.favorite),
-                //   title: const Text('즐겨찾기'),
-                //   onTap: () {},
-                // ),
-                // ListTile(
-                //   leading: const Icon(Icons.people),
-                //   title: const Text('친구'),
-                //   onTap: () {},
-                //   // 친구 요청 알림
-                //   trailing: ClipOval(
-                //       child: Container(
-                //           color: Colors.red,
-                //           width: 20,
-                //           height: 20,
-                //           child: const Center(
-                //             child: Text(
-                //               '8',
-                //               style: TextStyle(
-                //                 color: Colors.white,
-                //                 fontSize: 12,
-                //               ),
-                //             ),
-                //           ))),
-                // ),
-                // ListTile(
-                //   leading: const Icon(Icons.settings),
-                //   title: const Text('설정'),
-                //   onTap: () {},
-                // ),
-                // const Divider(),
-                // ListTile(
-                //   leading: const Icon(Icons.description),
-                //   title: const Text('라이선스'),
-                //   onTap: () {},
-                // ),
-                // ListTile(
-                //   leading: const Icon(Icons.star),
-                //   title: const Text('개발자들'),
-                //   onTap: () {},
-                // ),
               ],
             ),
           ),
