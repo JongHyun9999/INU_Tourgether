@@ -26,19 +26,23 @@ class _SettingsPageState extends State<SettingsPage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text('설정'),
+            Text(
+              '설정',
+              style: TextStyle(fontSize: 20.0, color: Colors.white),
+            ),
           ],
         ),
         centerTitle: true,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        elevation: 1,
+        backgroundColor:
+            Colors.blueAccent, //Theme.of(context).scaffoldBackgroundColor,
+        elevation: 3,
         leading: IconButton(
           onPressed: () {
             Navigator.of(context).pop();
           },
           icon: Icon(
             Icons.arrow_back,
-            color: Colors.blueAccent,
+            color: Colors.white, //Colors.blueAccent,
           ),
         ),
       ),
@@ -75,9 +79,6 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   Icon(Icons.arrow_forward_ios)
                 ],
-              ),
-              visualDensity: VisualDensity(
-                vertical: -3,
               ),
               onTap: () {
                 showDialog(
@@ -125,7 +126,6 @@ class _SettingsPageState extends State<SettingsPage> {
               title: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [Text("비밀번호 변경"), Icon(Icons.arrow_forward_ios)]),
-              visualDensity: VisualDensity(vertical: -3),
               onTap: () {
                 showDialog(
                   context: context,
@@ -160,7 +160,6 @@ class _SettingsPageState extends State<SettingsPage> {
               title: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [Text("언어 설정"), Icon(Icons.arrow_forward_ios)]),
-              visualDensity: VisualDensity(vertical: -3),
               onTap: () {
                 showDialog(
                   context: context,
@@ -188,7 +187,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 );
               },
             ),
-
+            SizedBox(
+              height: 10.0,
+            ),
             Row(
               children: [
                 Icon(
@@ -200,8 +201,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   width: 8,
                 ),
                 Text(
-                  "알림 설정",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  "알림",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -301,7 +302,9 @@ class _SettingsPageState extends State<SettingsPage> {
                   ]),
               visualDensity: VisualDensity(vertical: -3),
             ),
-
+            SizedBox(
+              height: 10.0,
+            ),
             Row(
               children: [
                 Icon(
@@ -314,7 +317,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 Text(
                   "기타",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -322,6 +325,7 @@ class _SettingsPageState extends State<SettingsPage> {
               height: 15,
               thickness: 2,
             ),
+
             ListTile(
               title: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -353,6 +357,9 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                 );
               },
+            ),
+            SizedBox(
+              height: 10.0,
             ),
             Center(
               child: Row(

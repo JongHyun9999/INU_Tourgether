@@ -112,6 +112,7 @@ class _NarBarState extends State<NarBar> {
           width: MediaQuery.of(context).size.width * 0.7,
           height: MediaQuery.of(context).size.height * 0.45,
           child: Drawer(
+            elevation: 5,
             // ListView: 선택 리스트를 쉽게 구현
             child: ListView(
               // appBar 부분까지 범위 내에 들도록 padding을 없앰
@@ -154,16 +155,25 @@ class _NarBarState extends State<NarBar> {
                     style: TextStyle(fontSize: 15),
                   ),
                   // 배경 이미지
-                  decoration: const BoxDecoration(
-                      color: Colors.blue,
-                      borderRadius:
-                          BorderRadius.only(bottomRight: Radius.circular(40.0)),
-                      image: DecorationImage(
-                        image: AssetImage(
-                          'image/userInfo_background.jpg',
-                        ),
-                        fit: BoxFit.cover,
-                      )),
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius:
+                        BorderRadius.only(bottomRight: Radius.circular(40.0)),
+                    image: DecorationImage(
+                      image: AssetImage(
+                        'image/userInfo_background.jpg',
+                      ),
+                      fit: BoxFit.cover,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(1.0),
+                        spreadRadius: 4,
+                        blurRadius: 5,
+                        offset: Offset(0, 3), // changes position of shadow
+                      ),
+                    ],
+                  ),
                 ),
                 Row(
                   children: [
@@ -171,12 +181,13 @@ class _NarBarState extends State<NarBar> {
                     const SizedBox(
                       width: 13,
                     ),
-                    Icon(
-                      onlineSwitch
-                          ? Icons.wifi_tethering
-                          : Icons.portable_wifi_off,
-                      size: 20,
-                    ),
+                    onlineSwitch
+                        ? Icon(
+                            Icons.wifi_tethering,
+                            size: 20,
+                            color: Colors.blueAccent,
+                          )
+                        : Icon(Icons.portable_wifi_off, size: 20),
                     const SizedBox(
                       width: 10,
                     ),
@@ -211,7 +222,8 @@ class _NarBarState extends State<NarBar> {
                           Transform.translate(
                             offset: Offset(0, 0),
                             child: IconButton(
-                              icon: Icon(Icons.people),
+                              icon:
+                                  Icon(Icons.people, color: Colors.blueAccent),
                               onPressed: () {},
                             ),
                           ),
@@ -228,11 +240,11 @@ class _NarBarState extends State<NarBar> {
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.star),
+                      icon: Icon(Icons.star, color: Colors.blueAccent),
                       onPressed: () {},
                     ),
                     IconButton(
-                      icon: Icon(Icons.settings),
+                      icon: Icon(Icons.settings, color: Colors.blueAccent),
                       onPressed: () {
                         Navigator.push(
                           context,
