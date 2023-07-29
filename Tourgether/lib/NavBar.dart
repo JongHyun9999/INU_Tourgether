@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tourgether/network.dart';
+import 'package:tourgether/setting.dart';
 import '../utilities/apiurl.dart';
 import 'package:badges/badges.dart' as badges;
 //import 'dart:convert';
@@ -232,7 +233,13 @@ class _NarBarState extends State<NarBar> {
                     ),
                     IconButton(
                       icon: Icon(Icons.settings),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SettingsPage()),
+                        );
+                      },
                     ),
                   ],
                 )
