@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:tourgether/setting.dart';
 
 // AWS EC2의 public ip + port
 final String myIp = "15.164.62.89";
@@ -16,12 +17,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter with Node.js',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Flutter with Node.js'),
-    );
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter with Node.js',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: SettingsPage()
+        //MyHomePage(title: 'Flutter with Node.js'),
+        );
   }
 }
 
