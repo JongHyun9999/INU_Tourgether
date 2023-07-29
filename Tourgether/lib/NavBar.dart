@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tourgether/network.dart';
-
+import '../utilities/apiurl.dart';
 import 'package:badges/badges.dart' as badges;
 //import 'dart:convert';
 
@@ -67,7 +67,7 @@ class _NarBarState extends State<NarBar> {
 
     // -------------------------------------------------------------------------
 
-    Network network = Network('http://10.0.2.2:3000/getUserInfo');
+    Network network = Network("${apiUrl.address}${apiUrl.userInfoApiUrl}");
 
     // network 통신 실시.
     var jsonData = await network.getJsonData();
@@ -82,7 +82,8 @@ class _NarBarState extends State<NarBar> {
   }
 
   updateUserStatus() async {
-    Network network = Network('http://10.0.2.2:3000/updateUserStatus');
+    Network network =
+        Network("${apiUrl.address}${apiUrl.updateUserStatusApiUrl}");
     final s = onlineSwitch ? 1 : 0;
     updateUserStatusData = {
       "user_status": s.toString(),
