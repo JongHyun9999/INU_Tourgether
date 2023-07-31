@@ -1,12 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatefulWidget {
+  void initSharedPreferences() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('notiPopularText', false);
+  }
+
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  final developerURL = Uri.parse('https://github.com/comjke33');
+
   String userMajor = '';
   String userNum = '';
   String userName = '';
@@ -14,12 +23,33 @@ class _SettingsPageState extends State<SettingsPage> {
   String userWarning = '';
   String userRegisterDate = '';
 
-  bool notiPopularText = true;
-  bool notiEvent = true;
-  bool notiComment = true;
-  bool notiChat = true;
+  bool notiPopularText = false;
+  bool notiEvent = false;
+  bool notiComment = false;
+  bool notiChat = false;
 
-  @override
+  void updateNoti() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    try {
+      notiPopularText = prefs.getBool('notiPopluarText')!;
+    } catch (err) {
+      print(err);
+    }
+  }
+
+  void _saveNoti(String where, bool newCookie) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool(where, newCookie);
+  }
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   //_saveNoti('notiPopularText', false);
+  //   updateNoti();
+  //   print("1" + notiPopularText.toString());
+  // }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -219,9 +249,11 @@ class _SettingsPageState extends State<SettingsPage> {
                       scale: 0.7,
                       child: CupertinoSwitch(
                         value: notiPopularText,
-                        onChanged: (bool value) {
-                          //print(value);
-                          notiPopularText = value;
+                        onChanged: (bool value) async {
+                          print("value: " + value.toString());
+
+                          _saveNoti('notiPopularText', value);
+                          updateNoti();
                           // 활동 상태 업데이트 함수 호출
                           //updateUserStatus();
                           //print("switch 동작함");
@@ -331,31 +363,13 @@ class _SettingsPageState extends State<SettingsPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [Text("개발자 공지사항"), Icon(Icons.arrow_forward_ios)]),
               visualDensity: VisualDensity(vertical: -3),
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text("개발자 공지사항",
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text("Kr"),
-                          Text("En"),
-                          Text("Jp"),
-                        ],
-                      ),
-                      actions: [
-                        TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text("닫기")),
-                      ],
-                    );
-                  },
-                );
+              onTap: () async {
+                if (await canLaunchUrl(developerURL)) {
+                  print('URL 실행 가능');
+                  launchUrl(developerURL);
+                } else {
+                  print("Can't launch url");
+                }
               },
             ),
             SizedBox(

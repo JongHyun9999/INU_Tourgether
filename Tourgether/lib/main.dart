@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tourgether/NavBar.dart';
+import 'package:tourgether/screens/NavBar.dart';
 
 void main() {
   runApp(const MyApp());

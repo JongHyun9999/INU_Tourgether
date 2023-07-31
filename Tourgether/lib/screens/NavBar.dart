@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tourgether/network.dart';
-import 'package:tourgether/setting.dart';
-import '../utilities/apiurl.dart';
+import 'package:tourgether/provider/network.dart';
+import 'package:tourgether/screens/setting.dart';
+import '../../utilities/apiurl.dart';
 import 'package:badges/badges.dart' as badges;
 //import 'dart:convert';
 
