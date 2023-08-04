@@ -1,27 +1,31 @@
 class MessageModel {
-  final String author;
-  final String content;
-  final double latitude;
-  final double longitude;
+  String author;
+  String content;
+  double latitude;
+  double longitude;
 
-  MessageModel({
-    required this.author,
-    required this.content,
-    required this.latitude,
-    required this.longitude,
-  });
+  String posted_time;
+  int liked;
+
+  MessageModel(
+      {required this.author,
+      required this.content,
+      required this.latitude,
+      required this.longitude,
+      required this.posted_time,
+      required this.liked});
 
   // 2023.07.09, jdk
   // API를 통해 전달받은 데이터를 Json으로 변경하는 factory 메서드.
-  factory MessageModel.fromJson(Map<String, dynamic> json) {
-    return MessageModel(
-      author: json['author'] ?? "",
-      content: json['body'] ?? "",
-      latitude: json['latitude'] ?? "",
-      longitude: json['longitude'] ?? "",
-    );
-  }
+  MessageModel.fromJson(Map<String, dynamic> json)
+      : author = json['user_id'],
+        content = json['content'],
+        latitude = json['latitude'],
+        longitude = json['longitude'],
+        posted_time = json['posted_time'],
+        liked = json['liked'];
 
+  /*
   // 2023.07.09, jdk
   // 현재 전달된 argument에 대한 Null Checking이 없으므로 주의해야 함.
   factory MessageModel.fromData(
@@ -51,4 +55,5 @@ class MessageModel {
       longitude: longitudeDouble!,
     );
   }
+  */
 }

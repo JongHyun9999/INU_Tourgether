@@ -1,25 +1,14 @@
+import 'package:geolocator/geolocator.dart';
+
 class GPSModel {
-  double? latitude;
-  double? longitude;
-  double? accuracy;
+  Position? _currentPosition;
 
-  GPSModel(double? latitudeArg, double? longitudeArg, double? accuracyArg) {
-    latitude = latitudeArg;
-    longitude = longitudeArg;
-    accuracy = accuracyArg;
-  }
+  // 2023.07.29, jdk
+  // null safety 연산자 ?를 사용하여 null일 경우 null을 return한다.
+  double? get latitude => _currentPosition?.latitude;
+  double? get longitude => _currentPosition?.longitude;
+  double? get accuracy => _currentPosition?.accuracy;
+  Position? get currentPosition => _currentPosition;
 
-  // 2023.07.10, jdk
-  // 새로운 GPS 데이터로 변경
-  void changeGPSData(
-      double? newLatitude, double? newLongtidue, double? newAccuracy) {
-    latitude = newLatitude;
-    longitude = newLongtidue;
-    accuracy = newAccuracy;
-  }
-
-  factory GPSModel.fromData(
-      double latitudeArg, double longitudeArg, double accuracyArg) {
-    return GPSModel(latitudeArg, longitudeArg, accuracyArg);
-  }
+  set currentPosition(Position? position) => _currentPosition = position;
 }

@@ -6,6 +6,7 @@ import 'package:mytourgether/screens/main_screen.dart';
 // import 'package:mytourgether/models/messageFormat.dart';
 // import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:mytourgether/screens/signin_screen.dart';
+import 'package:mytourgether/screens/user_post_list_screen.dart';
 import 'package:provider/provider.dart';
 
 // import 'package:google_fonts/google_fonts.dart';
@@ -29,9 +30,21 @@ class MyApp extends StatelessWidget {
           "/signin": (context) => const LoginSignupScreen(),
           "/main": (context) => MainScreen(),
           "/locationSetting": (context) => LocationSettingScreen(),
+          "/userPostList": (context) => UsersPostsListScreen(),
         },
         initialRoute: "/signin",
         debugShowCheckedModeBanner: false,
+
+        // 2023.08.04, jdk
+        // theme의 colorScheme Property를 이용하여 간단하게 팔레트 생성,
+        // 이후에 Theme.of(context)를 통해 색상을 꺼내 사용할 수 있도록 만든다.
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.lightBlueAccent,
+            onPrimaryContainer: Colors.blueAccent,
+          ),
+          useMaterial3: true,
+        ),
         home: LoginSignupScreen(),
       ),
     );
@@ -162,132 +175,11 @@ class MyApp extends StatelessWidget {
   // }
 
   // // 택스트 메세지 입력
-  // Future<void> inputContent(BuildContext context) {
-  //   // 다이얼로그 열기
-  //   return showDialog(
-  //       context: context,
-  //       builder: (BuildContext context) {
-  //         return AlertDialog(
-  //           title: Row(
-  //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //               children: [
-  //                 Text(
-  //                   '무엇을 남기고 싶나요?',
-  //                   style:
-  //                       TextStyle(fontSize: 12.0, fontWeight: FontWeight.w500),
-  //                 ),
-  //                 Container(
-  //                   width: 25,
-  //                   height: 25,
-  //                   child: ElevatedButton(
-  //                     style: ElevatedButton.styleFrom(
-  //                       backgroundColor: Colors.redAccent,
-  //                       shape: CircleBorder(),
-  //                     ),
-  //                     child: Icon(
-  //                       Icons.close,
-  //                       size: 10,
-  //                       color: Colors.white,
-  //                     ),
-  //                     onPressed: () {
-  //                       Navigator.of(context).pop();
-  //                     },
-  //                   ),
-  //                 )
-  //               ]),
-  //           backgroundColor: Colors.white,
-  //           shadowColor: Colors.grey,
-  //           surfaceTintColor: Colors.white,
-  //           iconColor: Colors.white,
-  //           content: Column(
-  //             mainAxisSize: MainAxisSize.min,
-  //             children: [
-  //               TextField(
-  //                 controller: contentController,
-  //                 decoration: InputDecoration(
-  //                     labelText: '내용',
-  //                     labelStyle: TextStyle(color: Colors.grey)),
-  //               )
-  //             ],
-  //           ),
-  //           actions: [
-  //             // TextButton(
-  //             //   child: Text('CANCEL',
-  //             //   style: TextStyle(
-  //             //     color: Colors.blueAccent
-  //             //   ),),
-  //             //   onPressed: () {
-  //             //     // 취소 눌렀을때
-  //             //     Navigator.of(context).pop();
-  //             //   },
-  //             // ),
-  //             TextButton(
-  //               child: Text(
-  //                 'SEND',
-  //                 style: TextStyle(color: Colors.white),
-  //               ),
-  //               style: TextButton.styleFrom(
-  //                 backgroundColor: Colors.blueAccent,
-  //                 minimumSize: Size.fromHeight(50),
-  //               ),
-  //               onPressed: () {
-  //                 // 남기기 눌렀을때
-  //                 setState(() {
-  //                   // 입력된 메세지 내용 컨트롤
-  //                   String content = contentController.text;
-  //                 });
-  //                 Navigator.of(context).pop();
-  //               },
-  //             ),
-  //           ],
-  //         );
-  //       });
-  // }
+
 
   // // pjh. 우측 하단 메뉴 다이얼 버튼.
   // // 라벨을 붙이기에 색깔 선정이 어려워서 주석처리하였습니다.
-  // Widget? floatingButtons() {
-  //   return SpeedDial(
-  //     animatedIcon: AnimatedIcons.menu_close,
-  //     visible: true,
-  //     curve: Curves.bounceIn,
-  //     backgroundColor: Colors.blueAccent,
-  //     foregroundColor: Colors.white,
-  //     overlayColor: Colors.black,
-  //     childMargin: EdgeInsets.all(20.0),
-  //     spaceBetweenChildren: 15,
-  //     children: [
-  //       SpeedDialChild(
-  //           // 글 작성하는 버튼
-  //           child: Icon(
-  //             Icons.border_color_rounded,
-  //             color: Colors.blueAccent,
-  //           ),
-  //           backgroundColor: Colors.white,
 
-  //           // label: "글 남기기",
-  //           // labelBackgroundColor: Colors.white,
-  //           // labelStyle: TextStyle(
-  //           //     fontWeight: FontWeight.bold,
-  //           //     color: Colors.blueAccent,
-  //           //     fontSize: 13),
-  //           onTap: () => inputContent(context)),
-  //       SpeedDialChild(
-  //           // 설정 버튼
-  //           child: Icon(Icons.settings, color: Colors.blueAccent),
-  //           backgroundColor: Colors.white,
-  //           // label: "설정",
-  //           // labelBackgroundColor: Colors.transparent,
-  //           // labelStyle: TextStyle(
-  //           //     fontWeight: FontWeight.w500,
-  //           //     color: Colors.white,
-  //           //     fontSize: 13),
-  //           onTap: () {
-  //             // 버튼 클릭 시
-  //           }),
-  //     ],
-  //   );
-  // }
 
 // 2023.07.27, jdk
 // 종현이가 작성한 코드를 주석으로 옮겨놓음.

@@ -624,9 +624,24 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                           //     context,
                           //     MaterialPageRoute(
                           //         builder: (context) => MainScreen()));
-                          Navigator.pushNamed(
+
+                          // ----------------------------------------
+                          // 2023.08.04, jdk
+                          // 페이지 이동 방식을 named 방식으로 변경, 
+                          // 로그인 페이지로 돌아오는 것을 막기 위하여
+                          // pushNamedAndRemoveUntil로 변경한다.
+                          //
+                          // 메서드의 세 번째 인자를 통해서
+                          // 내가 지울 Page를 지정할 수 있는 방식인데,
+                          // callback 함수에 대하여 true를 return하면
+                          // 현재 widget tree에서 지워지게 된다.
+                          // (_) => false 로 지정하면 모든 페이지를 지운다.
+                          // ----------------------------------------
+
+                          Navigator.pushNamedAndRemoveUntil(
                             context,
                             "/main",
+                            (_) => false,
                           );
                         },
                         child: Container(

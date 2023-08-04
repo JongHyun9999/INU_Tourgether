@@ -13,9 +13,15 @@ class _MapScreenState extends State<LocationSettingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text("TourGather"),
+      appBar: PreferredSize(
+        // TODO Appbar 높이 상대적으로 결정하기.
+        preferredSize: Size.fromHeight(45),
+        child: AppBar(
+          iconTheme: IconThemeData(
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+          ),
+          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        ),
       ),
       body: Column(
         children: [
@@ -35,8 +41,11 @@ class _MapScreenState extends State<LocationSettingScreen> {
                       Provider.of<GPSProvider>(context, listen: false)
                           .startGPSCallback();
                     },
-                    child: const Text(
+                    child: Text(
                       "GPS ON",
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
                     ),
                   ),
                 ),
@@ -51,8 +60,11 @@ class _MapScreenState extends State<LocationSettingScreen> {
                       Provider.of<GPSProvider>(context, listen: false)
                           .endGPSCallback();
                     },
-                    child: const Text(
+                    child: Text(
                       "GPS OFF",
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
                     ),
                   ),
                 )
@@ -68,8 +80,10 @@ class _MapScreenState extends State<LocationSettingScreen> {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          "Latitude : ${Provider.of<GPSProvider>(context).latitude}",
+                        Consumer<GPSProvider>(
+                          builder: (context, gpsProvider, child) {
+                            return Text("Latitude : ${gpsProvider.latitude}");
+                          },
                         ),
                         const SizedBox(
                           width: 20,
@@ -83,8 +97,11 @@ class _MapScreenState extends State<LocationSettingScreen> {
                       margin: const EdgeInsets.only(
                         top: 20,
                       ),
-                      child: Text(
-                        "Interval : ${Provider.of<GPSProvider>(context).streamInterval}",
+                      child: Consumer<GPSProvider>(
+                        builder: (context, gpsProvider, child) {
+                          return Text(
+                              "StreamInterval : ${gpsProvider.streamInterval}");
+                        },
                       ),
                     ),
                     const SizedBox(
@@ -94,8 +111,10 @@ class _MapScreenState extends State<LocationSettingScreen> {
                       margin: const EdgeInsets.only(
                         top: 20,
                       ),
-                      child: Text(
-                        "Accuracy : ${Provider.of<GPSProvider>(context).accuracy}",
+                      child: Consumer<GPSProvider>(
+                        builder: (context, gpsProvider, child) {
+                          return Text("Accuracy : ${gpsProvider.accuracy}");
+                        },
                       ),
                     ),
                   ],
