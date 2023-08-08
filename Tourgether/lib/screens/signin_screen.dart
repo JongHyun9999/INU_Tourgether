@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mytourgether/main.dart';
-import 'package:mytourgether/screens/main_screen.dart';
+import 'package:TourGather/main.dart';
+import 'package:TourGather/screens/main_screen.dart';
+
+import '../utilities/color_palette.dart';
 
 class Palette {
   static const Color iconColor = Color(0xFFB6C7D1);
@@ -48,6 +50,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
   String userDepartment = '';
   String userStudentNumber = '';
   String userEmail = '';
+
   void _tryValidation() {
     // 로그인 인증 부분.
     // 일단 프리패스로 작성
@@ -627,7 +630,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
 
                           // ----------------------------------------
                           // 2023.08.04, jdk
-                          // 페이지 이동 방식을 named 방식으로 변경, 
+                          // 페이지 이동 방식을 named 방식으로 변경,
                           // 로그인 페이지로 돌아오는 것을 막기 위하여
                           // pushNamedAndRemoveUntil로 변경한다.
                           //

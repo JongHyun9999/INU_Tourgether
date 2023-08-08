@@ -145,6 +145,7 @@ app.post('/api/postUserContent', async (req, res) => {
   console.log('postData : ', postData);
 
   const user_id = postData.user_id;
+  const title = postData.title;
   const content = postData.content;
   let posted_time = new Date(postData.posted_time);
   posted_time = posted_time.toISOString().slice(0, 19).replace('T', ' ');
@@ -153,6 +154,7 @@ app.post('/api/postUserContent', async (req, res) => {
   const longitude = postData.longitude;
 
   console.log(user_id);
+  console.log(title);
   console.log(content);
   console.log(posted_time);
   console.log(latitude);
@@ -161,8 +163,8 @@ app.post('/api/postUserContent', async (req, res) => {
   let conn = null;
   try {
 
-    let QUERY_STR = `INSERT INTO User_Posts(user_id, content, posted_time, latitude, longitude) \ 
-                        VALUES('${user_id}', '${content}', '${posted_time}', '${latitude}', '${longitude}');`;
+    let QUERY_STR = `INSERT INTO User_Posts(user_id, title, content, posted_time, latitude, longitude) \ 
+                        VALUES('${user_id}', '${title}', '${content}', '${posted_time}', '${latitude}', '${longitude}');`;
 
     conn = await new Promise((resolve, reject) => {
       pool.getConnection((err, connection) => {
@@ -170,6 +172,7 @@ app.post('/api/postUserContent', async (req, res) => {
         resolve(connection);
       });
     }).catch((err) => {
+      console.log("?");
       throw err;
     })
 
@@ -177,6 +180,8 @@ app.post('/api/postUserContent', async (req, res) => {
     console.log('Successfully uploaded the content on DB. [/api/postUserContent]');
     res.status(200).json(rows);
   } catch (err) {
+    console.log(err);
+
     res.status(404).json({
       error: "An error occurred while /api/postUserContent"
     });
@@ -190,7 +195,7 @@ app.get('/api/getUsersPostsList', async (req, res) => {
   let conn = null;
   try {
 
-    let QUERY_STR = `SELECT user_id, content, posted_time, liked, latitude, longitude FROM User_Posts order by posted_time desc;`;
+    let QUERY_STR = `SELECT user_id, title, content, posted_time, liked, latitude, longitude FROM User_Posts order by posted_time desc;`;
 
     conn = await new Promise((resolve, reject) => {
       pool.getConnection((err, connection) => {

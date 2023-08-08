@@ -1,16 +1,17 @@
+import 'package:TourGather/utilities/color_palette.dart';
 import 'package:flutter/material.dart';
 
 class UserPostDetailScreen extends StatefulWidget {
   UserPostDetailScreen({
     super.key,
-    required this.author,
+    required this.user_id,
     required this.content,
     required this.latitude,
     required this.longitude,
     required this.liked,
     required this.posted_time,
   });
-  final String author;
+  final String user_id;
   final String content;
   final double latitude;
   final double longitude;
@@ -26,19 +27,19 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(45),
+        preferredSize: Size.fromHeight(50),
         child: AppBar(
           iconTheme: IconThemeData(
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            color: ColorPalette.onPrimaryContainer,
           ),
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+          backgroundColor: ColorPalette.primaryContainer,
         ),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("${widget.author}"),
+            Text("${widget.user_id}"),
             Text("${widget.content}"),
             Text("${widget.latitude}"),
             Text("${widget.longitude}"),

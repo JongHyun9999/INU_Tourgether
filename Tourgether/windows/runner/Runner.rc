@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "mytourgether" "\0"
+            VALUE "FileDescription", "TourGather" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "mytourgether" "\0"
+            VALUE "InternalName", "TourGather" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "mytourgether.exe" "\0"
-            VALUE "ProductName", "mytourgether" "\0"
+            VALUE "OriginalFilename", "TourGather.exe" "\0"
+            VALUE "ProductName", "TourGather" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

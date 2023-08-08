@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 -->
     <application
-        android:label="mytourgether"
+        android:label="TourGather"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 

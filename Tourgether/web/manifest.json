@@ -1,6 +1,6 @@
 {
-    "name": "mytourgether",
-    "short_name": "mytourgether",
+    "name": "TourGather",
+    "short_name": "TourGather",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

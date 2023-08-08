@@ -1,6 +1,7 @@
+import 'package:TourGather/utilities/color_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'package:mytourgether/screens/user_post_detail_screen.dart';
+import 'package:TourGather/screens/user_post_detail_screen.dart';
 import '../models/message_model.dart';
 import '../services/post_services.dart';
 
@@ -16,22 +17,27 @@ class _UserPostListScreenState extends State<UsersPostsListScreen> {
     printer: PrettyPrinter(),
   );
 
+  // 2023.08.07, jdk
+  // 특정 글꼴로 Text를 생성할 수 있는
+  // Utility 생성 필요함.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(45),
+          preferredSize: Size.fromHeight(50),
           child: AppBar(
             title: Text(
-              "POST LIST",
+              "자유 게시판",
               style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimaryContainer),
+                color: ColorPalette.whiteColor,
+                fontFamily: 'Pretendard',
+              ),
             ),
             centerTitle: true,
             iconTheme: IconThemeData(
-              color: Theme.of(context).colorScheme.onPrimaryContainer,
+              color: ColorPalette.onPrimaryContainer,
             ),
-            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+            backgroundColor: ColorPalette.primaryContainer,
           ),
         ),
         body: Container(
@@ -45,35 +51,68 @@ class _UserPostListScreenState extends State<UsersPostsListScreen> {
                   ),
                 );
               } else if (snapshot.hasData) {
-                logger.d("${snapshot.data![0].author}");
                 return ListView.builder(
-                  itemCount: snapshot.data!.length,
+                  itemCount: snapshot.data?.length,
                   itemBuilder: (context, index) {
-                    return ListTile(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => UserPostDetailScreen(
-                              author: snapshot.data![index].author,
-                              content: snapshot.data![index].content,
-                              latitude: snapshot.data![index].latitude,
-                              longitude: snapshot.data![index].longitude,
-                              liked: snapshot.data![index].liked,
-                              posted_time: snapshot.data![index].posted_time,
+                    return Card(
+                      color: ColorPalette.secondaryContainer,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(0),
+                      ),
+                      margin: EdgeInsets.symmetric(vertical: 1),
+                      elevation: 5,
+                      child: ListTile(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => UserPostDetailScreen(
+                                user_id: snapshot.data![index].user_id,
+                                content: snapshot.data![index].content,
+                                latitude: snapshot.data![index].latitude,
+                                longitude: snapshot.data![index].longitude,
+                                liked: snapshot.data![index].liked,
+                                posted_time: snapshot.data![index].posted_time,
+                              ),
                             ),
+                          );
+                        },
+                        title: Text(
+                          "${snapshot.data![index].title}",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontFamily: 'Pretendard',
                           ),
-                        );
-                      },
-                      title: Text("${snapshot.data![index].content}"),
-                      leading: Text("${snapshot.data![index].author}"),
-                      subtitle: Text("${snapshot.data![index].posted_time}"),
-                      trailing: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text("${snapshot.data![index].latitude}"),
-                          Text("${snapshot.data![index].longitude}"),
-                        ],
+                        ),
+                        subtitle: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              "${snapshot.data![index].posted_time}",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontFamily: 'Pretendard',
+                              ),
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              "${snapshot.data![index].user_id}",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontFamily: 'Pretendard',
+                              ),
+                            ),
+                          ],
+                        ),
+                        trailing: Text(
+                          "인천대학교 어딘가",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontFamily: 'Pretendard',
+                          ),
+                        ),
                       ),
                     );
                   },

@@ -1,4 +1,4 @@
-name: mytourgether
+name: TourGather
 description: A new Flutter project.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -44,6 +44,11 @@ dependencies:
   provider: ^6.0.5
   logger: ^2.0.1
   http: ^1.1.0
+  font_awesome_flutter: ^10.5.0
+  flutter_native_splash: ^2.3.1
+  flutter_launcher_icons: ^0.13.1
+  fluttertoast: ^8.2.2
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:
@@ -55,6 +60,26 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+
+flutter_native_splash:
+  color: "#5EB6E4"
+  dark_color: "#5EB6E4"
+  fullscreen: true
+  android: true
+  ios: true
+  image: images/TourGather-Logo.png
+  dark_image: images/TourGather-Logo.png
+
+  android_12:
+    image: images/TourGather-Logo.png
+    icon_background_color: "#5EB6E4"
+    dark_image: images/TourGather-Logo.png 
+    icon_background_color_dark: "#5EB6E4"
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "images/TourGather-Logo.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

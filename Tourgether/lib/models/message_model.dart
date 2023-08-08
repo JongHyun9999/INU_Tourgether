@@ -1,14 +1,15 @@
 class MessageModel {
-  String author;
+  String user_id;
+  String title;
   String content;
   double latitude;
   double longitude;
-
   String posted_time;
   int liked;
 
   MessageModel(
-      {required this.author,
+      {required this.user_id,
+      required this.title,
       required this.content,
       required this.latitude,
       required this.longitude,
@@ -18,7 +19,8 @@ class MessageModel {
   // 2023.07.09, jdk
   // API를 통해 전달받은 데이터를 Json으로 변경하는 factory 메서드.
   MessageModel.fromJson(Map<String, dynamic> json)
-      : author = json['user_id'],
+      : user_id = json['user_id'],
+        title = json['title'],
         content = json['content'],
         latitude = json['latitude'],
         longitude = json['longitude'],

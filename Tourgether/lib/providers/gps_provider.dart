@@ -3,7 +3,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:mytourgether/models/gps_model.dart';
+import 'package:TourGather/models/gps_model.dart';
 import 'package:logger/logger.dart';
 
 // 2023.07.10 jdk
@@ -30,13 +30,16 @@ class GPSProvider with ChangeNotifier {
   // 2023.07.29, jdk
   // 쪽지를 작성할 때 현재 위치를 기록하기 위한 위치 변수
   // 쪽지 작성하기 버튼을 눌렀을 때 현재 위치를 기록한다.
-  late double currentLatitudeForLetter;
-  late double currentLongitudeForLetter;
+  double? currentLatitudeForPost;
+  double? currentLongitudeForPost;
 
   DateTime? _startTime;
   DateTime? _endTime;
   Duration? _streamInterval;
   Duration? get streamInterval => _streamInterval;
+
+  bool _isLoadingGPS = false;
+  bool get isLoadingGPS => _isLoadingGPS;
 
   bool _isListeningGPSPositionStream = false;
   bool get isListeningGPSPositionStream => _isListeningGPSPositionStream;
@@ -54,6 +57,9 @@ class GPSProvider with ChangeNotifier {
 
   // 2023.07.10, jdk
   startGPSCallback() async {
+    _isLoadingGPS = true;
+    notifyListeners();
+
     LocationPermission? permission;
 
     // LocationService 사용 가능 여부 확인
@@ -107,6 +113,7 @@ class GPSProvider with ChangeNotifier {
 
         if (newPosition != null) {
           _gpsModel.currentPosition = newPosition;
+          _isLoadingGPS = false;
 
           // 새로운 Position 데이터가 들어왔으므로, 구독자들에게 알려주어야 함.
           notifyListeners();
@@ -125,9 +132,9 @@ class GPSProvider with ChangeNotifier {
               _streamInterval = _endTime!.difference(_startTime!);
               _gpsModel.currentPosition = newPosition;
 
-              logger.d(
-                "A new GPS data has arrived\nlatitude : ${_gpsModel.latitude}\nlongitude : ${_gpsModel.longitude}\naccuracy : ${_gpsModel.accuracy}\nstreamInterval : ${streamInterval}",
-              );
+              // logger.d(
+              //   "A new GPS data has arrived\nlatitude : ${_gpsModel.latitude}\nlongitude : ${_gpsModel.longitude}\naccuracy : ${_gpsModel.accuracy}\nstreamInterval : ${streamInterval}",
+              // );
 
               notifyListeners();
               _startTime = DateTime.now();
@@ -172,5 +179,10 @@ class GPSProvider with ChangeNotifier {
             time: DateTime.now());
       });
     }
+  }
+
+  setCurrentPositionForPost() {
+    currentLatitudeForPost = latitude;
+    currentLongitudeForPost = longitude;
   }
 }

@@ -1,17 +1,25 @@
+import 'package:TourGather/providers/main_screen_ui_provider.dart';
+import 'package:TourGather/utilities/color_palette.dart';
 import 'package:flutter/material.dart';
-import 'package:mytourgether/providers/gps_provider.dart';
-import 'package:mytourgether/screens/location_setting_screen.dart';
-import 'package:mytourgether/screens/main_screen.dart';
+import 'package:TourGather/providers/gps_provider.dart';
+import 'package:TourGather/screens/location_setting_screen.dart';
+import 'package:TourGather/screens/main_screen.dart';
 // import 'package:like_button/like_button.dart';
-// import 'package:mytourgether/models/messageFormat.dart';
+// import 'package:TourGather/models/messageFormat.dart';
 // import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:mytourgether/screens/signin_screen.dart';
-import 'package:mytourgether/screens/user_post_list_screen.dart';
+import 'package:TourGather/screens/signin_screen.dart';
+import 'package:TourGather/screens/user_post_list_screen.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 
 // import 'package:google_fonts/google_fonts.dart';
 
 void main() {
+  // 2023.08.06, jdk
+  // Splash Screen이 Initialization 시간 동안 유지되도록 만드는 설정.
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  Future.delayed(Duration(seconds: 2), FlutterNativeSplash.remove);
   runApp(MyApp());
 }
 
@@ -22,7 +30,10 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (context) => GPSProvider(),
-        )
+        ),
+        ChangeNotifierProvider(
+          create: (context) => MainScreenUIProvider(),
+        ),
       ],
       child: MaterialApp(
         title: 'TourGather',
@@ -41,7 +52,11 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
             seedColor: Colors.lightBlueAccent,
-            onPrimaryContainer: Colors.blueAccent,
+            primaryContainer: Color(0xffE1F5FE),
+            onPrimaryContainer: Color(0xff1E88E5),
+            secondary: Color(0xff424242),
+            secondaryContainer: Color(0xff42A5F5),
+            onSecondaryContainer: Colors.white,
           ),
           useMaterial3: true,
         ),
