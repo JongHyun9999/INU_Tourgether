@@ -1,5 +1,6 @@
 import 'package:TourGather/providers/main_screen_ui_provider.dart';
 import 'package:TourGather/utilities/color_palette.dart';
+import 'package:TourGather/widgets/app_bars.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:TourGather/providers/gps_provider.dart';
@@ -43,8 +44,6 @@ class _MainScreenState extends State<MainScreen> {
   TransformationController _transformationController =
       TransformationController();
 
-  double currentScaleValue = 1;
-
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -53,137 +52,28 @@ class _MainScreenState extends State<MainScreen> {
     final double bottomNavigationBarHeight = 60;
     final double appBarHeight = 50;
 
-    final gpsProvider = Provider.of<GPSProvider>(context);
+    final gpsProvider = Provider.of<GPSProvider>(context, listen: false);
+    final mainScreenUIProvider =
+        Provider.of<MainScreenUIProvider>(context, listen: false);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(appBarHeight),
-        child: AppBar(
-          // 2023.08.07, jdk
-          // Circular Border AppBar
-          // shape: RoundedRectangleBorder(
-          //   borderRadius: BorderRadius.vertical(
-          //     bottom: Radius.circular(30),
-          //   ),
-          // ),
-          backgroundColor: ColorPalette.primaryContainer,
-          leading: IconButton(
-            iconSize: 30,
-            onPressed: () {},
-            icon: Icon(
-              Icons.menu,
-              color: ColorPalette.onPrimaryContainer,
-            ),
-          ),
-          actions: [
-            IconButton(
-              iconSize: 30,
-              onPressed: () {
-                Navigator.pushNamed(
-                  context,
-                  "/locationSetting",
-                );
-              },
-              icon: Icon(
-                Icons.location_on,
-                color: ColorPalette.primaryContainer,
-              ),
-            )
-          ],
-        ),
-      ),
+      // appBar: (Provider.of<MainScreenUIProvider>(context).isAppBarVisible)
+      //     ? getAppBar(context, appBarHeight)
+      //     : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       extendBody: true,
-      floatingActionButton: showFloatingActionButton(
-        context,
-        gpsProvider.isListeningGPSPositionStream,
-      ),
-      bottomNavigationBar: Container(
-        height: bottomNavigationBarHeight,
-        child: BottomAppBar(
-          color: ColorPalette.primaryContainer,
-          shape: CircularNotchedRectangle(),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                flex: 1,
-                child: Container(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          Navigator.pushNamed(
-                            context,
-                            "/userPostList",
-                          );
-                        },
-                        icon: FaIcon(
-                          FontAwesomeIcons.listUl,
-                          color: ColorPalette.onPrimaryContainer,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Flexible(
-                flex: 1,
-                child: Container(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      IconButton(
-                        onPressed: () {},
-                        icon: FaIcon(
-                          FontAwesomeIcons.solidComments,
-                          color: ColorPalette.onPrimaryContainer,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Flexible(
-                flex: 1,
-                child: Container(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      IconButton(
-                        onPressed: () {},
-                        icon: FaIcon(
-                          FontAwesomeIcons.userGroup,
-                          color: ColorPalette.onPrimaryContainer,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Flexible(
-                flex: 1,
-                child: Container(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        onPressed: () {},
-                        icon: FaIcon(
-                          FontAwesomeIcons.trophy,
-                          color: ColorPalette.onPrimaryContainer,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      floatingActionButton:
+          (Provider.of<MainScreenUIProvider>(context).isAppBarVisible)
+              ? showFloatingActionButton(
+                  context,
+                  gpsProvider.isListeningGPSPositionStream,
+                )
+              : null,
+      bottomNavigationBar:
+          (Provider.of<MainScreenUIProvider>(context).isAppBarVisible)
+              ? getBottomAppBar(context, bottomNavigationBarHeight)
+              : null,
       body: Center(
         child: Stack(
           children: [
@@ -195,13 +85,67 @@ class _MainScreenState extends State<MainScreen> {
                 height: backgroundImageHeight,
                 child: InteractiveViewer(
                   transformationController: _transformationController,
+                  onInteractionStart: (details) {
+                    logger.d("OnInteractionStart Callback Function Called.");
+                  },
+                  onInteractionUpdate: (details) {
+                    // onInteractionUpdate Callback이 실행될 경우,
+                    // MainScreenUIProvider에서 isUserInteractingWithMap
+                    // flag를 set한다. 이를 통해 onInteractionEnd에서
+                    // 동작을 구분한다.
+
+                    if (mainScreenUIProvider.isUserInteractingWithMap ==
+                        false) {
+                      mainScreenUIProvider.isUserInteractingWithMap = true;
+                    }
+
+                    // 유저가 InteractiveVeiwer와 상호작용 하는 상태.
+                    if (mainScreenUIProvider.isAppBarVisible == true) {
+                      logger.d("check-4");
+                      mainScreenUIProvider.changeAppBarsVisibility();
+                    }
+                  },
                   onInteractionEnd: (details) {
+                    logger.d("OnInteractionEnd Callback Function Called.");
+
                     double correctScaleValue =
                         _transformationController.value.getMaxScaleOnAxis();
 
-                    if (correctScaleValue != currentScaleValue) {
-                      currentScaleValue = correctScaleValue;
-                      logger.d("currentScaleValue : $currentScaleValue");
+                    // 2023.08.09, jdk
+                    // Scale Level의 변화를 체크하는 파트.
+                    // 만약 Scale Level이 달라진다면, MainScreenUIProvider의 변수인
+                    // currentScaleValue를 갱신한다. 이후에는 확대 레벨에 맞춰서
+                    // InteractiveViewer에 대한 margin 값을 조정하면 된다.
+                    if (correctScaleValue !=
+                        mainScreenUIProvider.currentScaleValue) {
+                      mainScreenUIProvider.currentScaleValue =
+                          correctScaleValue;
+
+                      logger.d(
+                        "currentScaleValue : ${mainScreenUIProvider.currentScaleValue}",
+                      );
+                    }
+
+                    // 유저가 화면을 한 번 터치한 상태.
+                    if (mainScreenUIProvider.isUserInteractingWithMap ==
+                        false) {
+                      // 유저가 화면을 한 번 터치했는데, appBar가 invisible인 상태였다면
+                      // changeAppBarsVisibility()를 실행한다.
+                      logger.d("check-1");
+
+                      if (mainScreenUIProvider.isAppBarVisible == false) {
+                        logger.d("check-2");
+
+                        mainScreenUIProvider.changeAppBarsVisibility();
+                      }
+                    } else if (mainScreenUIProvider.isUserInteractingWithMap ==
+                        true) {
+                      mainScreenUIProvider.isUserInteractingWithMap = false;
+                      if (mainScreenUIProvider.isAppBarVisible == false) {
+                        logger.d("check-2");
+
+                        mainScreenUIProvider.changeAppBarsVisibility();
+                      }
                     }
                   },
                   scaleEnabled: true,
@@ -211,9 +155,7 @@ class _MainScreenState extends State<MainScreen> {
                   // 지도 위치 조정 과정 확인 필요
                   boundaryMargin: EdgeInsets.fromLTRB(
                     (backgroundImageWidth - screenWidth) / 2,
-                    (backgroundImageHeight - screenHeight) / 2 +
-                        appBarHeight +
-                        statusBarHeight,
+                    (backgroundImageHeight - screenHeight) / 2,
                     (backgroundImageWidth - screenWidth) / 2,
                     (backgroundImageHeight - screenHeight) / 2 + 20,
                     // 원래는 BottomNavigationBarHeight만큼 더해야 하나,
@@ -400,7 +342,10 @@ class _MainScreenState extends State<MainScreen> {
     // ----------------------------------------------------------------
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+
     final gpsProvider = Provider.of<GPSProvider>(context, listen: false);
+
+    // GPSProvider를 통해서 현재 사용자의 위치를 가져온다.
     gpsProvider.setCurrentPositionForPost();
 
     // ------------------------------------------------------------------------
