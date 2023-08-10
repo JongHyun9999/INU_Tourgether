@@ -34,7 +34,7 @@ class Network {
     // body부분에 json 데이터를 보낸다.
     // map형으로 가져와서 jsonEncode 명령어를 이용해서 json형으로 바꾼 후 보내도 된다.
     //print("send!");
-    print(data);
+    //print(data);
 
     // --------------------------------------------------------
     // 2023.07.29, jdk
@@ -64,9 +64,11 @@ class Network {
     // check the status code for the result
     if (response.statusCode == 201) {
       print(response.body);
+    } else if (response.statusCode == 200) {
+      print("UpdateUserStatus 완료: " + data['user_status'].toString());
     } else {
       print('Request failed with status: ${response.statusCode}.');
     }
-    return json.decode(utf8.decode(response.bodyBytes));
+    //return json.decode(utf8.decode(response.bodyBytes));
   }
 }

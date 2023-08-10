@@ -166,7 +166,7 @@ app.get('/getUserInfo', (req, res) => {
       }
 
       console.log("DB query succesfully");
-
+      console.log(response)
       if (response) {
         res.status(200).json({
           user_info: response
@@ -176,6 +176,7 @@ app.get('/getUserInfo', (req, res) => {
         console.log('can not receive response');
       }
     })
+    
   })
 })
 
