@@ -23,11 +23,17 @@ class MainScreenUIProvider with ChangeNotifier {
 
   // InteractiveViewer Variables
   double _currentScaleValue = 1;
+  double _currentMapPositionX = 0;
+  double _currentMapPositionY = 0;
 
   double get currentScaleValue => _currentScaleValue;
-  set currentScaleValue(double currentScaleValue) {
-    _currentScaleValue = currentScaleValue;
-  }
+  double get currentMapPositionX => _currentMapPositionX;
+  double get currentMapPositionY => _currentMapPositionY;
+
+  set currentScaleValue(double currentScaleValue) =>
+      _currentScaleValue = currentScaleValue;
+  set currentMapPositionX(double currentMapPositionX) => _currentMapPositionX;
+  set currentMapPositionY(double currentMapPositionY) => _currentMapPositionY;
 
   // Post Methods
   void detectEmptyTextField(bool isTitleEmpty, bool isContentEmpty) {
@@ -51,16 +57,45 @@ class MainScreenUIProvider with ChangeNotifier {
   void changeAppBarsVisibility() {
     print("$isAppBarVisible");
 
-    if (isAppBarVisible == true) {
-      isAppBarVisible = false;
-    } else if (isAppBarVisible == false) {
-      isAppBarVisible = true;
-    }
-
-    print("$isAppBarVisible");
+    isAppBarVisible = !isAppBarVisible;
 
     notifyListeners();
-    print(
-        "--- changeAppBarVisibility() is called on MainScreenUIProvider.\ncurrent isAppBarVisible : $isAppBarVisible");
   }
+
+  /* 
+  void changeCurrentScaleValue(double newScaleValue) {
+    _currentScaleValue = newScaleValue;
+  }
+
+  bool compareNewScaleValueWithPrev(double newScaleValue) {
+    print("currentScaleValue $_currentScaleValue");
+    print("newScaleValue $newScaleValue");
+
+    return (_currentScaleValue == newScaleValue);
+  }
+
+  void changeMapPosition(double newMapPositionX, double newMapPositionY) {
+    _currentMapPositionX = newMapPositionX;
+    _currentMapPositionY = newMapPositionY;
+  }
+
+  // 새로운 Position이 이전의 Position과 같은지 비교하는 함수.
+  bool compareNewPositionWithPrev(
+    double newMapPositionX,
+    double newMapPositionY,
+  ) {
+    print("newPosX : ${newMapPositionX}");
+    print("newPosY : ${newMapPositionY}");
+
+    print("currentPosX : ${currentMapPositionX}");
+    print("currentPosY : ${currentMapPositionY}");
+
+    bool isEqual = (_currentMapPositionX == newMapPositionX) &&
+        (_currentMapPositionY == newMapPositionY);
+
+    print("isEqual : $isEqual");
+
+    return isEqual;
+  }
+  */
 }
