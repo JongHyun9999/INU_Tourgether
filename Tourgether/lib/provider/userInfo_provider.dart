@@ -10,15 +10,16 @@ class UserInfoProvider extends ChangeNotifier {
   String _userEmail = "null";
   String _userBadge = "null";
   String _userNum = "null";
-  int _userStatus = 0;
+  bool _user_map_visibility_status = false;
+  int _show_online_status_type = 0;
 
   String get userMajor => _userMajor;
   String get userName => _userName;
   String get userEmail => _userEmail;
   String get userBadge => _userBadge;
   String get userNum => _userNum;
-  int get userStatus => _userStatus;
-
+  bool get user_map_visibility_status => _user_map_visibility_status;
+  int get show_online_status_type => _show_online_status_type;
   // 테스트 데이터를 가져오는 메서드1
   void getTestData() async {
     // 2023.07.29, comjke33
@@ -36,7 +37,7 @@ class UserInfoProvider extends ChangeNotifier {
 
     // 2. Network Class를 Singleton Class로 생성하기.
     // 전역 변수를 예시로 생각해보자. 현재 getTestData() 메서드와
-    // updateUserStatus 메서드는 각 메서드 내에서 Network의 객체를 새롭게 생성하고 있다.
+    // update_user_map_visibility_status 메서드는 각 메서드 내에서 Network의 객체를 새롭게 생성하고 있다.
     // 이것은 메서드가 실행될 때마다 새로운 객체를 만들고 메서드의 실행이 끝나면
     // 해당 객체들의 할당을 해제하는 방식이므로, 다소 비효율적이라고 할 수 있다.
     // 따라서 Network Class를 전역적인 변수(OOP에서는 Singleton Pattern 이라고 함.)로 생성,
@@ -50,7 +51,10 @@ class UserInfoProvider extends ChangeNotifier {
     _userMajor = await jsonData['user_info'][0]["user_major"];
     _userName = await jsonData['user_info'][0]["user_name"];
     _userNum = await jsonData['user_info'][0]['user_schoolnum'].toString();
-    _userStatus = await jsonData['user_info'][0]['user_status'];
+    _user_map_visibility_status =
+        await jsonData['user_info'][0]['user_map_visibility_status'] == 1;
+    _show_online_status_type =
+        await jsonData['user_info'][0]['show_online_status_type'];
     _userEmail = await jsonData['user_info'][0]['user_Email'];
     _userBadge = await jsonData['user_info'][0]['user_Badge'];
     print("userInfo 정보 받아오기 성공");
@@ -59,16 +63,17 @@ class UserInfoProvider extends ChangeNotifier {
   }
 
   // 사용자 상태 정보 업데이트 메서드2
-  void updateUserStatus(String userNum, bool _userOnline) {
-    _userOnline ? this._userStatus = 1 : this._userStatus = 0;
+  void update_user_map_visibility_status(String userNum, bool _userOnline) {
+    this._user_map_visibility_status = _userOnline;
 
-    Network network =
-        Network("${apiUrl.address}${apiUrl.updateUserStatusApiUrl}");
-    Map<String, String> updateUserStatusData = {
-      "user_status": _userStatus.toString(),
+    Network network = Network(
+        "${apiUrl.address}${apiUrl.update_user_map_visibility_statusApiUrl}");
+    Map<String, String> update_user_map_visibility_statusData = {
+      "user_map_visibility_status": _user_map_visibility_status ? "1" : "0",
       "user_schoolnum": userNum
     };
-    network.updateUserStatus(updateUserStatusData);
+    network.update_user_map_visibility_status(
+        update_user_map_visibility_statusData);
 
     notifyListeners();
   }

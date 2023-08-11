@@ -255,7 +255,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           _saveNoti('notiPopularText', value);
                           updateNoti();
                           // 활동 상태 업데이트 함수 호출
-                          //updateUserStatus();
+                          //update_user_map_visibility_status();
                           //print("switch 동작함");
                           setState(() {});
                         },
@@ -278,7 +278,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           //print(value);
                           notiComment = value;
                           // 활동 상태 업데이트 함수 호출
-                          //updateUserStatus();
+                          //update_user_map_visibility_status();
                           //print("switch 동작함");
                           setState(() {});
                         },
@@ -301,7 +301,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           //print(value);
                           notiChat = value;
                           // 활동 상태 업데이트 함수 호출
-                          //updateUserStatus();
+                          //update_user_map_visibility_status();
                           //print("switch 동작함");
                           setState(() {});
                         },
@@ -324,7 +324,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           //print(value);
                           notiEvent = value;
                           // 활동 상태 업데이트 함수 호출
-                          //updateUserStatus();
+                          //update_user_map_visibility_status();
                           //print("switch 동작함");
                           setState(() {});
                         },

@@ -48,12 +48,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-        drawer: const NarBar(),
-        appBar: AppBar(
-          title: const Text("사용자 정보 위젯 실습"),
-        ),
-        body: Center(
-          child: Text("${Provider.of<UserInfoProvider>(context).userName}"),
-        ));
+      drawer: const NarBar(),
+      appBar: AppBar(
+        title: const Text("사용자 정보 위젯 실습"),
+      ),
+    );
   }
 }

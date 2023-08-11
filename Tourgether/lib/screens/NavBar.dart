@@ -61,7 +61,7 @@ class _NarBarState extends State<NarBar> {
 
   // 2. Network Class를 Singleton Class로 생성하기.
   // 전역 변수를 예시로 생각해보자. 현재 getTestData() 메서드와
-  // updateUserStatus 메서드는 각 메서드 내에서 Network의 객체를 새롭게 생성하고 있다.
+  // update_user_map_visibility_status 메서드는 각 메서드 내에서 Network의 객체를 새롭게 생성하고 있다.
   // 이것은 메서드가 실행될 때마다 새로운 객체를 만들고 메서드의 실행이 끝나면
   // 해당 객체들의 할당을 해제하는 방식이므로, 다소 비효율적이라고 할 수 있다.
   // 따라서 Network Class를 전역적인 변수(OOP에서는 Singleton Pattern 이라고 함.)로 생성,
@@ -164,7 +164,9 @@ class _NarBarState extends State<NarBar> {
                     const SizedBox(
                       width: 13,
                     ),
-                    Provider.of<UserInfoProvider>(context).userStatus == 1
+                    Provider.of<UserInfoProvider>(context)
+                                .user_map_visibility_status ==
+                            1
                         ? Icon(
                             Icons.wifi_tethering,
                             size: 20,
@@ -182,19 +184,18 @@ class _NarBarState extends State<NarBar> {
                       width: 10,
                     ),
                     Switch(
-                      // 만약 스위치를 사용자가 조작했다면, updateUserStatus 메서드를 호출해서
+                      // 만약 스위치를 사용자가 조작했다면, update_user_map_visibility_status 메서드를 호출해서
                       // 현재 사용자의 Status를 업데이트함.
                       onChanged: (bool isOnline) {
                         // 활동 상태 업데이트 함수 호출
                         Provider.of<UserInfoProvider>(context, listen: false)
-                            .updateUserStatus(
+                            .update_user_map_visibility_status(
                                 context.read<UserInfoProvider>().userNum,
                                 isOnline);
                       },
                       // 지금 DB에 저장된 Status가 참인지 거짓인지 확인해서 넣어둠
-                      value:
-                          Provider.of<UserInfoProvider>(context).userStatus ==
-                              1,
+                      value: Provider.of<UserInfoProvider>(context)
+                          .user_map_visibility_status,
                       activeColor: Colors.green,
                     ),
                   ],
