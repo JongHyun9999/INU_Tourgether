@@ -2,14 +2,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'dart:convert' as convert;
-import 'package:logger/logger.dart';
 import '../models/message_model.dart';
+import '../utilities/log.dart';
 
 class PostServices {
-  static var logger = Logger(
-    printer: PrettyPrinter(),
-  );
-
   static Map<String, String> headers = {
     'Content-Type': 'application/json; charset=UTF-8',
   };
@@ -17,9 +13,11 @@ class PostServices {
   static const baseUrl = "http://10.0.2.2:3000";
   static const String postUserContentUrl = "/api/postUserContent";
   static const String getUsersPostsListUrl = "/api/getUsersPostsList";
+  static const String pressedLikeButtonUrl = "/api/pressedLikeButton";
+  static const String isPressedPostLikeUrl = "/api/isPressedPostLike";
 
   static Future<bool> postUserContent(Map<String, dynamic> postData) async {
-    logger.d(
+    Log.logger.d(
         "postUserContent : URL[${baseUrl + postUserContentUrl}]\npassed data : ${postData}");
 
     String jsonData = jsonEncode(postData);
@@ -33,23 +31,23 @@ class PostServices {
       )
           .then((response) {
         if (response.statusCode == 200) {
-          logger.d("A post successfully uploaded on DB.");
+          Log.logger.d("A post successfully uploaded on DB.");
           return true;
         } else {
-          logger.e(
+          Log.logger.e(
             "An error occurred while uploading a post on DB. (statusCode is not 200)",
           );
           throw Exception();
         }
       });
     } catch (error) {
-      logger.e("error", error: error);
+      Log.logger.e("error", error: error);
       return false;
     }
   }
 
   static Future<List<MessageModel>> getUsersPostsList() async {
-    logger.d("getUsersPostsList : URL[${baseUrl + getUsersPostsListUrl}]");
+    Log.logger.d("getUsersPostsList : URL[${baseUrl + getUsersPostsListUrl}]");
 
     // TODO
     // 2023.08.07, jdk
@@ -58,12 +56,12 @@ class PostServices {
       final response =
           await http.get(Uri.parse(baseUrl + getUsersPostsListUrl));
 
-      logger.d(response.body);
+      Log.logger.d(response.body);
       var jsonResponse = convert.jsonDecode(response.body);
 
       if (jsonResponse is! List) {
         jsonResponse = [jsonResponse];
-        logger.d("converted to List");
+        Log.logger.d("converted to List");
       }
 
       return jsonResponse.map((model) {
@@ -78,8 +76,87 @@ class PostServices {
         return MessageModel.fromJson(model);
       }).toList();
     } catch (error) {
-      logger.e("An error occurred while fetching users posts", error: error);
+      Log.logger
+          .e("An error occurred while fetching users posts", error: error);
       throw Exception("An error occurred while fetching users posts");
+    }
+  }
+
+  // 2023.08.13, jdk
+  // 현재 게시글에 좋아요를 눌렀는지 체크하는 API
+  static Future<bool> isPressedPostLike(Map<String, dynamic> postData) async {
+    String jsonData = jsonEncode(postData);
+    Log.logger.d("jsonData : ${jsonData}");
+
+    try {
+      var response = await http.post(
+        Uri.parse(baseUrl + isPressedPostLikeUrl),
+        headers: headers,
+        body: jsonData,
+      );
+
+      var jsonResponse;
+      if (response.statusCode == 200) {
+        Log.logger.d(
+          "Successfully received the response on /api/isPressedPostLike",
+        );
+
+        jsonResponse = convert.jsonDecode(response.body);
+      } else {
+        Log.logger.d(
+          "Failed to receive the response on /api/isPressedPostLike",
+        );
+
+        // 2023.08.13, jdk
+        // 여기서 exception이 나면 바깥의 catch로 빠지는지 확인해보기.
+        throw Exception();
+      }
+
+      Log.logger.d("jsonResponse['isPressed'] : ${jsonResponse['isPressed']}");
+
+      if (jsonResponse['isPressed'] == true) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      throw Exception();
+    }
+  }
+
+  static Future<bool> pressedLikeButton(
+    Map<String, dynamic> likedPostData,
+  ) async {
+    Log.logger.d("pressedLikeButton : URL[${baseUrl + pressedLikeButtonUrl}]");
+
+    String jsonData = jsonEncode(likedPostData);
+    Log.logger.d("jsonData : ${jsonData}");
+
+    try {
+      return await http
+          .post(
+        Uri.parse(baseUrl + pressedLikeButtonUrl),
+        headers: headers,
+        body: jsonData,
+      )
+          .then((response) {
+        if (response.statusCode == 200) {
+          Log.logger.d("User's like is successfully aplied on DB.");
+          return true;
+        } else {
+          Log.logger.d(
+            "An error occurred while applying User's like on DB. (status code is not 200)",
+          );
+
+          throw Exception();
+        }
+      });
+      // TODO
+      // 2023.08.11, jdk
+      // API 실패에 따른 error catch와 status code is not 200 error catch의 구분이 필요함.
+    } catch (error) {
+      Log.logger.e("error", error: error);
+      return false;
     }
   }
 }

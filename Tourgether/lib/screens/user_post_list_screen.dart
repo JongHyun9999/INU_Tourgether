@@ -1,5 +1,5 @@
 import 'package:TourGather/utilities/color_palette.dart';
-import 'package:TourGather/widgets/post_widget.dart';
+import 'package:TourGather/widgets/user_post.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:TourGather/screens/user_post_detail_screen.dart';
@@ -58,75 +58,10 @@ class _UserPostListScreenState extends State<UsersPostsListScreen> {
                   child: ListView.builder(
                     itemCount: snapshot.data?.length,
                     itemBuilder: (context, index) {
-                      return PostWidget(
-                          postData: snapshot.data![index], index: index);
-
-                      // return Card(
-                      //   color: ColorPalette.secondaryContainer,
-                      //   shape: RoundedRectangleBorder(
-                      //     borderRadius: BorderRadius.circular(0),
-                      //   ),
-                      //   margin: EdgeInsets.symmetric(vertical: 1),
-                      //   elevation: 5,
-                      //   child: ListTile(
-                      //     onTap: () {
-                      //       Navigator.push(
-                      //         context,
-                      //         MaterialPageRoute(
-                      //           builder: (context) => UserPostDetailScreen(
-                      //             user_id: snapshot.data![index].user_id,
-                      //             title: snapshot.data![index].title,
-                      //             content: snapshot.data![index].content,
-                      //             latitude: snapshot.data![index].latitude,
-                      //             longitude: snapshot.data![index].longitude,
-                      //             liked: snapshot.data![index].liked,
-                      //             posted_time: snapshot.data![index].posted_time,
-                      //           ),
-                      //         ),
-                      //       );
-                      //     },
-                      //     title: Text(
-                      //       "${snapshot.data![index].title}",
-                      //       overflow: TextOverflow.clip,
-                      //       style: TextStyle(
-                      //         fontSize: 15,
-                      //         fontFamily: 'Pretendard',
-                      //       ),
-                      //     ),
-                      //     subtitle: Row(
-                      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //       children: [
-                      //         Row(
-                      //           children: [
-                      //             Text(
-                      //               "${snapshot.data![index].posted_time}",
-                      //               style: TextStyle(
-                      //                 fontSize: 12,
-                      //                 fontFamily: 'Pretendard',
-                      //               ),
-                      //             ),
-                      //             Padding(
-                      //               padding: const EdgeInsets.only(left: 10),
-                      //               child: Text(
-                      //                 "${snapshot.data![index].user_id}",
-                      //                 style: TextStyle(
-                      //                   fontSize: 12,
-                      //                   fontFamily: 'Pretendard',
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //           ],
-                      //         ),
-                      //         Text(
-                      //           "인천대학교 어딘가",
-                      //           style: TextStyle(
-                      //             fontSize: 12,
-                      //           ),
-                      //         ),
-                      //       ],
-                      //     ),
-                      //   ),
-                      // );
+                      return UserPost(
+                        postData: snapshot.data![index],
+                        index: index,
+                      );
                     },
                   ),
                 ),

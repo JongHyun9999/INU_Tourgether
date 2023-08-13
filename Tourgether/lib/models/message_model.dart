@@ -1,31 +1,39 @@
 class MessageModel {
-  String user_id;
-  String title;
-  String content;
-  double latitude;
-  double longitude;
-  String posted_time;
+  // 글을 입력할 경우에는 rid가 필요하지 않으므로
+  // 기본값은 0으로 설정한다.
+  int rid = 0;
+  final String user_name;
+  final String title;
+  final String content;
+  final double latitude;
+  final double longitude;
+  final String posted_time;
   int liked;
+  int comments_num;
 
   MessageModel(
-      {required this.user_id,
+      {required this.rid,
+      required this.user_name,
       required this.title,
       required this.content,
       required this.latitude,
       required this.longitude,
       required this.posted_time,
-      required this.liked});
+      required this.liked,
+      required this.comments_num});
 
   // 2023.07.09, jdk
   // API를 통해 전달받은 데이터를 Json으로 변경하는 factory 메서드.
   MessageModel.fromJson(Map<String, dynamic> json)
-      : user_id = json['user_id'],
+      : rid = json['rid'],
+        user_name = json['user_name'],
         title = json['title'],
         content = json['content'],
         latitude = json['latitude'],
         longitude = json['longitude'],
         posted_time = json['posted_time'],
-        liked = json['liked'];
+        liked = json['liked'],
+        comments_num = json['comments_num'];
 
   /*
   // 2023.07.09, jdk

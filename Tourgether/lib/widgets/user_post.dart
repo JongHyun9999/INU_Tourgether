@@ -5,17 +5,16 @@ import 'package:http/http.dart';
 import '../models/message_model.dart';
 import '../screens/user_post_detail_screen.dart';
 
-class PostWidget extends StatefulWidget {
-  PostWidget({super.key, required this.postData, required this.index});
+class UserPost extends StatelessWidget {
+  const UserPost({
+    super.key,
+    required this.postData,
+    required this.index,
+  });
 
   final MessageModel postData;
   final int index;
 
-  @override
-  State<PostWidget> createState() => _PostWidgetState();
-}
-
-class _PostWidgetState extends State<PostWidget> {
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -27,14 +26,14 @@ class _PostWidgetState extends State<PostWidget> {
           context,
           MaterialPageRoute(
             builder: (context) => UserPostDetailScreen(
-              postData: widget.postData,
+              postData: postData,
             ),
           ),
         );
       },
       child: Container(
         decoration: BoxDecoration(
-          border: (widget.index == 0)
+          border: (index == 0)
               ? Border(
                   bottom: BorderSide(color: ColorPalette.spacerColor, width: 1),
                   top: BorderSide(color: ColorPalette.spacerColor, width: 1),
@@ -54,9 +53,9 @@ class _PostWidgetState extends State<PostWidget> {
                       height: 30,
                       alignment: Alignment.bottomLeft,
                       child: Text(
-                        "${widget.postData.title}",
+                        "${postData.title}",
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 13,
                           fontWeight: FontWeight.bold,
                         ),
                         // 2023.08.10, jdk
@@ -66,10 +65,12 @@ class _PostWidgetState extends State<PostWidget> {
                       ),
                     ),
                     Container(
-                      height: 50,
+                      height: 40,
                       alignment: Alignment.topLeft,
                       child: Text(
-                        "${widget.postData.content}",
+                        "${postData.content}",
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 12,
                         ),
@@ -88,7 +89,7 @@ class _PostWidgetState extends State<PostWidget> {
                           children: [
                             Container(
                               child: Text(
-                                "${widget.postData.user_id}",
+                                "${postData.user_name}",
                                 style: TextStyle(
                                   color: ColorPalette.spacerColor,
                                   fontSize: 12,
@@ -102,7 +103,8 @@ class _PostWidgetState extends State<PostWidget> {
                               child: Text(
                                 // TODO
                                 // 시간 변환 알고리즘 추가
-                                "${widget.postData.posted_time.substring(11, 16)}",
+                                // n분 전, n시간 전, n일 전, n달 전, n년 전
+                                "${postData.posted_time.substring(11, 16)}",
                                 style: TextStyle(
                                   color: ColorPalette.spacerColor,
                                   fontSize: 12,
@@ -113,13 +115,18 @@ class _PostWidgetState extends State<PostWidget> {
                               width: 10,
                             ),
                             Container(
-                              child: Text(
-                                // TODO
-                                // Location 변환 알고리즘 추가
-                                "Location",
-                                style: TextStyle(
-                                  color: ColorPalette.spacerColor,
-                                  fontSize: 12,
+                              child: Expanded(
+                                child: Text(
+                                  // TODO
+                                  // Location 변환 알고리즘 추가
+                                  "인천대학교 어딘가",
+                                  style: TextStyle(
+                                    color: ColorPalette.spacerColor,
+                                    fontSize: 12,
+                                  ),
+                                  // 혹시 모를 overflow에 대비해 ellipsis 적용.
+                                  // 가장 끝 쪽에만 적용하면 됨.
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ),
@@ -142,9 +149,7 @@ class _PostWidgetState extends State<PostWidget> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  // 2023.08.11, jdk
-                  // 댓글 및 추천 수 확인 Icon은 임시적으로 주석 처리 함.
-
+                  // Comments Num Icon
                   Container(
                     decoration: BoxDecoration(
                       color: ColorPalette.primaryContainer,
@@ -180,6 +185,7 @@ class _PostWidgetState extends State<PostWidget> {
                       ],
                     ),
                   ),
+                  // Like Num Icon
                   Container(
                     // decoration: BoxDecoration(
                     //   border: Border.all(
@@ -203,7 +209,7 @@ class _PostWidgetState extends State<PostWidget> {
                           child: Container(
                             alignment: Alignment.center,
                             child: Text(
-                              "0",
+                              "${postData.liked}",
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,

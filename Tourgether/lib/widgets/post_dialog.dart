@@ -89,7 +89,7 @@ Future<bool> sendPost(
   Log.logger.d("current time : $postedTime");
 
   // 유저 정보를 보관하는 Class에서 유저의 정보를 가져와야 함.
-  postData['user_id'] = 'test';
+  postData['user_name'] = "개발자정동교";
   postData['posted_time'] = postedTime.toString().substring(0, 19);
 
   // 2023.08.07, jdk

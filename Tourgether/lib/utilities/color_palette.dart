@@ -4,7 +4,7 @@ class ColorPalette {
   static const Color primaryContainer = Color.fromARGB(255, 106, 174, 233);
   static const Color onPrimaryContainer = Color.fromARGB(255, 241, 247, 253);
 
-  static const Color secondaryContainer = Color.fromARGB(255, 247, 251, 255);
+  static const Color secondaryContainer = Color.fromARGB(255, 203, 224, 245);
 
   static const Color accentColor = Color(0xff1E88E5);
   static const Color normalColor = Color(0xff424242);

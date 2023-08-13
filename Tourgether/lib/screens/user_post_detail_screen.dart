@@ -1,9 +1,12 @@
 import 'package:TourGather/utilities/color_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart';
 
 import '../models/message_model.dart';
+import '../services/post_services.dart';
 import '../utilities/log.dart';
+import '../widgets/user_post_comment.dart';
 
 class UserPostDetailScreen extends StatefulWidget {
   UserPostDetailScreen({
@@ -20,15 +23,66 @@ class UserPostDetailScreen extends StatefulWidget {
 class _MyWidgetState extends State<UserPostDetailScreen> {
   TextEditingController commentController = TextEditingController();
 
+  late final int rid;
+  late final String user_name;
+  late final String content;
+  late final double latitude;
+  late final double longitude;
+  late final String posted_time;
+  late int liked;
+  late int comments_num;
+
   bool isLikePressed = false;
   bool isBookMarked = false;
 
-  int likeNum = 0;
+  final double appBarHeight = 50;
+
+  // postData 변수 초기화
+  // ----------------------------------------------------------
+  // 2023.08.13, jdk
+  // TODO
+  // 게시글에 들어갔을 때 내용이 수정되었을 수도 있으므로,
+  // API를 통해 게시글 내용을 다시 받아올 수 있도록 수정해야 함.
+
+  // initState는 async method가 될 수 없음.
+  // ----------------------------------------------------------
+  @override
+  void initState() {
+    super.initState();
+
+    rid = widget.postData.rid;
+    user_name = widget.postData.user_name;
+    content = widget.postData.content;
+    latitude = widget.postData.latitude;
+    longitude = widget.postData.longitude;
+    posted_time = widget.postData.posted_time;
+    liked = widget.postData.liked;
+    comments_num = widget.postData.comments_num;
+
+    checkLikeButtonPressed();
+  }
+
+  checkLikeButtonPressed() {
+    Map<String, dynamic> postData = {
+      'rid': rid,
+      'user_name': user_name,
+    };
+
+    PostServices.isPressedPostLike(postData).then((isPressedPostLike) {
+      if (isPressedPostLike == true) {
+        isLikePressed = true;
+        Log.logger.d("check : ${isLikePressed}");
+
+        setState(() {});
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
+    final double statusBarHeight = MediaQuery.of(context).viewPadding.top;
 
     // 2023.08.10, jdk
     // Build Method 안에 TextEditingController를 설정하면
@@ -47,9 +101,13 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
           backgroundColor: ColorPalette.primaryContainer,
         ),
       ),
+      // body의 최상단에 Container를 선언하고 크기를 고정,
+      // 이로서 화면에 한 번에 보이는 Container의 크기는 제한된다.
+      // 하지만 자식 Widget으로 SingleChildScrollView를 가져서
+      // SingleChildScrollView의 height는 제한이 없어진다.
       body: Container(
         width: screenWidth,
-        height: screenHeight,
+        height: screenHeight - (appBarHeight + statusBarHeight),
         child: SingleChildScrollView(
           child: Column(
             children: [
@@ -84,12 +142,36 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                           // user_id, posted_time
                           Container(
                             child: Text(
-                              "${widget.postData.user_id}",
+                              "${widget.postData.user_name}",
+                              style: TextStyle(
+                                fontFamily: 'Pretendard',
+                                fontSize: 13,
+                                color: ColorPalette.normalColor,
+                              ),
                             ),
                           ),
                           Container(
                             child: Text(
-                                "${widget.postData.posted_time.substring(0, 16)}"),
+                              "${widget.postData.posted_time.substring(0, 16)}",
+                              style: TextStyle(
+                                fontFamily: 'Pretendard',
+                                fontSize: 13,
+                                color: ColorPalette.normalColor,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            child: Text(
+                              // TODO 매칭 알고리즘 추가 필요
+                              "인천대학교 어딘가",
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontFamily: 'Pretendard',
+                                fontSize: 13,
+                                color: ColorPalette.accentColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -158,19 +240,41 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                       // Container의 크기를 지정하지 않으면,
                       // 그 방향으로 크기가 Flexible하게 증가한다.
                       InkWell(
-                        onTap: () {
+                        onTap: () async {
                           Log.logger.d("Like touched!");
-                          setState(() {
-                            isLikePressed = !isLikePressed;
 
-                            if (isLikePressed == true) {
-                              likeNum++;
-                            } else if (isLikePressed == false) {
-                              likeNum--;
-                            }
+                          isLikePressed = !isLikePressed;
 
-                            Log.logger.d("${likeNum}");
-                          });
+                          // TODO : 현재 유저의 로그인 정보를 이용하여
+                          // 좋아요 기능에 유저 아이디가 변수로 전달되도록 변경.
+
+                          Map<String, dynamic> likedPostData = {
+                            "rid": rid,
+                            "user_name": "개발자정동교",
+                          };
+
+                          // 좋아요를 누른 경우.
+                          if (isLikePressed == true) {
+                            liked++;
+                            likedPostData['isCanceled'] = false;
+                            // 좋아요를 취소한 경우.
+                          } else if (isLikePressed == false) {
+                            liked--;
+                            likedPostData['isCanceled'] = true;
+                          }
+
+                          bool isSucceeded =
+                              await PostServices.pressedLikeButton(
+                            likedPostData,
+                          );
+
+                          if (isSucceeded) {
+                            Log.logger.d("성공");
+                          } else {
+                            Log.logger.d("실패");
+                          }
+
+                          setState(() {});
                         },
                         child: Container(
                           height: 40,
@@ -196,7 +300,7 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                                 child: Container(
                                   alignment: Alignment.center,
                                   child: Text(
-                                    "${likeNum}",
+                                    "${liked}",
                                     style: TextStyle(
                                       color: ColorPalette.whiteColor,
                                     ),
@@ -233,29 +337,32 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                           ),
                           child: Row(
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(10, 5, 5, 5),
-                                child: Icon(
-                                  (isBookMarked)
-                                      ? Icons.star
-                                      : Icons.star_border,
-                                  color: (isBookMarked)
-                                      ? Colors.yellow
-                                      : ColorPalette.whiteColor,
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(5, 5, 10, 5),
-                                child: Container(
-                                  child: Text(
-                                    "즐겨찾기",
-                                    style: TextStyle(
-                                      color: ColorPalette.whiteColor,
-                                      fontSize: 15,
-                                    ),
-                                  ),
-                                ),
-                              ),
+                              // 2023.08.13, jdk
+                              // TODO
+                              // 즐겨찾기는 적절한 구현법을 구상하기 전까지 주석처리.
+                              // Padding(
+                              //   padding: const EdgeInsets.fromLTRB(10, 5, 5, 5),
+                              //   child: Icon(
+                              //     (isBookMarked)
+                              //         ? Icons.star
+                              //         : Icons.star_border,
+                              //     color: (isBookMarked)
+                              //         ? Colors.yellow
+                              //         : ColorPalette.whiteColor,
+                              //   ),
+                              // ),
+                              // Padding(
+                              //   padding: const EdgeInsets.fromLTRB(5, 5, 10, 5),
+                              //   child: Container(
+                              //     child: Text(
+                              //       "즐겨찾기",
+                              //       style: TextStyle(
+                              //         color: ColorPalette.whiteColor,
+                              //         fontSize: 15,
+                              //       ),
+                              //     ),
+                              //   ),
+                              // ),
                             ],
                           ),
                         ),
@@ -278,7 +385,7 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.only(right: 5),
                           child: CircleAvatar(
                             child: Icon(
                               Icons.person,
@@ -298,7 +405,7 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                                 decoration: InputDecoration(
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: ColorPalette.normalColor,
+                                      color: ColorPalette.lightGreyColor,
                                     ),
                                   ),
                                   focusedBorder: OutlineInputBorder(
@@ -315,12 +422,17 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 0, horizontal: 0),
-                          child: IconButton(
-                            icon: Icon(Icons.send),
-                            iconSize: 25,
-                            onPressed: () {},
+                          padding: const EdgeInsets.only(left: 5),
+                          child: CircleAvatar(
+                            backgroundColor: ColorPalette.secondaryContainer,
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.send,
+                                color: ColorPalette.accentColor,
+                              ),
+                              iconSize: 25,
+                              onPressed: () {},
+                            ),
                           ),
                         ),
                       ],
@@ -329,54 +441,47 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                 ),
               ),
               // Container 6)
+              // comment spacer text
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 30, 10, 20),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        width: 0.5,
+                        color: ColorPalette.spacerColor,
+                      ),
+                    ),
+                  ),
+                  width: screenWidth,
+                  height: 35,
+                  alignment: Alignment.topLeft,
+                  child: Container(
+                    child: Text(
+                      "댓글 ${comments_num}",
+                      style: TextStyle(
+                        fontFamily: 'Pretendard',
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              // Container 7)
               // comments
               Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 child: Flexible(
-                  flex: 1,
                   child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.orange,
-                    ),
+                    width: screenWidth * 0.95,
                     child: Column(
                       children: [
-                        // Padding(
-                        //   padding: const EdgeInsets.symmetric(
-                        //     vertical: 5,
-                        //     horizontal: 0,
-                        //   ),
-                        //   child: Container(
-                        //     decoration: BoxDecoration(
-                        //       border: Border.all(width: 1),
-                        //     ),
-                        //     height: 100,
-                        //   ),
-                        // ),
-                        // Padding(
-                        //   padding: const EdgeInsets.symmetric(
-                        //     vertical: 5,
-                        //     horizontal: 0,
-                        //   ),
-                        //   child: Container(
-                        //     decoration: BoxDecoration(
-                        //       border: Border.all(width: 1),
-                        //     ),
-                        //     height: 100,
-                        //   ),
-                        // ),
-                        // Padding(
-                        //   padding: const EdgeInsets.symmetric(
-                        //     vertical: 5,
-                        //     horizontal: 0,
-                        //   ),
-                        //   child: Container(
-                        //     decoration: BoxDecoration(
-                        //       border: Border.all(width: 1),
-                        //     ),
-                        //     height: 100,
-                        //   ),
-                        // ),
+                        // 2023.08.11, jdk
+                        // User Post Comment는 따로 Widget으로 분리하였음.
+                        UserPostComment(
+                          screenWidth: screenWidth,
+                        ),
                       ],
                     ),
                   ),
