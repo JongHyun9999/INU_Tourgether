@@ -440,7 +440,45 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                         ),
                       ),
                     ),
-                  ))
+                  )),
+              Positioned(
+                bottom: 50,
+                left: 0,
+                right: 0,
+                child: Container(
+                  width: 200,
+                  padding: EdgeInsets.all(10),
+                  margin: EdgeInsets.all(30),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.5),
+                          spreadRadius: 1,
+                          blurRadius: 1,
+                          offset: const Offset(0, 1),
+                        ),
+                      ], 
+                  ),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        "/main",
+                        (_) => false,
+                      );
+                    },
+                    child: Center(
+                      child: Text('Skip',
+                        style: TextStyle(
+                          color: Colors.blueAccent,
+                          fontSize: 20
+                        ),),
+                    ),
+                    ),
+                  )
+                ),
             ],
           ),
         ));
