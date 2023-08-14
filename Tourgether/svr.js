@@ -548,6 +548,7 @@ app.post('/api/addUser', async (req, res) => {
 })
 
 // 2023.07.25, jdk /get API
+// 유저 정보를 전부 가져오는 api
 app.get('/getUserInfo', (req, res) => {
 
   pool.getConnection((err, conn) => {
@@ -580,6 +581,8 @@ app.get('/getUserInfo', (req, res) => {
   })
 })
 
+// 2023-08-14 JKE
+// 해당 회원 번호와 일치하는 회원을 찾아 맵 보이기를 활성화시키기기
 app.post('/update_user_map_visibility_status', async (req, res) => {
   console.log('check');
   const user_num = req.body.user_num;

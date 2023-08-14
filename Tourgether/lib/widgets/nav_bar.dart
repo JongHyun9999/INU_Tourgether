@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 //import 'package:tourgether/screens/setting.dart';
 import 'package:provider/provider.dart';
@@ -20,11 +22,6 @@ class NavBar extends StatefulWidget {
 class _NavBarState extends State<NavBar> {
   //late bool onlineSwitch;
   bool friendRequest = true;
-  //late TabController _tabController;
-  late String userMajor = '';
-  late String userName = '';
-  late String userNum = '';
-  late String userEmail = '';
   List<Widget> userInfoTabs = [
     Container(
         height: 40,
@@ -155,10 +152,15 @@ class _NavBarState extends State<NavBar> {
                   ),
                   accountEmail: Consumer<UserInfoProvider>(
                     builder: (context, userinfo, child) {
-                      return Text(
-                        "${userinfo.userName}",
-                        style: TextStyle(fontSize: 15),
-                      );
+                      return userinfo.userMajorDetail == null
+                          ? Text(
+                              "${userinfo.userName}",
+                              style: TextStyle(fontSize: 15),
+                            )
+                          : Text(
+                              "${userinfo.userMajorDetail} ${userinfo.userName}",
+                              style: TextStyle(fontSize: 15),
+                            );
                     },
                   ),
                   // 배경 이미지
@@ -225,7 +227,6 @@ class _NavBarState extends State<NavBar> {
                   ],
                 ),
                 const Divider(),
-                // TabBar
                 DefaultTabController(
                     length: 3,
                     child: TabBar(

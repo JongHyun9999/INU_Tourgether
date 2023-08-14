@@ -6,17 +6,21 @@ class UserInfoProvider extends ChangeNotifier {
   // network 통신 실시.
 
   String _userMajor = "null";
+  // 전공 세부사항이 없는 사람들이 있을 수 있으므로 null-safety 적용
+  String? _userMajorDetail = null;
   String _userName = "null";
   String _userEmail = "null";
-  String _userBadge = "null";
+  // 같은 이유로 null-safety 적용
+  String? _userBadge = null;
   String _userNum = "null";
   bool _user_map_visibility_status = false;
   int _show_online_status_type = 0;
 
   String get userMajor => _userMajor;
+  String? get userMajorDetail => _userMajorDetail;
   String get userName => _userName;
   String get userEmail => _userEmail;
-  String get userBadge => _userBadge;
+  String? get userBadge => _userBadge;
   String get userNum => _userNum;
   bool get user_map_visibility_status => _user_map_visibility_status;
   int get show_online_status_type => _show_online_status_type;
@@ -48,16 +52,18 @@ class UserInfoProvider extends ChangeNotifier {
     Network network = Network("${ApiUrl.address}${ApiUrl.userInfoApiUrl}");
     var jsonData = await network.getJsonData();
     // 가져온 jsonData(map형)을 전공, 이름, 학번으로 나누어 선언
-    _userMajor = await jsonData['user_info'][0]["user_major"];
-    _userName = await jsonData['user_info'][0]["user_name"];
-    _userNum = await jsonData['user_info'][0]['user_num'].toString();
+    _userMajor = await jsonData['user_info'][1]["user_major"];
+    _userMajorDetail = await jsonData['user_info'][1]["user_major_detail"];
+    _userName = await jsonData['user_info'][1]["user_name"];
+    _userNum = await jsonData['user_info'][1]['user_num'].toString();
     _user_map_visibility_status =
-        await jsonData['user_info'][0]['user_map_visibility_status'] == 1;
+        await jsonData['user_info'][1]['user_map_visibility_status'] == 1;
     _show_online_status_type =
-        await jsonData['user_info'][0]['show_online_status_type'];
-    _userEmail = await jsonData['user_info'][0]['user_Email'];
-    _userBadge = await jsonData['user_info'][0]['user_Badge'];
+        await jsonData['user_info'][1]['show_online_status_type'];
+    _userEmail = await jsonData['user_info'][1]['user_Email'];
+    _userBadge = await jsonData['user_info'][1]['user_Badge'];
     print("userInfo 정보 받아오기 성공");
+
     // 새로고침
     notifyListeners();
   }
