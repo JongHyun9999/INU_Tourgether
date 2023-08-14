@@ -15,6 +15,10 @@ class PostServices {
   static const String getUsersPostsListUrl = "/api/getUsersPostsList";
   static const String pressedLikeButtonUrl = "/api/pressedLikeButton";
   static const String isLikeButtonPressedUrl = "/api/isLikeButtonPressed";
+  static const String postSigninUrl = "/api/postSignin";
+  static const String postSignupUrl = "/api/postSignup";
+  static const String emailVerifyUrl = "/api/emailVerify";
+  static const String addUserUrl = "/api/addUser";
 
   static Future<bool> postUserContent(Map<String, dynamic> postData) async {
     Log.logger.d(
@@ -154,6 +158,123 @@ class PostServices {
       // TODO
       // 2023.08.11, jdk
       // API 실패에 따른 error catch와 status code is not 200 error catch의 구분이 필요함.
+    } catch (error) {
+      Log.logger.e("error", error: error);
+      return false;
+    }
+  }
+
+  static Future<bool> postSignin(Map<String, dynamic> postData) async {
+    Log.logger.d(
+        "postUserContent : URL[${baseUrl + postSigninUrl}]\npassed data : ${postData}");
+
+    String jsonData = jsonEncode(postData);
+
+    try {
+      return await http
+          .post(
+        Uri.parse(baseUrl + postSigninUrl),
+        headers: headers,
+        body: jsonData,
+      )
+          .then((response) {
+        if (response.statusCode == 200) {
+          Log.logger.d("A post successfully uploaded on DB.");
+          return true;
+        } else {
+          Log.logger.e(
+            "An error occurred while uploading a post on DB. (statusCode is not 200)",
+          );
+          throw Exception();
+        }
+      });
+    } catch (error) {
+      Log.logger.e("error", error: error);
+      return false;
+    }
+  }
+
+  static Future<bool> postSignup(Map<String, dynamic> postData) async {
+    Log.logger.d(
+        "postUserContent : URL[${baseUrl + postSignupUrl}]\npassed data : ${postData}");
+    String jsonData = jsonEncode(postData);
+
+    try {
+      return await http
+          .post(
+        Uri.parse(baseUrl + postSignupUrl),
+        headers: headers,
+        body: jsonData,
+      )
+          .then((response) {
+        if (response.statusCode == 200) {
+          Log.logger.d("A post successfully uploaded on DB.");
+          return true;
+        } else {
+          Log.logger.e(
+            "An error occurred while uploading a post on DB. (statusCode is not 200)",
+          );
+          throw Exception();
+        }
+      });
+    } catch (error) {
+      Log.logger.e("error", error: error);
+      return false;
+    }
+  }
+
+  static Future<bool> emailVerify(Map<String, dynamic> postData) async {
+    Log.logger.d(
+        "postUserContent : URL[${baseUrl + emailVerifyUrl}]\npassed data : ${postData}");
+    String jsonData = jsonEncode(postData);
+
+    try {
+      return await http
+          .post(
+        Uri.parse(baseUrl + emailVerifyUrl),
+        headers: headers,
+        body: jsonData,
+      )
+          .then((response) {
+        if (response.statusCode == 200) {
+          Log.logger.d("A post successfully uploaded on DB.");
+          return true;
+        } else {
+          Log.logger.e(
+            "An error occurred while uploading a post on DB. (statusCode is not 200)",
+          );
+          throw Exception();
+        }
+      });
+    } catch (error) {
+      Log.logger.e("error", error: error);
+      return false;
+    }
+  }
+
+  static Future<bool> postAddUser(Map<String, dynamic> postData) async {
+    Log.logger.d(
+        "postUserContent : URL[${baseUrl + addUserUrl}]\npassed data : ${postData}");
+    String jsonData = jsonEncode(postData);
+
+    try {
+      return await http
+          .post(
+        Uri.parse(baseUrl + addUserUrl),
+        headers: headers,
+        body: jsonData,
+      )
+          .then((response) {
+        if (response.statusCode == 200) {
+          Log.logger.d("A post successfully uploaded on DB.");
+          return true;
+        } else {
+          Log.logger.e(
+            "An error occurred while uploading a post on DB. (statusCode is not 200)",
+          );
+          throw Exception();
+        }
+      });
     } catch (error) {
       Log.logger.e("error", error: error);
       return false;

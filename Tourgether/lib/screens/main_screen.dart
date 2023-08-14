@@ -9,7 +9,9 @@ import 'package:provider/provider.dart';
 import 'package:logger/logger.dart';
 
 import '../enums/alert_message_type.dart';
+import '../providers/user_info_provider.dart';
 import '../utilities/log.dart';
+import '../widgets/nav_bar.dart';
 import '../widgets/post_dialog.dart';
 // import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -43,6 +45,15 @@ class _MainScreenState extends State<MainScreen> {
       TransformationController();
 
   @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(
+      () => Provider.of<UserInfoProvider>(context, listen: false).getTestData(),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -55,8 +66,11 @@ class _MainScreenState extends State<MainScreen> {
         Provider.of<MainScreenUIProvider>(context, listen: false);
 
     return Scaffold(
+      drawer: const NavBar(),
       extendBodyBehindAppBar: true,
-      appBar: getAppBar(context, appBarHeight),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+      ), // getAppBar(context, appBarHeight),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       extendBody: true,
       floatingActionButton: showFloatingActionButton(

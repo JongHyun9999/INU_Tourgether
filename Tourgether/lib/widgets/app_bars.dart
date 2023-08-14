@@ -14,7 +14,7 @@ PreferredSize getAppBar(BuildContext context, double appBarHeight) {
       //     bottom: Radius.circular(30),
       //   ),
       // ),
-      backgroundColor: Colors.transparent,
+      backgroundColor: ColorPalette.primaryContainer,
       leading: IconButton(
         iconSize: 30,
         onPressed: () {},

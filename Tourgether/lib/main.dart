@@ -1,4 +1,5 @@
 import 'package:TourGather/providers/main_screen_ui_provider.dart';
+import 'package:TourGather/providers/user_info_provider.dart';
 import 'package:TourGather/providers/user_post_provider.dart';
 import 'package:TourGather/utilities/color_palette.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +39,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => UserPostProvider(),
         ),
+        ChangeNotifierProvider(
+          create: (context) => UserInfoProvider(),
+        )
       ],
       child: MaterialApp(
         title: 'TourGather',
