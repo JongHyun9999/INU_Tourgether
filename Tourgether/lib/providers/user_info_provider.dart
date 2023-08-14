@@ -55,9 +55,9 @@ class UserInfoProvider extends ChangeNotifier {
         await jsonData['user_info'][0]['user_map_visibility_status'] == 1;
     _show_online_status_type =
         await jsonData['user_info'][0]['show_online_status_type'];
-    _userEmail = await jsonData['user_info'][0]['user_Email'];
-    _userBadge = await jsonData['user_info'][0]['user_Badge'];
-    print("userInfo 정보 받아오기 성공");
+    _userEmail = await jsonData['user_info'][0]['user_email'];
+    _userBadge = await jsonData['user_info'][0]['user_badge'];
+
     // 새로고침
     notifyListeners();
   }
