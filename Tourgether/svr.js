@@ -182,10 +182,10 @@ app.get('/getUserInfo', (req, res) => {
 
 app.post('/update_user_map_visibility_status', async (req, res) => {
   console.log('check');
-  const user_schoolnum = req.body.user_schoolnum;
+  const user_num = req.body.user_num;
   const user_map_visibility_status = parseInt(req.body.user_map_visibility_status);
   
-  console.log(`user_schoolnum : ${user_schoolnum}`);
+  console.log(`user_num : ${user_num}`);
   console.log(`user_map_visibility_status : ${user_map_visibility_status}`);
 
   let conn = null;
@@ -201,8 +201,8 @@ app.post('/update_user_map_visibility_status', async (req, res) => {
 
   try {
     let QUERY_STR = null;
-    if(req.body.user_schoolnum){
-      QUERY_STR = `UPDATE User_Info SET user_map_visibility_status = '${user_map_visibility_status}' WHERE user_schoolnum = '${user_schoolnum}';`
+    if(req.body.user_num){
+      QUERY_STR = `UPDATE User_Info SET user_map_visibility_status = '${user_map_visibility_status}' WHERE user_num = '${user_num}';`
     }
   
   // Promise가 무엇인지 잘 알아보기!

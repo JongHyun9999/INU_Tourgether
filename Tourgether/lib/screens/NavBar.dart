@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:tourgether/provider/userInfo_provider.dart';
-import 'package:tourgether/screens/setting.dart';
+//import 'package:tourgether/screens/setting.dart';
 import 'package:provider/provider.dart';
+import 'package:tourgether/screens/friendTab.dart';
 
-import 'package:badges/badges.dart' as badges;
+//import 'package:badges/badges.dart' as badges;
 //import 'dart:convert';
 
 // 사용자 정보를 담은 Stateful 위젯 선언
@@ -19,11 +20,34 @@ class NarBar extends StatefulWidget {
 class _NarBarState extends State<NarBar> {
   //late bool onlineSwitch;
   bool friendRequest = true;
+  //late TabController _tabController;
   late String userMajor = '';
   late String userName = '';
   late String userNum = '';
   late String userEmail = '';
-
+  List<Widget> userInfoTabs = [
+    Container(
+        height: 40,
+        alignment: Alignment.center,
+        child: Icon(
+          Icons.people,
+          color: Colors.blueAccent,
+        )),
+    Container(
+        height: 40,
+        alignment: Alignment.center,
+        child: Icon(
+          Icons.star,
+          color: Colors.blueAccent,
+        )),
+    Container(
+        height: 40,
+        alignment: Alignment.center,
+        child: Icon(
+          Icons.settings,
+          color: Colors.blueAccent,
+        )),
+  ];
   // 첫번째로 호출되는 메서드
   @override
   void initState() {
@@ -85,7 +109,7 @@ class _NarBarState extends State<NarBar> {
       children: [
         Container(
           width: MediaQuery.of(context).size.width * 0.7,
-          height: MediaQuery.of(context).size.height * 0.45,
+          height: MediaQuery.of(context).size.height * 1.0,
           child: Drawer(
             elevation: 5,
             // ListView: 선택 리스트를 쉽게 구현
@@ -132,7 +156,7 @@ class _NarBarState extends State<NarBar> {
                   accountEmail: Consumer<UserInfoProvider>(
                     builder: (context, userinfo, child) {
                       return Text(
-                        "${userinfo.userNum} ${userinfo.userName}",
+                        "${userinfo.userName}",
                         style: TextStyle(fontSize: 15),
                       );
                     },
@@ -201,49 +225,13 @@ class _NarBarState extends State<NarBar> {
                   ],
                 ),
                 const Divider(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Center(
-                      child: Stack(
-                        children: [
-                          Transform.translate(
-                            offset: Offset(0, 0),
-                            child: IconButton(
-                              icon:
-                                  Icon(Icons.people, color: Colors.blueAccent),
-                              onPressed: () {},
-                            ),
-                          ),
-                          Positioned(
-                            top: 10,
-                            right: 18,
-                            child: badges.Badge(
-                              showBadge: friendRequest,
-                              badgeColor: Colors.redAccent,
-                              child: SizedBox.shrink(),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.star, color: Colors.blueAccent),
-                      onPressed: () {},
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.settings, color: Colors.blueAccent),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => SettingsPage()),
-                        );
-                      },
-                    ),
-                  ],
-                )
+                // TabBar
+                DefaultTabController(
+                    length: 3,
+                    child: TabBar(
+                      tabs: userInfoTabs,
+                      indicatorColor: Colors.blueAccent,
+                    ))
               ],
             ),
           ),

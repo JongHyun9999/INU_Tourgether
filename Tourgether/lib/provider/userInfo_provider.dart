@@ -50,7 +50,7 @@ class UserInfoProvider extends ChangeNotifier {
     // 가져온 jsonData(map형)을 전공, 이름, 학번으로 나누어 선언
     _userMajor = await jsonData['user_info'][0]["user_major"];
     _userName = await jsonData['user_info'][0]["user_name"];
-    _userNum = await jsonData['user_info'][0]['user_schoolnum'].toString();
+    _userNum = await jsonData['user_info'][0]['user_num'].toString();
     _user_map_visibility_status =
         await jsonData['user_info'][0]['user_map_visibility_status'] == 1;
     _show_online_status_type =
@@ -65,12 +65,14 @@ class UserInfoProvider extends ChangeNotifier {
   // 사용자 상태 정보 업데이트 메서드2
   void update_user_map_visibility_status(String userNum, bool _userOnline) {
     this._user_map_visibility_status = _userOnline;
-
+    // URL, apiURL 주고 네트워크 메서드 호출
     Network network = Network(
         "${apiUrl.address}${apiUrl.update_user_map_visibility_statusApiUrl}");
+
+    //
     Map<String, String> update_user_map_visibility_statusData = {
       "user_map_visibility_status": _user_map_visibility_status ? "1" : "0",
-      "user_schoolnum": userNum
+      "user_num": userNum
     };
     network.update_user_map_visibility_status(
         update_user_map_visibility_statusData);

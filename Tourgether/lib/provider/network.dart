@@ -39,24 +39,24 @@ class Network {
 
     // --------------------------------------------------------
     // 2023.07.29, jdk
-    // 현재 data['user_schoolnum'], data['user_map_visibility_status']이 data에 존재하지 않아서
+    // 현재 data['user_num'], data['user_map_visibility_status']이 data에 존재하지 않아서
     // Null 값이 body로 넘어가 통신이 제대로 안된 것임.
     // 항상 내가 설정한 데이터가 제대로 전달되었는지 체크를 해 주어야 함.
 
-    // print(data['user_schoolnum']);
+    // print(data['user_num']);
     // print(data['user_map_visibility_status']);
 
     // http.Response response = await http.post(Uri.parse(url), body: {
-    //   'user_schoolnum': data['user_schoolnum'],
+    //   'user_num': data['user_num'],
     //   'user_map_visibility_status': data['user_map_visibility_status']
     // });
     // --------------------------------------------------------
 
-    //print(data['user_schoolnum']);
+    //print(data['user_num']);
     // print(data['user_map_visibility_status']);
 
     var response = await http.post(Uri.parse(url), body: {
-      'user_schoolnum': data['user_schoolnum'],
+      'user_num': data['user_num'],
       'user_map_visibility_status': data['user_map_visibility_status']
     });
 
