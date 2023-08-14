@@ -11,16 +11,17 @@ class MessageModel {
   int liked;
   int comments_num;
 
-  MessageModel(
-      {required this.rid,
-      required this.user_name,
-      required this.title,
-      required this.content,
-      required this.latitude,
-      required this.longitude,
-      required this.posted_time,
-      required this.liked,
-      required this.comments_num});
+  MessageModel({
+    required this.rid,
+    required this.user_name,
+    required this.title,
+    required this.content,
+    required this.latitude,
+    required this.longitude,
+    required this.posted_time,
+    required this.liked,
+    required this.comments_num,
+  });
 
   // 2023.07.09, jdk
   // API를 통해 전달받은 데이터를 Json으로 변경하는 factory 메서드.

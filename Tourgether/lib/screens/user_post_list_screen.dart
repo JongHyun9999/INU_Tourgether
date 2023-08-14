@@ -1,8 +1,10 @@
+import 'package:TourGather/providers/user_post_provider.dart';
 import 'package:TourGather/utilities/color_palette.dart';
 import 'package:TourGather/widgets/user_post.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:TourGather/screens/user_post_detail_screen.dart';
+import 'package:provider/provider.dart';
 import '../models/message_model.dart';
 import '../services/post_services.dart';
 
@@ -23,15 +25,18 @@ class _UserPostListScreenState extends State<UsersPostsListScreen> {
   // Utility 생성 필요함.
   @override
   Widget build(BuildContext context) {
+    // 2023.08.13, jdk
+    // user_post_list_screen.dart
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(50),
         child: AppBar(
           title: Text(
-            "자유 게시판",
+            "자유게시판",
             style: TextStyle(
               color: ColorPalette.whiteColor,
               fontFamily: 'Pretendard',
+              fontSize: 15,
             ),
           ),
           centerTitle: true,

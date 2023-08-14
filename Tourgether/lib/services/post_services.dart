@@ -14,7 +14,7 @@ class PostServices {
   static const String postUserContentUrl = "/api/postUserContent";
   static const String getUsersPostsListUrl = "/api/getUsersPostsList";
   static const String pressedLikeButtonUrl = "/api/pressedLikeButton";
-  static const String isPressedPostLikeUrl = "/api/isPressedPostLike";
+  static const String isLikeButtonPressedUrl = "/api/isLikeButtonPressed";
 
   static Future<bool> postUserContent(Map<String, dynamic> postData) async {
     Log.logger.d(
@@ -84,13 +84,13 @@ class PostServices {
 
   // 2023.08.13, jdk
   // 현재 게시글에 좋아요를 눌렀는지 체크하는 API
-  static Future<bool> isPressedPostLike(Map<String, dynamic> postData) async {
+  static Future<bool> isLikeButtonPressed(Map<String, dynamic> postData) async {
     String jsonData = jsonEncode(postData);
     Log.logger.d("jsonData : ${jsonData}");
 
     try {
       var response = await http.post(
-        Uri.parse(baseUrl + isPressedPostLikeUrl),
+        Uri.parse(baseUrl + isLikeButtonPressedUrl),
         headers: headers,
         body: jsonData,
       );
@@ -98,13 +98,13 @@ class PostServices {
       var jsonResponse;
       if (response.statusCode == 200) {
         Log.logger.d(
-          "Successfully received the response on /api/isPressedPostLike",
+          "Successfully received the response on /api/isPressedPostLikeButton",
         );
 
         jsonResponse = convert.jsonDecode(response.body);
       } else {
         Log.logger.d(
-          "Failed to receive the response on /api/isPressedPostLike",
+          "Failed to receive the response on /api/isPressedPostLikeButton",
         );
 
         // 2023.08.13, jdk

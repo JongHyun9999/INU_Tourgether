@@ -234,13 +234,13 @@ app.post('/api/pressedLikeButton', async (req, res) => {
 
   const rid = likedPostData.rid;
   const user_name = likedPostData.user_name;
-  const isCanceled = likedPostData.isCanceled;
+  const isPressed = likedPostData.isPressed;
 
   let added_num = null;
   let QUERY_STR_UPDATE_LIKE_ROW = null;
 
   // 새롭게 좋아요를 등록하는 경우
-  if (isCanceled == false) {
+  if (isPressed == true) {
     added_num = 1;
     QUERY_STR_UPDATE_LIKE_ROW = `INSERT INTO User_Posts_Like(rid, user_name) VALUES(${rid}, '${user_name}');`;
   }
@@ -287,7 +287,7 @@ app.post('/api/pressedLikeButton', async (req, res) => {
 });
 
 
-app.post('/api/isPressedPostLike', async (req, res) => {
+app.post('/api/isLikeButtonPressed', async (req, res) => {
   let conn = null;
 
   const likedPostData = req.body;
@@ -295,7 +295,11 @@ app.post('/api/isPressedPostLike', async (req, res) => {
   const rid = likedPostData.rid;
   const user_name = likedPostData.user_name;
 
-  const QUERY_STR = `SELECT 1 FROM User_Posts_Like WHERE rid=${rid} and user_name='${user_name}';`;
+  const QUERY_STR = `SELECT EXISTS (
+    SELECT 1
+    FROM User_Posts_Like
+    WHERE rid = ${rid} AND user_name = '${user_name}'
+    ) AS row_exists;`;
   let isPressed = false;
 
   try {
@@ -312,20 +316,19 @@ app.post('/api/isPressedPostLike', async (req, res) => {
     // catch를 추가하여 error handling이 필요함.
     const [rows] = await conn.promise().query(QUERY_STR);
 
-    console.log(rows);
+    console.log(rows[0]);
 
-    if (rows[0]['1'] == 1) {
+    // 2023.08.14, jdk
+    // 1이라는 이름 바꾸기. => pressedLike
+    if (rows[0].row_exists == 1) {
       isPressed = true;
     }
-
-    console.log('rows.affectedRows : ', rows.affectedRows);
-    console.log('isPressed : ', isPressed);
 
     // rows 반환이 필요함?
     // 필요하지 않은 것으로 생각되어, sendStatus로 교체
     // console.log(rows);
 
-    console.log('Successfully applied user\'s like on DB. [/api/pressedLikeButton]');
+    console.log('Successfully checked the pressed state of the like button. [/api/isPressedLikeButton]');
     res.status(200).json({
       isPressed: isPressed,
     });

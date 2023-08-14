@@ -1,12 +1,16 @@
 import 'package:TourGather/utilities/color_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:provider/provider.dart';
 
 import '../models/message_model.dart';
+import '../providers/user_post_provider.dart';
 import '../screens/user_post_detail_screen.dart';
+import '../services/post_services.dart';
+import '../utilities/log.dart';
 
 class UserPost extends StatelessWidget {
-  const UserPost({
+  UserPost({
     super.key,
     required this.postData,
     required this.index,
@@ -22,13 +26,35 @@ class UserPost extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => UserPostDetailScreen(
-              postData: postData,
-            ),
-          ),
+        // 사용자의 좋아요 정보를 가져옴.
+        Map<String, dynamic> postDataForLikeCheking = {
+          'rid': postData.rid,
+          'user_name': postData.user_name,
+        };
+
+        PostServices.isLikeButtonPressed(postDataForLikeCheking).then(
+          (likeValue) {
+            context.read<UserPostProvider>().selectedPostLikeNum =
+                postData.liked;
+
+            if (likeValue == true) {
+              // 2023.08.14, jdk
+              // API 통신 결과 이미 좋아요를 눌렀다면 UserPostProvider에서 값을 true로 변경한다.
+
+              context.read<UserPostProvider>().isLikePressed = true;
+            } else if (likeValue == false) {
+              context.read<UserPostProvider>().isLikePressed = false;
+            }
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => UserPostDetailScreen(
+                  postData: postData,
+                ),
+              ),
+            );
+          },
         );
       },
       child: Container(

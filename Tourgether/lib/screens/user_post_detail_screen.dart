@@ -2,8 +2,10 @@ import 'package:TourGather/utilities/color_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
+import 'package:provider/provider.dart';
 
 import '../models/message_model.dart';
+import '../providers/user_post_provider.dart';
 import '../services/post_services.dart';
 import '../utilities/log.dart';
 import '../widgets/user_post_comment.dart';
@@ -25,6 +27,7 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
 
   late final int rid;
   late final String user_name;
+  late final String title;
   late final String content;
   late final double latitude;
   late final double longitude;
@@ -52,6 +55,7 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
 
     rid = widget.postData.rid;
     user_name = widget.postData.user_name;
+    title = widget.postData.title;
     content = widget.postData.content;
     latitude = widget.postData.latitude;
     longitude = widget.postData.longitude;
@@ -59,24 +63,43 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
     liked = widget.postData.liked;
     comments_num = widget.postData.comments_num;
 
-    checkLikeButtonPressed();
+    MessageModel postData = MessageModel(
+      rid: rid,
+      user_name: user_name,
+      title: title,
+      content: content,
+      latitude: latitude,
+      longitude: longitude,
+      posted_time: posted_time,
+      liked: liked,
+      comments_num: comments_num,
+    );
+
+    // 2023.08.14, jdk
+    // TODO MessageModel 이름 수정. => UserPostModel
+    // Provider에 CurrentSelectedPost(MessageModel) 데이터 초기화하기.
+    context.read<UserPostProvider>().setCurrentSelectedPostData(postData);
   }
 
-  checkLikeButtonPressed() {
-    Map<String, dynamic> postData = {
-      'rid': rid,
-      'user_name': user_name,
-    };
+  // checkLikeButtonPressed() {
+  //   Map<String, dynamic> postData = {
+  //     'rid': rid,
+  //     'user_name': user_name,
+  //   };
 
-    PostServices.isPressedPostLike(postData).then((isPressedPostLike) {
-      if (isPressedPostLike == true) {
-        isLikePressed = true;
-        Log.logger.d("check : ${isLikePressed}");
+  //   PostServices.isPressedPostLike(postData).then(
+  //     (isPressedPostLike) {
+  //       if (isPressedPostLike == true) {
+  //         isLikePressed = true;
+  //         Log.logger.d("check : ${isLikePressed}");
 
-        setState(() {});
-      }
-    });
-  }
+  //         // 2023.08.14, jdk
+  //         // API 통신 결과 이미 좋아요를 눌렀다면 UserPostProvider에서 값을 true로 변경한다.
+  //         context.read<UserPostProvider>().changeCurrentPostLikeButtonState();
+  //       }
+  //     },
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +165,7 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                           // user_id, posted_time
                           Container(
                             child: Text(
-                              "${widget.postData.user_name}",
+                              "${user_name}",
                               style: TextStyle(
                                 fontFamily: 'Pretendard',
                                 fontSize: 13,
@@ -152,7 +175,7 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                           ),
                           Container(
                             child: Text(
-                              "${widget.postData.posted_time.substring(0, 16)}",
+                              "${posted_time.substring(0, 16)}",
                               style: TextStyle(
                                 fontFamily: 'Pretendard',
                                 fontSize: 13,
@@ -196,7 +219,7 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                       Expanded(
                         child: Container(
                           child: Text(
-                            "${widget.postData.title}",
+                            "${title}",
                             style: TextStyle(
                               fontFamily: 'Pretendard',
                               fontSize: 20,
@@ -222,7 +245,7 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                     children: [
                       Flexible(
                         child: Text(
-                          "${widget.postData.content}",
+                          "${content}",
                         ),
                       ),
                     ],
@@ -248,67 +271,94 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                           // TODO : 현재 유저의 로그인 정보를 이용하여
                           // 좋아요 기능에 유저 아이디가 변수로 전달되도록 변경.
 
+                          // 현재 Provider에서 가진 isLikeButtonPressed 상태를 반전하여
+                          // 이후에 반영될 결과를 서버에 전달함.
+                          bool isPressed =
+                              context.read<UserPostProvider>().isLikePressed;
+                          isPressed = !isPressed;
+
                           Map<String, dynamic> likedPostData = {
                             "rid": rid,
                             "user_name": "개발자정동교",
+                            "isPressed": isPressed,
                           };
 
-                          // 좋아요를 누른 경우.
-                          if (isLikePressed == true) {
-                            liked++;
-                            likedPostData['isCanceled'] = false;
-                            // 좋아요를 취소한 경우.
-                          } else if (isLikePressed == false) {
-                            liked--;
-                            likedPostData['isCanceled'] = true;
-                          }
+                          // // 좋아요를 누른 경우.
+                          // if (context.read<UserPostProvider>().isLikePressed == false) {
+                          //   // liked++;
+                          //   likedPostData['isPressed'] = true;
+                          //   Log.logger.d("true");
+                          //   // 좋아요를 취소한 경우.
+                          // } else {
+                          //   // liked--;
+                          //   likedPostData['isPressed'] = false;
+                          //   Log.logger.d("false");
+                          // }
 
                           bool isSucceeded =
                               await PostServices.pressedLikeButton(
                             likedPostData,
                           );
 
+                          // 2023.08.14, jdk
+                          // API 통신 결, 좋아요 기능이 반영되었으므로
+                          // UserPostProvider에서 결과를 바꿔준다.
                           if (isSucceeded) {
-                            Log.logger.d("성공");
+                            context
+                                .read<UserPostProvider>()
+                                .changeCurrentPostLikeButtonState();
+                            Log.logger.d("좋아요 반영 성공");
                           } else {
-                            Log.logger.d("실패");
+                            Log.logger.d("좋아요 반영 실패");
                           }
-
-                          setState(() {});
                         },
-                        child: Container(
-                          height: 40,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: (isLikePressed)
-                                ? ColorPalette.primaryContainer
-                                : ColorPalette.lightGreyColor,
-                          ),
-                          child: Row(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(10, 5, 5, 5),
-                                child: Icon(
-                                  (isLikePressed)
-                                      ? Icons.thumb_up_alt_rounded
-                                      : Icons.thumb_up_alt_outlined,
-                                  color: ColorPalette.whiteColor,
-                                ),
+                        child: Consumer<UserPostProvider>(
+                          builder: (context, userPostProvider, child) {
+                            Log.logger.d(
+                              "userPostProvider : ${userPostProvider.isLikePressed}",
+                            );
+
+                            Log.logger.d(
+                              "userPostProvider : ${userPostProvider.selectedPostLikeNum}",
+                            );
+
+                            return Container(
+                              height: 40,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: (userPostProvider.isLikePressed)
+                                    ? ColorPalette.primaryContainer
+                                    : ColorPalette.lightGreyColor,
                               ),
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(5, 5, 10, 5),
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    "${liked}",
-                                    style: TextStyle(
+                              child: Row(
+                                children: [
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(10, 5, 5, 5),
+                                    child: Icon(
+                                      (userPostProvider.isLikePressed)
+                                          ? Icons.thumb_up_alt_rounded
+                                          : Icons.thumb_up_alt_outlined,
                                       color: ColorPalette.whiteColor,
                                     ),
                                   ),
-                                ),
-                              )
-                            ],
-                          ),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(5, 5, 10, 5),
+                                    child: Container(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        "${context.read<UserPostProvider>().selectedPostLikeNum}",
+                                        style: TextStyle(
+                                          color: ColorPalette.whiteColor,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            );
+                          },
                         ),
                       ),
                       SizedBox(
