@@ -17,6 +17,10 @@ class PostServices {
   static const baseUrl = "http://10.0.2.2:3000";
   static const String postUserContentUrl = "/api/postUserContent";
   static const String getUsersPostsListUrl = "/api/getUsersPostsList";
+  static const String postSigninUrl = "/api/postSignin";
+  static const String postSignupUrl = "/api/postSignup";
+  static const String emailVerifyUrl = "/api/emailVerify";
+  static const String addUserUrl = "/api/addUser";
 
   static Future<bool> postUserContent(Map<String, dynamic> postData) async {
     logger.d(
@@ -80,6 +84,123 @@ class PostServices {
     } catch (error) {
       logger.e("An error occurred while fetching users posts", error: error);
       throw Exception("An error occurred while fetching users posts");
+    }
+  }
+
+  static Future<bool> postSignin(Map<String, dynamic> postData) async {
+    logger.d(
+        "postUserContent : URL[${baseUrl + postSigninUrl}]\npassed data : ${postData}");
+
+    String jsonData = jsonEncode(postData);
+
+    try {
+      return await http
+          .post(
+        Uri.parse(baseUrl + postSigninUrl),
+        headers: headers,
+        body: jsonData,
+      )
+          .then((response) {
+        if (response.statusCode == 200) {
+          logger.d("A post successfully uploaded on DB.");
+          return true;
+        } else {
+          logger.e(
+            "An error occurred while uploading a post on DB. (statusCode is not 200)",
+          );
+          throw Exception();
+        }
+      });
+    } catch (error) {
+      logger.e("error", error: error);
+      return false;
+    }
+  }
+
+  static Future<bool> postSignup(Map<String, dynamic> postData) async {
+    logger.d(
+        "postUserContent : URL[${baseUrl + postSignupUrl}]\npassed data : ${postData}");
+    String jsonData = jsonEncode(postData);
+
+    try {
+      return await http
+          .post(
+        Uri.parse(baseUrl + postSignupUrl),
+        headers: headers,
+        body: jsonData,
+      )
+          .then((response) {
+        if (response.statusCode == 200) {
+          logger.d("A post successfully uploaded on DB.");
+          return true;
+        } else {
+          logger.e(
+            "An error occurred while uploading a post on DB. (statusCode is not 200)",
+          );
+          throw Exception();
+        }
+      });
+    } catch (error) {
+      logger.e("error", error: error);
+      return false;
+    }
+  }
+
+  static Future<bool> emailVerify(Map<String, dynamic> postData) async {
+    logger.d(
+        "postUserContent : URL[${baseUrl + emailVerifyUrl}]\npassed data : ${postData}");
+    String jsonData = jsonEncode(postData);
+
+    try {
+      return await http
+          .post(
+        Uri.parse(baseUrl + emailVerifyUrl),
+        headers: headers,
+        body: jsonData,
+      )
+          .then((response) {
+        if (response.statusCode == 200) {
+          logger.d("A post successfully uploaded on DB.");
+          return true;
+        } else {
+          logger.e(
+            "An error occurred while uploading a post on DB. (statusCode is not 200)",
+          );
+          throw Exception();
+        }
+      });
+    } catch (error) {
+      logger.e("error", error: error);
+      return false;
+    }
+  }
+
+  static Future<bool> postAddUser(Map<String, dynamic> postData) async {
+    logger.d(
+        "postUserContent : URL[${baseUrl + addUserUrl}]\npassed data : ${postData}");
+    String jsonData = jsonEncode(postData);
+
+    try {
+      return await http
+          .post(
+        Uri.parse(baseUrl + addUserUrl),
+        headers: headers,
+        body: jsonData,
+      )
+          .then((response) {
+        if (response.statusCode == 200) {
+          logger.d("A post successfully uploaded on DB.");
+          return true;
+        } else {
+          logger.e(
+            "An error occurred while uploading a post on DB. (statusCode is not 200)",
+          );
+          throw Exception();
+        }
+      });
+    } catch (error) {
+      logger.e("error", error: error);
+      return false;
     }
   }
 }

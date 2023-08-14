@@ -1,3 +1,5 @@
+import 'package:TourGather/screens/signup_verify_screen.dart';
+import 'package:TourGather/services/post_services.dart';
 import 'package:flutter/material.dart';
 import 'package:TourGather/main.dart';
 import 'package:TourGather/screens/main_screen.dart';
@@ -41,7 +43,7 @@ class LoginSignupScreen extends StatefulWidget {
 }
 
 class _LoginSignupScreenState extends State<LoginSignupScreen> {
-  late bool isSignUpScreen = true;
+  late bool isSignUpScreen = false;
   final _formKey = GlobalKey<FormState>();
   bool _passwordVisible = false;
 
@@ -51,20 +53,68 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
   String userStudentNumber = '';
   String userEmail = '';
 
-  void _tryValidation() {
+  void _tryValidation() async {
     // 로그인 인증 부분.
-    // 일단 프리패스로 작성
-    // final isValid = _formKey.currentState!.validate();
-    // if (isValid) {
-    //   _formKey.currentState!.save();
-    // }
+    final isValid = _formKey.currentState!.validate();
+    if (!isValid) {
+      // 입력 양식이 올바르지 않을때.
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('올바르지 않은 이메일 양식입니다.')));
+    } else {
+      // onSaved 함수 실행.
+      _formKey.currentState!.save();
+
+      // 23.08.12 pjh
+      // 로그인 api 전송.
+      // 로그인 성공 시 메인페이지로 넘어간다.
+      Map<String, dynamic> postData = {};
+      postData['email'] = userEmail;
+      postData['password'] = userPassword;
+      bool isPostSucceeded = await PostServices.postSignin(postData);
+      print(isPostSucceeded);
+
+      if (isPostSucceeded) {
+        // ----------------------------------------
+        // 2023.08.04, jdk
+        // 페이지 이동 방식을 named 방식으로 변경,
+        // 로그인 페이지로 돌아오는 것을 막기 위하여
+        // pushNamedAndRemoveUntil로 변경한다.
+        //
+        // 메서드의 세 번째 인자를 통해서
+        // 내가 지울 Page를 지정할 수 있는 방식인데,
+        // callback 함수에 대하여 true를 return하면
+        // 현재 widget tree에서 지워지게 된다.
+        // (_) => false 로 지정하면 모든 페이지를 지운다.
+        // ----------------------------------------
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          "/main",
+          (_) => false,
+        );
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('등록되지 않은 이메일 혹은 비밀번호입니다.')));
+      }
+      
+    }
+  }
+
+  void _trySignup() async {
+    _formKey.currentState!.save();
+    Map<String, dynamic> postData = {};
+    postData['email'] = userEmail;
+    print(userEmail);
+    PostServices.postSignup(postData);
+
+    Navigator.push(context,
+            MaterialPageRoute(builder: (context) => SignUpVerifyScrren(email: userEmail)));
   }
 
   TextEditingController stringController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Palette.backgroundColor,
+        backgroundColor: Colors.blueAccent,
         body: GestureDetector(
           // 다른 곳 선택 시 소프트 키보드 자동 내림
           onTap: () {
@@ -77,66 +127,18 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                 right: 0,
                 left: 0,
                 child: Container(
-                    height: 300,
-                    // decoration: const BoxDecoration(
-                    //     image: DecorationImage(
-                    //         image: AssetImage('image/purple.png'),
-                    //         fit: BoxFit.fill)),
-                    child: Container(
-                        padding: const EdgeInsets.only(top: 90, left: 20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            RichText(
-                              text: TextSpan(
-                                  text: 'Welcome',
-                                  style: const TextStyle(
-                                      letterSpacing: 1.0,
-                                      fontSize: 25,
-                                      color: Colors.white),
-                                  children: [
-                                    TextSpan(
-                                      text: isSignUpScreen ? ' ' : ' back!',
-                                      style: const TextStyle(
-                                          letterSpacing: 1.0,
-                                          fontSize: 25,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    if (isSignUpScreen)
-                                      const TextSpan(
-                                        text: 'to ',
-                                        style: TextStyle(
-                                          letterSpacing: 1.0,
-                                          fontSize: 25,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    if (isSignUpScreen)
-                                      const TextSpan(
-                                        text: 'Tourgather!',
-                                        style: TextStyle(
-                                            letterSpacing: 1.0,
-                                            fontSize: 25,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                  ]),
-                            ),
-                            const SizedBox(
-                              height: 5.0,
-                            ),
-                            Text(
-                              isSignUpScreen
-                                  ? 'Signup to Continue'
-                                  : 'Signin to Continue',
-                              style: const TextStyle(
-                                letterSpacing: 1.0,
-                                color: Colors.white,
-                              ),
-                            )
-                          ],
-                        ))),
+                  height: MediaQuery.of(context).size.height / 5,
+                  width: MediaQuery.of(context).size.width * 0.7,
+                  child: Container(
+                      padding: EdgeInsets.only(top: 90, left: 20),
+                      child: Text(
+                        '투게더에 오신걸 환영합니다!',
+                        style: TextStyle(
+                            fontSize: 25,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold),
+                      )),
+                ),
               ),
               //배경을 위한 포지션
               AnimatedPositioned(
@@ -147,7 +149,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                       duration: const Duration(milliseconds: 500),
                       curve: Curves.easeIn,
                       padding: const EdgeInsets.all(20.0),
-                      height: isSignUpScreen ? 450.0 : 250.0,
+                      height: isSignUpScreen ? 200.0 : 250.0,
                       //mediaQuery가 항상 좌우 픽셀의 40만큼 띄도록 한다
                       width: MediaQuery.of(context).size.width - 40,
                       margin: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -178,7 +180,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                   child: Column(
                                     children: [
                                       Text(
-                                        'LOGIN',
+                                        '로그인',
                                         style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
@@ -190,7 +192,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                         Container(
                                           height: 2,
                                           width: 55,
-                                          color: Colors.orange,
+                                          color: Colors.blueAccent,
                                         )
                                     ],
                                   ),
@@ -204,7 +206,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                   child: Column(
                                     children: [
                                       Text(
-                                        'SIGNUP',
+                                        '회원등록',
                                         style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
@@ -216,7 +218,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                         Container(
                                           height: 2,
                                           width: 55,
-                                          color: Colors.orange,
+                                          color: Colors.blueAccent,
                                         )
                                     ],
                                   ),
@@ -224,6 +226,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                               ],
                             ),
                             if (isSignUpScreen)
+                              // 회원가입 스크린
                               (AnimatedContainer(
                                   duration: const Duration(milliseconds: 500),
                                   curve: Curves.easeIn,
@@ -235,226 +238,8 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                           key: const ValueKey(1),
                                           validator: (value) {
                                             if (value!.isEmpty ||
-                                                value.length < 5) {
-                                              return 'Please enter over 5 length';
-                                            }
-                                            return null;
-                                          },
-                                          onSaved: (value) {
-                                            userName = value!;
-                                          },
-                                          decoration: const InputDecoration(
-                                              prefixIcon: Icon(
-                                                Icons.account_circle,
-                                                color: Palette.iconColor,
-                                              ),
-                                              enabledBorder: OutlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                      color:
-                                                          Palette.textColor1),
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              35.0))),
-                                              focusedBorder: OutlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                      color:
-                                                          Palette.textColor1),
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              35.0))),
-                                              hintText: 'User name',
-                                              hintStyle: TextStyle(
-                                                  fontSize: 14,
-                                                  color: Palette.textColor1),
-                                              contentPadding:
-                                                  EdgeInsets.all(10))),
-                                      const SizedBox(
-                                        height: 8,
-                                      ),
-                                      TextFormField(
-                                          key: const ValueKey(2),
-                                          //controller: _userPasswordController,
-                                          obscureText: !_passwordVisible,
-                                          validator: (value) {
-                                            if (value!.isEmpty ||
-                                                value.length < 8) {
-                                              return 'Please enter over 8 length';
-                                            }
-                                            return null;
-                                          },
-                                          onSaved: (value) {
-                                            userPassword = value!;
-                                          },
-                                          decoration: InputDecoration(
-                                              prefixIcon: const Icon(
-                                                Icons.lock_rounded,
-                                                color: Palette.iconColor,
-                                              ),
-                                              suffixIcon: IconButton(
-                                                icon: Icon(
-                                                  size: 20,
-                                                  _passwordVisible
-                                                      ? Icons.visibility
-                                                      : Icons.visibility_off,
-                                                  color: Theme.of(context)
-                                                      .primaryColorDark,
-                                                ),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    _passwordVisible =
-                                                        !_passwordVisible;
-                                                  });
-                                                },
-                                              ),
-                                              enabledBorder:
-                                                  const OutlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                          color: Palette
-                                                              .textColor1),
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                              Radius.circular(
-                                                                  35.0))),
-                                              focusedBorder:
-                                                  const OutlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                          color: Palette
-                                                              .textColor1),
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                              Radius.circular(
-                                                                  35.0))),
-                                              hintText: 'Password',
-                                              hintStyle: const TextStyle(
-                                                  fontSize: 14,
-                                                  color: Palette.textColor1),
-                                              contentPadding:
-                                                  const EdgeInsets.all(10))),
-                                      const SizedBox(
-                                        height: 8,
-                                      ),
-                                      TextFormField(
-                                          key: const ValueKey(3),
-                                          obscureText: true,
-                                          decoration: const InputDecoration(
-                                              prefixIcon: Icon(
-                                                Icons.lock_rounded,
-                                                color: Palette.iconColor,
-                                              ),
-                                              enabledBorder: OutlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                      color:
-                                                          Palette.textColor1),
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              35.0))),
-                                              focusedBorder: OutlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                      color:
-                                                          Palette.textColor1),
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              35.0))),
-                                              hintText: 'Password repeat',
-                                              hintStyle: TextStyle(
-                                                  fontSize: 14,
-                                                  color: Palette.textColor1),
-                                              contentPadding:
-                                                  EdgeInsets.all(10))),
-                                      const SizedBox(
-                                        height: 8,
-                                      ),
-                                      TextFormField(
-                                          key: const ValueKey(4),
-                                          onSaved: (value) {
-                                            userDepartment = value!;
-                                          },
-                                          decoration: const InputDecoration(
-                                              prefixIcon: Icon(
-                                                Icons.account_tree,
-                                                color: Palette.iconColor,
-                                              ),
-                                              enabledBorder: OutlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                      color:
-                                                          Palette.textColor1),
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              35.0))),
-                                              focusedBorder: OutlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                      color:
-                                                          Palette.textColor1),
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              35.0))),
-                                              hintText: 'Department',
-                                              hintStyle: TextStyle(
-                                                  fontSize: 14,
-                                                  color: Palette.textColor1),
-                                              contentPadding:
-                                                  EdgeInsets.all(10))),
-                                      const SizedBox(
-                                        height: 8,
-                                      ),
-                                      TextFormField(
-                                          key: const ValueKey(5),
-                                          controller: stringController,
-                                          validator: (value) {
-                                            String checkingString =
-                                                stringController.text.trim();
-                                            if (value!.isEmpty) {
-                                              return 'Please enter all';
-                                            }
-                                            if (checkingString.isNotEmpty) {
-                                              return 'Do not enter String';
-                                            }
-                                            return null;
-                                          },
-                                          onSaved: (value) {
-                                            userStudentNumber = value!;
-                                          },
-                                          decoration: const InputDecoration(
-                                              prefixIcon: Icon(
-                                                Icons.numbers_rounded,
-                                                color: Palette.iconColor,
-                                              ),
-                                              enabledBorder: OutlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                      color:
-                                                          Palette.textColor1),
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              35.0))),
-                                              focusedBorder: OutlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                      color:
-                                                          Palette.textColor1),
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              35.0))),
-                                              hintText: 'Student Number',
-                                              hintStyle: TextStyle(
-                                                  fontSize: 14,
-                                                  color: Palette.textColor1),
-                                              contentPadding:
-                                                  EdgeInsets.all(10))),
-                                      const SizedBox(
-                                        height: 8,
-                                      ),
-                                      TextFormField(
-                                          key: const ValueKey(6),
-                                          validator: (value) {
-                                            if (value!.isEmpty ||
-                                                value.contains('@')) {
+                                                !value.contains('@')) {
+                                              print(value);
                                               return 'Please enter a valid email address';
                                             }
                                             return null;
@@ -483,12 +268,15 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                                       BorderRadius.all(
                                                           Radius.circular(
                                                               35.0))),
-                                              hintText: 'E-mail',
+                                              hintText: '학교 이메일',
                                               hintStyle: TextStyle(
                                                   fontSize: 14,
                                                   color: Palette.textColor1),
                                               contentPadding:
                                                   EdgeInsets.all(10))),
+                                      const SizedBox(
+                                        height: 8,
+                                      ),
                                     ]),
                                   )))
                             else
@@ -498,20 +286,20 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                     key: _formKey,
                                     child: Column(children: [
                                       TextFormField(
-                                          key: const ValueKey(7),
-                                          onSaved: (value) {
-                                            userName = value!;
-                                          },
+                                          key: const ValueKey(1),
                                           validator: (value) {
                                             if (value!.isEmpty ||
-                                                value.length < 5) {
-                                              return 'Please enter over 5 length';
+                                                !value.contains('@')) {
+                                              return 'Please enter a valid email address';
                                             }
                                             return null;
                                           },
+                                          onSaved: (value) {
+                                            userEmail = value!;
+                                          },
                                           decoration: const InputDecoration(
                                               prefixIcon: Icon(
-                                                Icons.account_circle,
+                                                Icons.mail_rounded,
                                                 color: Palette.iconColor,
                                               ),
                                               enabledBorder: OutlineInputBorder(
@@ -530,7 +318,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                                       BorderRadius.all(
                                                           Radius.circular(
                                                               35.0))),
-                                              hintText: 'User name',
+                                              hintText: '학교 이메일',
                                               hintStyle: TextStyle(
                                                   fontSize: 14,
                                                   color: Palette.textColor1),
@@ -591,7 +379,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                                           BorderRadius.all(
                                                               Radius.circular(
                                                                   35.0))),
-                                              hintText: 'Password',
+                                              hintText: '비밀번호',
                                               hintStyle: const TextStyle(
                                                   fontSize: 14,
                                                   color: Palette.textColor1),
@@ -609,7 +397,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
               AnimatedPositioned(
                   duration: const Duration(milliseconds: 500),
                   curve: Curves.easeIn,
-                  top: isSignUpScreen ? 580 : 390,
+                  top: isSignUpScreen ? 340 : 390,
                   right: 0,
                   left: 0,
                   child: Center(
@@ -622,35 +410,16 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                           borderRadius: BorderRadius.circular(50)),
                       child: GestureDetector(
                         onTap: () {
-                          // _tryValidation();
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder: (context) => MainScreen()));
-
-                          // ----------------------------------------
-                          // 2023.08.04, jdk
-                          // 페이지 이동 방식을 named 방식으로 변경,
-                          // 로그인 페이지로 돌아오는 것을 막기 위하여
-                          // pushNamedAndRemoveUntil로 변경한다.
-                          //
-                          // 메서드의 세 번째 인자를 통해서
-                          // 내가 지울 Page를 지정할 수 있는 방식인데,
-                          // callback 함수에 대하여 true를 return하면
-                          // 현재 widget tree에서 지워지게 된다.
-                          // (_) => false 로 지정하면 모든 페이지를 지운다.
-                          // ----------------------------------------
-
-                          Navigator.pushNamedAndRemoveUntil(
-                            context,
-                            "/main",
-                            (_) => false,
-                          );
+                          if (isSignUpScreen) {
+                            _trySignup();
+                          } else {
+                            _tryValidation();
+                          }
                         },
                         child: Container(
                           decoration: BoxDecoration(
                               gradient: const LinearGradient(
-                                  colors: [Colors.purple, Colors.white],
+                                  colors: [Colors.blueAccent, Colors.white],
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight),
                               borderRadius: BorderRadius.circular(30),

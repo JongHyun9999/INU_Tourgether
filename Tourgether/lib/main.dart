@@ -1,4 +1,5 @@
 import 'package:TourGather/providers/main_screen_ui_provider.dart';
+import 'package:TourGather/screens/make_user_screen.dart';
 import 'package:TourGather/utilities/color_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:TourGather/providers/gps_provider.dart';
