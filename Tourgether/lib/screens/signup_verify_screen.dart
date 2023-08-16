@@ -4,6 +4,7 @@ import 'package:TourGather/services/post_services.dart';
 import 'package:flutter/material.dart';
 import 'package:TourGather/main.dart';
 import 'package:TourGather/screens/main_screen.dart';
+import 'package:http/http.dart';
 
 import '../utilities/color_palette.dart';
 
@@ -49,14 +50,14 @@ class _SignUpVerifyScrrenState extends State<SignUpVerifyScrren> {
   final _formKey = GlobalKey<FormState>();
   bool _passwordVisible = false;
 
-  String userName = '';
-  String userPassword = '';
-  String userMajor = '';
+  String user_otp_code = '';
   String userEmail = '';
 
   void _tryValidation() async {
+    _formKey.currentState!.save();
     Map<String, dynamic> postData = {};
     postData['email'] = userEmail;
+    postData['otp_code'] = user_otp_code;
     bool isPostSucceeded = await PostServices.emailVerify(postData);
     print(isPostSucceeded);
 
@@ -74,7 +75,7 @@ class _SignUpVerifyScrrenState extends State<SignUpVerifyScrren> {
               builder: (context) => MakeUserScreen(email: userEmail)));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('인증이 완료되지 않았습니다. 이메일을 확인해주세요.')));
+          SnackBar(content: Text('인증번호가 일치하지 않습니다. 이메일을 확인해주세요.')));
     }
   }
 
@@ -175,7 +176,7 @@ class _SignUpVerifyScrrenState extends State<SignUpVerifyScrren> {
                                           return null;
                                         },
                                         onSaved: (value) {
-                                          userPassword = value!;
+                                          user_otp_code = value!;
                                         },
                                         decoration: InputDecoration(
                                             prefixIcon: const Icon(

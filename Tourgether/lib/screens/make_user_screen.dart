@@ -32,7 +32,6 @@ class _MakeUserScreenState extends State<MakeUserScreen> {
   String userName = '';
   String userPassword = '';
   String userDepartment = '';
-  String userStudentNumber = '';
   String userEmail = '';
 
   void _tryAddUser() async {
@@ -43,18 +42,26 @@ class _MakeUserScreenState extends State<MakeUserScreen> {
     postData['uid'] = parts[0];
     postData['email'] = userEmail;
     postData['password'] = userPassword;
-    postData['name'] = '정동교입니다';
+    postData['name'] = userName;
+    postData['major'] = userDepartment;
 
-    await PostServices.postAddUser(postData);
+    bool is_duplicate_name = await PostServices.checkDupName(postData);
+    if (!is_duplicate_name) {
+      await PostServices.postAddUser(postData);
+      print('회원가입 성공');
+      // pjh. 23.08.13
+      // 추후에 provider 추가해서 인자로 메일주소 넘길 필요없게 처리해야함.
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        "/signin",
+        (_) => false,
+      );
+    }
+    else{
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('중복되는 이름이 존재합니다. 다른 이름을 입력해주세요.')));
+    }
 
-    print('회원가입 성공');
-    // pjh. 23.08.13
-    // 추후에 provider 추가해서 인자로 메일주소 넘길 필요없게 처리해야함.
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      "/signin",
-      (_) => false,
-    );
     // Navigator.push(
     //     context, MaterialPageRoute(builder: (context) => LoginSignupScreen()));
   }
@@ -98,7 +105,7 @@ class _MakeUserScreenState extends State<MakeUserScreen> {
                       duration: const Duration(milliseconds: 500),
                       curve: Curves.easeIn,
                       padding: const EdgeInsets.all(20.0),
-                      height: isSignUpScreen ? 200.0 : 250.0,
+                      height: 350.0,
                       //mediaQuery가 항상 좌우 픽셀의 40만큼 띄도록 한다
                       width: MediaQuery.of(context).size.width - 40,
                       margin: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -272,6 +279,78 @@ class _MakeUserScreenState extends State<MakeUserScreen> {
                                     const SizedBox(
                                       height: 8,
                                     ),
+                                    TextFormField(
+                                      key: const ValueKey(7),
+                                      onSaved: (value) {
+                                        userName = value!;
+                                      },
+                                      validator: (value) {
+                                        if (value!.isEmpty ||
+                                            value.length < 1 ||
+                                            value.length > 10) {
+                                          return 'Please enter name in 2~10 length';
+                                        }
+                                        return null;
+                                      },
+                                      decoration: const InputDecoration(
+                                        prefixIcon: Icon(
+                                          Icons.account_circle,
+                                          color: Palette.iconColor,
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color:
+                                                    Palette.textColor1),
+                                            borderRadius:
+                                                BorderRadius.all(
+                                                    Radius.circular(
+                                                        35.0))),
+                                        focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color:
+                                                    Palette.textColor1),
+                                            borderRadius:
+                                                BorderRadius.all(
+                                                    Radius.circular(
+                                                        35.0))),
+                                        hintText: '닉네임',
+                                        hintStyle: TextStyle(
+                                            fontSize: 14,
+                                            color: Palette.textColor1),
+                                        contentPadding:
+                                            EdgeInsets.all(10))),
+                                    const SizedBox(
+                                      height: 8,
+                                    ),
+                                    TextFormField(
+                                        key: const ValueKey(4),
+                                        onSaved: (value) {
+                                          userDepartment = value!;
+                                        },
+                                        decoration: const InputDecoration(
+                                            prefixIcon: Icon(
+                                              Icons.account_tree,
+                                              color: Palette.iconColor,
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Palette.textColor1),
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(35.0))),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Palette.textColor1),
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(35.0))),
+                                            hintText: 'Department',
+                                            hintStyle: TextStyle(
+                                                fontSize: 14,
+                                                color: Palette.textColor1),
+                                            contentPadding:
+                                                EdgeInsets.all(10))),
+                                    const SizedBox(
+                                      height: 8,
+                                    ),
                                   ]),
                                 ))
                           ],
@@ -281,7 +360,7 @@ class _MakeUserScreenState extends State<MakeUserScreen> {
               AnimatedPositioned(
                   duration: const Duration(milliseconds: 500),
                   curve: Curves.easeIn,
-                  top: isSignUpScreen ? 340 : 390,
+                  top: 490,
                   right: 0,
                   left: 0,
                   child: Center(

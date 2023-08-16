@@ -19,6 +19,7 @@ class PostServices {
   static const String postSignupUrl = "/api/postSignup";
   static const String emailVerifyUrl = "/api/emailVerify";
   static const String addUserUrl = "/api/addUser";
+  static const String checkDupNameUrl = "/api/checkDupName";
 
   static Future<bool> postUserContent(Map<String, dynamic> postData) async {
     Log.logger.d(
@@ -261,6 +262,35 @@ class PostServices {
       return await http
           .post(
         Uri.parse(baseUrl + addUserUrl),
+        headers: headers,
+        body: jsonData,
+      )
+          .then((response) {
+        if (response.statusCode == 200) {
+          Log.logger.d("A post successfully uploaded on DB.");
+          return true;
+        } else {
+          Log.logger.e(
+            "An error occurred while uploading a post on DB. (statusCode is not 200)",
+          );
+          throw Exception();
+        }
+      });
+    } catch (error) {
+      Log.logger.e("error", error: error);
+      return false;
+    }
+  }
+
+  static Future<bool> checkDupName(Map<String, dynamic> postData) async {
+    Log.logger.d(
+        "checkDupNameContent : URL[${baseUrl + checkDupNameUrl}]\npassed data : ${postData}");
+    String jsonData = jsonEncode(postData);
+
+    try {
+      return await http
+          .post(
+        Uri.parse(baseUrl + checkDupNameUrl),
         headers: headers,
         body: jsonData,
       )

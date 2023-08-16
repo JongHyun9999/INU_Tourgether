@@ -9,6 +9,7 @@ const fs = require('fs');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 const sharp = require('sharp');
+const crypto = require('crypto-js');
 
 const dbconfig = require('./cfg/dbconfig.json');
 let pool = mysql.createPool(dbconfig);
@@ -42,12 +43,7 @@ async function sendEmail(email, subject, content) {
     from: "premieravengers@gmail.com",
     to: email,          //이메일을 받는 주소
     subject: subject,   //이메일 제목
-    html: `<h1>이메일 인증</h1>
-            <div>
-              아래 버튼을 눌러 인증을 완료해주세요.
-              <a href='http://localhost:3000/api/processVerify/${email}'>이메일 인증하기</a>
-            </div>`,    //이메일 내용
-    text: 'Tourgather 앱을 이용해주셔서 감사합니다! \n인증을 완료하기 위해 아래 버튼을 눌러주세요.'
+    text: `Tourgather 앱을 이용해주셔서 감사합니다! \n인증을 완료하기 위해 아래 4자리 숫자를을 입력해주세요. \n  ${content}`
   };
 
   return new Promise((resolve, reject) => {
@@ -64,7 +60,6 @@ async function sendEmail(email, subject, content) {
   });
 }
 
-const dict_isverified = {};
 // ============================================
 
 // ====================== AWS S3 ======================
@@ -387,10 +382,13 @@ app.post('/api/isLikeButtonPressed', async (req, res) => {
 
 app.post('/api/postSignin', async (req, res) => {
   console.log('/api/postSignin 호출됨');
+  const hash_password = crypto.SHA256(req.body.password).toString();
+  console.log(hash_password);
+
   let conn = null;
   try {
 
-    let QUERY_STR = `SELECT user_email, user_password from User_Info where user_email = '${req.body.email}' and user_password = '${req.body.password}';`;
+    let QUERY_STR = `SELECT user_email, user_password from User_Info where user_email = '${req.body.email}' and user_password = '${hash_password}';`;
     conn = await new Promise((resolve, reject) => {
       pool.getConnection((err, connection) => {
         if (err) reject(err);
@@ -417,11 +415,19 @@ app.post('/api/postSignin', async (req, res) => {
 // 입력한 이메일로 인증메일 전송
 app.post('/api/postSignup', async (req, res) => {
   console.log('/api/postSignup 호출됨');
+  let otp_code = '';
+  for (let i = 0; i < 4; i++) {
+    otp_code += Math.floor(Math.random() * 10);
+  }
+  otp_code = otp_code.toString();
+  console.log('발송한 인증코드 : ', otp_code);
+
   let conn = null;
   try {
-    await sendEmail(req.body.email, 'Tourgather 인증메일입니다.', '0352');
+    await sendEmail(req.body.email, 'Tourgather 인증메일입니다.', otp_code);
 
-    let QUERY_STR = `insert into User_SignUp(user_email, isVerified) values('${req.body.email}', 'N');`;
+    let QUERY_STR = `delete from User_Signup where user_email = '${req.body.email}';`;
+    console.log(QUERY_STR);
     conn = await new Promise((resolve, reject) => {
       pool.getConnection((err, connection) => {
         if (err) reject(err);
@@ -430,7 +436,17 @@ app.post('/api/postSignup', async (req, res) => {
     }).catch((err) => {
       throw err;
     })
+    const [rows2] = await conn.promise().query(QUERY_STR);
 
+    QUERY_STR = `insert into User_Signup(user_email, otp_code) values('${req.body.email}', '${otp_code}');`;
+    conn = await new Promise((resolve, reject) => {
+      pool.getConnection((err, connection) => {
+        if (err) reject(err);
+        resolve(connection);
+      });
+    }).catch((err) => {
+      throw err;
+    })
     const [rows] = await conn.promise().query(QUERY_STR);
 
     console.log(rows)
@@ -451,8 +467,8 @@ app.get('/api/processVerify/:user_email', async (req, res) => {
   console.log('/api/processVerify 호출됨');
   let conn = null;
   try {
-    // dict_isverified[`${req.params.user_email}`] = true;
-    let QUERY_STR = `update User_SignUp set isVerified = 'Y' where user_email = '${req.params.user_email}';`;
+
+    let QUERY_STR = `update User_Signup set isVerified = 'Y' where user_email = '${req.params.user_email}';`;
     conn = await new Promise((resolve, reject) => {
       pool.getConnection((err, connection) => {
         if (err) reject(err);
@@ -476,13 +492,18 @@ app.get('/api/processVerify/:user_email', async (req, res) => {
   }
 })
 
+
 // 인증 다음 단계 버튼 누를시
 app.post('/api/emailVerify/', async (req, res) => {
+  // 인증번호가 일치한지 확인하고, 일치한다면 회원가입 테이블에서 해당 유저의 인증정보를 지워버린다.
+
   console.log('/api/emailVerify 호출됨');
+  console.log('받은 인증코드 : ', req.body.otp_code);
   let conn = null;
   try {
     console.log(req.body.email + ' 이메일 인증 확인 시작');
-    let QUERY_STR = `select isVerified from User_SignUp where user_email = '${req.body.email}';`;
+    // let QUERY_STR = `select isVerified from User_Signup where user_email = '${req.body.email}' and otp_code = '${req.body.otp_code}';`;
+    let QUERY_STR = `select user_email from User_Signup where user_email = '${req.body.email}' and otp_code = '${req.body.otp_code}';`;
     conn = await new Promise((resolve, reject) => {
       pool.getConnection((err, connection) => {
         if (err) reject(err);
@@ -491,17 +512,34 @@ app.post('/api/emailVerify/', async (req, res) => {
     }).catch((err) => {
       throw err;
     })
+    const [rows1] = await conn.promise().query(QUERY_STR);
 
-    const [rows] = await conn.promise().query(QUERY_STR);
+    let result;
+    console.log(rows1[0])
+    if (rows1[0] !== undefined) {
+      console.log('지우기 시작')
+      QUERY_STR = `delete from User_Signup where user_email = '${req.body.email}';`;
+      console.log(QUERY_STR);
+      conn = await new Promise((resolve, reject) => {
+        pool.getConnection((err, connection) => {
+          if (err) reject(err);
+          resolve(connection);
+        });
+      }).catch((err) => {
+        throw err;
+      })
+      const [rows2] = await conn.promise().query(QUERY_STR);
+      result = rows2;
+    }
 
     console.log('Successfully fetched the users posts list. [/api/emailVerify]');
-    if (rows[0].isVerified === 'Y') {
+    if (result.affectedRows) {
       console.log('메일 인증 완료. 다음 단계로 넘어감.');
       res.status(200).json(true);
     }
     else {
       console.log('메일 인증 오류.');
-      res.status(404).json(true);
+      res.status(404).json(false);
     }
   } catch (err) {
     res.status(404).json({
@@ -512,14 +550,47 @@ app.post('/api/emailVerify/', async (req, res) => {
   }
 })
 
+// 닉네임 중복 검사
+app.post('/api/checkDupName', async (req, res) => {
+  console.log('/api/checkDupName 호출됨');
+
+  let conn = null;
+  try {
+    let QUERY_STR = `select user_name from User_Info where user_name = '${req.body.name}';`;
+    conn = await new Promise((resolve, reject) => {
+      pool.getConnection((err, connection) => {
+        if (err) reject(err);
+        resolve(connection);
+      });
+    }).catch((err) => {
+      throw err;
+    })
+    const [rows] = await conn.promise().query(QUERY_STR);
+
+    console.log(rows);
+    console.log('Successfully fetched the users posts list. [/api/checkDupName]');
+    if (rows[0]) res.status(200).json(true);
+    else res.status(404).json(false);
+  } catch (err) {
+    console.log(err);
+    res.status(404).json({
+      error: "An error occurred while /api/checkDupName"
+    });
+  } finally {
+    if (conn) conn.release();
+  }
+})
+
 // 유저 등록
 app.post('/api/addUser', async (req, res) => {
   console.log('/api/addUser 호출됨');
+  const hash_password = crypto.SHA256(req.body.password).toString();
+  console.log(hash_password);
   let conn = null;
   try {
 
     let QUERY_STR = `insert into User_Info(user_id, user_name, user_email, user_password, user_major) 
-      values('${req.body.uid}', '${req.body.name}', '${req.body.email}', '${req.body.password}', '임베테스트')`;
+      values('${req.body.uid}', '${req.body.name}', '${req.body.email}', '${hash_password}', '${req.body.major}')`;
 
     conn = await new Promise((resolve, reject) => {
       pool.getConnection((err, connection) => {
@@ -529,7 +600,6 @@ app.post('/api/addUser', async (req, res) => {
     }).catch((err) => {
       throw err;
     })
-
     const [rows] = await conn.promise().query(QUERY_STR);
 
     console.log(rows);
@@ -537,7 +607,6 @@ app.post('/api/addUser', async (req, res) => {
     if (rows[0]) res.status(200).json(true);
     else res.status(404).json(false);
   } catch (err) {
-    console.log('addUser');
     console.log(err);
     res.status(404).json({
       error: "An error occurred while /api/addUser"
