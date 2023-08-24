@@ -1,6 +1,7 @@
 import 'package:TourGather/providers/main_screen_ui_provider.dart';
 import 'package:TourGather/providers/user_info_provider.dart';
 import 'package:TourGather/providers/user_post_provider.dart';
+import 'package:TourGather/screens/auth_screen.dart';
 import 'package:TourGather/utilities/color_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:TourGather/providers/gps_provider.dart';
@@ -40,18 +41,19 @@ class MyApp extends StatelessWidget {
           create: (context) => UserPostProvider(),
         ),
         ChangeNotifierProvider(
-          create: (context) => UserInfoProvider(),
+          create: (context) => UserInfoProvider(app_name: "투게더"),
         )
       ],
       child: MaterialApp(
         title: 'TourGather',
-        routes: {
+        routes: { 
           "/signin": (context) => const LoginSignupScreen(),
           "/main": (context) => MainScreen(),
           "/locationSetting": (context) => LocationSettingScreen(),
           "/userPostList": (context) => UsersPostsListScreen(),
+          "/routeTest" : (context) => AuthScreen()
         },
-        initialRoute: "/signin",
+        initialRoute: "/routeTest",
         debugShowCheckedModeBanner: false,
 
         // 2023.08.04, jdk
@@ -68,7 +70,7 @@ class MyApp extends StatelessWidget {
           ),
           useMaterial3: true,
         ),
-        home: LoginSignupScreen(),
+        // home: LoginSignupScreen(),
       ),
     );
   }

@@ -1,8 +1,10 @@
+import 'package:TourGather/providers/user_info_provider.dart';
 import 'package:TourGather/screens/signup_verify_screen.dart';
 import 'package:TourGather/services/post_services.dart';
 import 'package:flutter/material.dart';
 import 'package:TourGather/main.dart';
 import 'package:TourGather/screens/main_screen.dart';
+import 'package:provider/provider.dart';
 
 import '../utilities/color_palette.dart';
 
@@ -47,6 +49,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _passwordVisible = false;
 
+  String appTitle = '';
   String userName = '';
   String userPassword = '';
   String userDepartment = '';
@@ -132,12 +135,31 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                   width: MediaQuery.of(context).size.width * 0.7,
                   child: Container(
                       padding: EdgeInsets.only(top: 90, left: 20),
-                      child: Text(
-                        '투게더에 오신걸 환영합니다!',
-                        style: TextStyle(
-                            fontSize: 25,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold),
+                      child: Consumer<UserInfoProvider>(
+                        child: Text(
+                          ' 에 오신걸 환영합니다!',
+                          style: TextStyle(
+                              fontSize: 25,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        builder: (_, provider, child) {
+                          return (provider.app_name == "정동교")
+                              ? Text(
+                                  '동교는 신이야!!',
+                                  style: TextStyle(
+                                      fontSize: 25,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold),
+                                )
+                              : Text(
+                                  '${provider.app_name}에 오신걸 환영합니다!',
+                                  style: TextStyle(
+                                      fontSize: 25,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold),
+                                );
+                        },
                       )),
                 ),
               ),
@@ -461,20 +483,25 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                         ),
                       ],
                     ),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => MainScreen()));
+                    child: Consumer<UserInfoProvider>(
+                      builder: (_, userinfo, child) {
+                        return GestureDetector(
+                          onTap: () {
+                            // Navigator.push(
+                            //     context,
+                            //     MaterialPageRoute(
+                            //         builder: (context) => MainScreen()));
+                            userinfo.changeTitle();
+                          },
+                          child: Center(
+                            child: Text(
+                              'Skip',
+                              style: TextStyle(
+                                  color: Colors.blueAccent, fontSize: 20),
+                            ),
+                          ),
+                        );
                       },
-                      child: Center(
-                        child: Text(
-                          'Skip',
-                          style:
-                              TextStyle(color: Colors.blueAccent, fontSize: 20),
-                        ),
-                      ),
                     ),
                   )),
             ],

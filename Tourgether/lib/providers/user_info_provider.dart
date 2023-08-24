@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:TourGather/utilities/api_url.dart';
 import '../services/network.dart';
 
-class UserInfoProvider extends ChangeNotifier {
+class UserInfoProvider with ChangeNotifier {
   // network 통신 실시.
-
+  String? app_name;
   String _userMajor = "null";
   String _userName = "null";
   String _userEmail = "null";
@@ -20,6 +20,9 @@ class UserInfoProvider extends ChangeNotifier {
   String get userNum => _userNum;
   bool get user_map_visibility_status => _user_map_visibility_status;
   int get show_online_status_type => _show_online_status_type;
+
+  UserInfoProvider({required this.app_name});
+
   // 테스트 데이터를 가져오는 메서드1
   void getTestData() async {
     // 2023.07.29, comjke33
@@ -77,6 +80,16 @@ class UserInfoProvider extends ChangeNotifier {
     network.update_user_map_visibility_status(
         update_user_map_visibility_statusData);
 
+    notifyListeners();
+  }
+
+  void changeTitle() {
+    print(this.app_name);
+    if (this.app_name == "투게더") {
+      this.app_name = "정동교";
+    } else {
+      this.app_name = "투게더";
+    }
     notifyListeners();
   }
 }
