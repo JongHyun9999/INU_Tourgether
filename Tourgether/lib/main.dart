@@ -1,7 +1,7 @@
 import 'package:TourGather/providers/main_screen_ui_provider.dart';
 import 'package:TourGather/providers/user_info_provider.dart';
 import 'package:TourGather/providers/user_post_provider.dart';
-import 'package:TourGather/screens/auth_screen.dart';
+import 'package:TourGather/router/auth_screen.dart';
 import 'package:TourGather/utilities/color_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:TourGather/providers/gps_provider.dart';
@@ -29,49 +29,33 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (context) => GPSProvider(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => MainScreenUIProvider(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => UserPostProvider(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => UserInfoProvider(app_name: "투게더"),
-        )
-      ],
-      child: MaterialApp(
-        title: 'TourGather',
-        routes: { 
-          "/signin": (context) => const LoginSignupScreen(),
-          "/main": (context) => MainScreen(),
-          "/locationSetting": (context) => LocationSettingScreen(),
-          "/userPostList": (context) => UsersPostsListScreen(),
-          "/routeTest" : (context) => AuthScreen()
-        },
-        initialRoute: "/routeTest",
-        debugShowCheckedModeBanner: false,
+    return MaterialApp(
+      title: 'TourGather',
+      routes: { 
+        // "/signin": (context) => const LoginSignupScreen(),
+        // "/main": (context) => MainScreen(),
+        // "/locationSetting": (context) => LocationSettingScreen(),
+        // "/userPostList": (context) => UsersPostsListScreen(),
+        "/routeTest" : (context) => AuthScreen()
+      },
+      initialRoute: "/routeTest",
+      debugShowCheckedModeBanner: false,
 
-        // 2023.08.04, jdk
-        // theme의 colorScheme Property를 이용하여 간단하게 팔레트 생성,
-        // 이후에 Theme.of(context)를 통해 색상을 꺼내 사용할 수 있도록 만든다.
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.lightBlueAccent,
-            primaryContainer: Color(0xffE1F5FE),
-            onPrimaryContainer: Color(0xff1E88E5),
-            secondary: Color(0xff424242),
-            secondaryContainer: Color(0xff42A5F5),
-            onSecondaryContainer: Colors.white,
-          ),
-          useMaterial3: true,
+      // 2023.08.04, jdk
+      // theme의 colorScheme Property를 이용하여 간단하게 팔레트 생성,
+      // 이후에 Theme.of(context)를 통해 색상을 꺼내 사용할 수 있도록 만든다.
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.lightBlueAccent,
+          primaryContainer: Color(0xffE1F5FE),
+          onPrimaryContainer: Color(0xff1E88E5),
+          secondary: Color(0xff424242),
+          secondaryContainer: Color(0xff42A5F5),
+          onSecondaryContainer: Colors.white,
         ),
-        // home: LoginSignupScreen(),
+        useMaterial3: true,
       ),
+      // home: LoginSignupScreen(),
     );
   }
 }
