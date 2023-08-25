@@ -191,8 +191,7 @@ class _NavBarState extends State<NavBar> {
                       width: 13,
                     ),
                     Provider.of<UserInfoProvider>(context)
-                                .user_map_visibility_status ==
-                            1
+                            .user_map_visibility_status
                         ? Icon(
                             Icons.wifi_tethering,
                             size: 20,
