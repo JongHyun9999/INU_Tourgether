@@ -52,16 +52,16 @@ class UserInfoProvider extends ChangeNotifier {
     Network network = Network("${ApiUrl.address}${ApiUrl.userInfoApiUrl}");
     var jsonData = await network.getJsonData();
     // 가져온 jsonData(map형)을 전공, 이름, 학번으로 나누어 선언
-    _userMajor = await jsonData['user_info'][1]["user_major"];
-    _userMajorDetail = await jsonData['user_info'][1]["user_major_detail"];
-    _userName = await jsonData['user_info'][1]["user_name"];
-    _userNum = await jsonData['user_info'][1]['user_num'].toString();
+    _userMajor = await jsonData['user_info'][0]["user_major"];
+    _userMajorDetail = await jsonData['user_info'][0]["user_major_detail"];
+    _userName = await jsonData['user_info'][0]["user_name"];
+    _userNum = await jsonData['user_info'][0]['user_num'].toString();
     _user_map_visibility_status =
-        await jsonData['user_info'][1]['user_map_visibility_status'] == 1;
+        await jsonData['user_info'][0]['user_map_visibility_status'] == 1;
     _show_online_status_type =
-        await jsonData['user_info'][1]['show_online_status_type'];
-    _userEmail = await jsonData['user_info'][1]['user_Email'];
-    _userBadge = await jsonData['user_info'][1]['user_Badge'];
+        await jsonData['user_info'][0]['show_online_status_type'];
+    _userEmail = await jsonData['user_info'][0]['user_Email'];
+    _userBadge = await jsonData['user_info'][0]['user_Badge'];
     print("userInfo 정보 받아오기 성공");
 
     // 새로고침
