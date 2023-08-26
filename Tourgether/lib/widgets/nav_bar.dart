@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 //import 'package:tourgether/screens/setting.dart';
 import 'package:provider/provider.dart';
@@ -19,8 +17,11 @@ class NavBar extends StatefulWidget {
 
 // 위젯 상태 설정 class
 // 실질적으로 위젯에 관련된 정보가 들어있는 부분
-class _NavBarState extends State<NavBar> {
+class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
   //late bool onlineSwitch;
+  late TabController _tabController;
+  int _currentIndex = 0;
+
   bool friendRequest = true;
   List<Widget> userInfoTabs = [
     Container(
@@ -49,8 +50,14 @@ class _NavBarState extends State<NavBar> {
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: userInfoTabs.length, vsync: this);
   }
 
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
   // void didChangeDependencies() {
   //   super.didChangeDependencies();
   //   print("화면 정리 중");
@@ -228,10 +235,34 @@ class _NavBarState extends State<NavBar> {
                 const Divider(),
                 DefaultTabController(
                     length: 3,
-                    child: TabBar(
-                      tabs: userInfoTabs,
-                      indicatorColor: Colors.blueAccent,
-                    ))
+                    child: SizedBox(
+                      height: 500,
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 45,
+                            child: TabBar(
+                                indicatorColor: Colors.blueAccent,
+                                labelColor: Colors.black,
+                                unselectedLabelColor: Colors.grey,
+                                tabs: userInfoTabs),
+                          ),
+                          Expanded(
+                            child: TabBarView(
+                              children: [
+                                Scaffold(
+                                  backgroundColor: Colors.amber,
+                                ),
+                                Scaffold(backgroundColor: Colors.pink),
+                                Scaffold(
+                                  backgroundColor: Colors.blueGrey,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )),
               ],
             ),
           ),
