@@ -10,7 +10,7 @@ import 'package:TourGather/screens/main_screen.dart';
 // import 'package:like_button/like_button.dart';
 // import 'package:TourGather/models/messageFormat.dart';
 // import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:TourGather/screens/signin_screen.dart';
+import 'package:TourGather/screens/auth/signin_screen.dart';
 import 'package:TourGather/screens/user_post_list_screen.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';

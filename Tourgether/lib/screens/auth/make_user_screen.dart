@@ -1,11 +1,11 @@
-import 'package:TourGather/screens/signin_screen.dart';
-import 'package:TourGather/screens/signup_verify_screen.dart';
+import 'package:TourGather/screens/auth/signin_screen.dart';
+import 'package:TourGather/screens/auth/signup_verify_screen.dart';
 import 'package:TourGather/services/post_services.dart';
 import 'package:flutter/material.dart';
 import 'package:TourGather/main.dart';
 import 'package:TourGather/screens/main_screen.dart';
 
-import '../utilities/color_palette.dart';
+import '../../utilities/color_palette.dart';
 
 class Palette {
   static const Color iconColor = Color(0xFFB6C7D1);
