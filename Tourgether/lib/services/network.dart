@@ -10,8 +10,8 @@ class Network {
   // 끊임없이 체크하는 것이 아니라,
   // future 타입으로 response를 줘서 비동기적인 대기 및 처리를 하도록 함
   // 아래는 jsonData를 얻는 메서드이다.
-  Future<dynamic> getJsonData(String arg) async {
-    print("getJsonData is executed...");
+  Future<dynamic> getUserInfoByEmail(String arg) async {
+    print("getUserInfoByEmail is executed...");
 
     Map<String, String> data = {'user_email': arg};
     // http.get 메서드에 url을 넘기고 response를 받는 코드

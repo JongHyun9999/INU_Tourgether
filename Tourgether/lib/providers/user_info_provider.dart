@@ -49,7 +49,7 @@ class UserInfoProvider extends ChangeNotifier {
     // 2023.09.01 JKE
     // Email
     Network network = Network("${ApiUrl.address}${ApiUrl.userInfoApiUrl}");
-    var jsonData = await network.getJsonData(arg);
+    var jsonData = await network.getUserInfoByEmail(arg);
     // 가져온 jsonData(map형)을 전공, 이름, 학번으로 나누어 선언
     print("가져온 jsonData: ");
     print(jsonData);
