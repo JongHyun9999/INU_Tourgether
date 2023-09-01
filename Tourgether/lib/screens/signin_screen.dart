@@ -92,7 +92,8 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
         // 현재 widget tree에서 지워지게 된다.
         // (_) => false 로 지정하면 모든 페이지를 지운다.
         // ----------------------------------------
-        Provider.of<UserInfoProvider>(context, listen: false).getTestData(userEmail);
+        Provider.of<UserInfoProvider>(context, listen: false)
+            .initUserInfo(userEmail);
         Navigator.pushNamedAndRemoveUntil(
           context,
           "/main",

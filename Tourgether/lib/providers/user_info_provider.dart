@@ -21,7 +21,7 @@ class UserInfoProvider extends ChangeNotifier {
   bool get user_map_visibility_status => _user_map_visibility_status;
   int get show_online_status_type => _show_online_status_type;
   // 테스트 데이터를 가져오는 메서드1
-  void getTestData(String arg) async {
+  void initUserInfo(String arg_userEmail) async {
     // 2023.07.29, comjke33
     // network 객체 생성
     // 애뮬레이터 실습 시에는 localHost를 사용할 수 없다.
@@ -36,7 +36,7 @@ class UserInfoProvider extends ChangeNotifier {
     // => Data Class 공부해보기.s
 
     // 2. Network Class를 Singleton Class로 생성하기.
-    // 전역 변수를 예시로 생각해보자. 현재 getTestData() 메서드와
+    // 전역 변수를 예시로 생각해보자. 현재 initUserInfo() 메서드와
     // update_user_map_visibility_status 메서드는 각 메서드 내에서 Network의 객체를 새롭게 생성하고 있다.
     // 이것은 메서드가 실행될 때마다 새로운 객체를 만들고 메서드의 실행이 끝나면
     // 해당 객체들의 할당을 해제하는 방식이므로, 다소 비효율적이라고 할 수 있다.
@@ -49,11 +49,8 @@ class UserInfoProvider extends ChangeNotifier {
     // 2023.09.01 JKE
     // Email
     Network network = Network("${ApiUrl.address}${ApiUrl.userInfoApiUrl}");
-    var jsonData = await network.getUserInfoByEmail(arg);
+    var jsonData = await network.getUserInfoByEmail(arg_userEmail);
     // 가져온 jsonData(map형)을 전공, 이름, 학번으로 나누어 선언
-    print("가져온 jsonData: ");
-    print(jsonData);
-    print("\n----------");
     _userMajor = await jsonData['user_info'][0]["user_major"];
     _userName = await jsonData['user_info'][0]["user_name"];
     _userNum = await jsonData['user_info'][0]['user_num'].toString();

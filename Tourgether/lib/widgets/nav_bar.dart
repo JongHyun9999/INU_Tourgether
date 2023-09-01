@@ -59,7 +59,7 @@ class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
   // void didChangeDependencies() {
   //   super.didChangeDependencies();
   //   print("화면 정리 중");
-  //   Provider.of<UserInfoProvider>(context).getTestData();
+  //   Provider.of<UserInfoProvider>(context).initUserInfo();
   // }
   // --- 개념 ---
   // async: promise를 반환
@@ -86,7 +86,7 @@ class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
   // => Data Class 공부해보기.
 
   // 2. Network Class를 Singleton Class로 생성하기.
-  // 전역 변수를 예시로 생각해보자. 현재 getTestData() 메서드와
+  // 전역 변수를 예시로 생각해보자. 현재 initUserInfo() 메서드와
   // update_user_map_visibility_status 메서드는 각 메서드 내에서 Network의 객체를 새롭게 생성하고 있다.
   // 이것은 메서드가 실행될 때마다 새로운 객체를 만들고 메서드의 실행이 끝나면
   // 해당 객체들의 할당을 해제하는 방식이므로, 다소 비효율적이라고 할 수 있다.

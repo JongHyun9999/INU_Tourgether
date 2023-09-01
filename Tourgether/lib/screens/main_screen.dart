@@ -50,7 +50,7 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
 
     // Future.microtask(
-    //   () => Provider.of<UserInfoProvider>(context, listen: false).getTestData(),
+    //   () => Provider.of<UserInfoProvider>(context, listen: false).initUserInfo(),
     // );
   }
 
