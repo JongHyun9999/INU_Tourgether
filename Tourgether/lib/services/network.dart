@@ -10,13 +10,13 @@ class Network {
   // 끊임없이 체크하는 것이 아니라,
   // future 타입으로 response를 줘서 비동기적인 대기 및 처리를 하도록 함
   // 아래는 jsonData를 얻는 메서드이다.
-  Future<dynamic> getJsonData() async {
+  Future<dynamic> getJsonData(String arg) async {
     print("getJsonData is executed...");
 
+    Map<String, String> data = {'user_email': arg};
     // http.get 메서드에 url을 넘기고 response를 받는 코드
     // response는 http.dart에 선언된 http.response 타입을 이용한다
-    http.Response response = await http.get(Uri.parse(url));
-
+    http.Response response = await http.get(Uri.parse(url), headers: data);
     // response의 body에 사용자 정보가 들어있다.
     // response.request로 거꾸로 요청도 보낼 수 있다.
     var userJson = response.body;

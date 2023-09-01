@@ -1,8 +1,10 @@
+import 'package:TourGather/providers/user_info_provider.dart';
 import 'package:TourGather/screens/signup_verify_screen.dart';
 import 'package:TourGather/services/post_services.dart';
 import 'package:flutter/material.dart';
 import 'package:TourGather/main.dart';
 import 'package:TourGather/screens/main_screen.dart';
+import 'package:provider/provider.dart';
 
 import '../utilities/color_palette.dart';
 
@@ -71,7 +73,11 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
       postData['email'] = userEmail;
       postData['password'] = userPassword;
       bool isPostSucceeded = await PostServices.postSignin(postData);
-      print(isPostSucceeded);
+
+      // 2023-09-01 JKE
+      // 로그인 시도 성공 시, 관련 출력문 주석 처리
+      // print("로그인 성공!!!!");
+      // print(isPostSucceeded);
 
       if (isPostSucceeded) {
         // ----------------------------------------
@@ -86,6 +92,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
         // 현재 widget tree에서 지워지게 된다.
         // (_) => false 로 지정하면 모든 페이지를 지운다.
         // ----------------------------------------
+        Provider.of<UserInfoProvider>(context, listen: false).getTestData(userEmail);
         Navigator.pushNamedAndRemoveUntil(
           context,
           "/main",

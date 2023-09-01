@@ -623,9 +623,10 @@ app.get('/getUserInfo', (req, res) => {
     if (err) {
       res.statusMessage(404).send('Database Connection error')
     }
+    console.log(req)
 
-    let query = 'select * from User_Info';
-
+    let query = `select * from User_Info WHERE user_email = '${req.headers.user_email}'`;
+    console.log(query)
     conn.query(query, (err, response, fields) => {
 
       if (err) {

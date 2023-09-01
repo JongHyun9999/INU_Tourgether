@@ -17,8 +17,9 @@ class NavBar extends StatefulWidget {
 
 // 위젯 상태 설정 class
 // 실질적으로 위젯에 관련된 정보가 들어있는 부분
-class _NavBarState extends State<NavBar> {
+class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
   //late bool onlineSwitch;
+  late TabController _tabController;
   bool friendRequest = true;
   //late TabController _tabController;
   late String userMajor = '';
@@ -52,6 +53,7 @@ class _NavBarState extends State<NavBar> {
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: userInfoTabs.length, vsync: this);
   }
 
   // void didChangeDependencies() {
@@ -228,10 +230,36 @@ class _NavBarState extends State<NavBar> {
                 // TabBar
                 DefaultTabController(
                     length: 3,
-                    child: TabBar(
-                      tabs: userInfoTabs,
-                      indicatorColor: Colors.blueAccent,
-                    ))
+                    child: SizedBox(
+                      height: 500,
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 40,
+                            child: TabBar(
+                                controller: _tabController,
+                                indicatorColor: Colors.blueAccent,
+                                labelColor: Colors.black,
+                                unselectedLabelColor: Colors.grey,
+                                tabs: userInfoTabs),
+                          ),
+                          Expanded(
+                            child: TabBarView(
+                              controller: _tabController,
+                              children: [
+                                Scaffold(
+                                  backgroundColor: Colors.amber,
+                                ),
+                                Scaffold(backgroundColor: Colors.pink),
+                                Scaffold(
+                                  backgroundColor: Colors.blueGrey,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )),
               ],
             ),
           ),

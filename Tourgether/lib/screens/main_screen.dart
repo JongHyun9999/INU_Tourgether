@@ -1,6 +1,7 @@
 import 'package:TourGather/providers/main_screen_ui_provider.dart';
 import 'package:TourGather/utilities/color_palette.dart';
 import 'package:TourGather/widgets/app_bars.dart';
+import 'package:TourGather/widgets/show_post.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:TourGather/providers/gps_provider.dart';
@@ -48,9 +49,9 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
 
-    Future.microtask(
-      () => Provider.of<UserInfoProvider>(context, listen: false).getTestData(),
-    );
+    // Future.microtask(
+    //   () => Provider.of<UserInfoProvider>(context, listen: false).getTestData(),
+    // );
   }
 
   @override
@@ -65,6 +66,7 @@ class _MainScreenState extends State<MainScreen> {
     final mainScreenUIProvider =
         Provider.of<MainScreenUIProvider>(context, listen: false);
 
+    bool showPostThing = false;
     return Scaffold(
       drawer: const NavBar(),
       extendBodyBehindAppBar: true,
@@ -219,7 +221,7 @@ class _MainScreenState extends State<MainScreen> {
                           fit: BoxFit.cover,
                         ),
                       ),
-                      /* 
+
                       // 2023.07.29, jdk
                       // Map Image 위에 아이콘을 표시하기 위하여
                       // Positioned Widget을 위치시켜야 하는 부분.
@@ -234,7 +236,6 @@ class _MainScreenState extends State<MainScreen> {
                           color: Colors.blueAccent,
                         ),
                       ),
-                      */
                     ],
                   ),
                 ),

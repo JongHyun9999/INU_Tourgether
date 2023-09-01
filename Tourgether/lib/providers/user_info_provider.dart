@@ -21,7 +21,7 @@ class UserInfoProvider extends ChangeNotifier {
   bool get user_map_visibility_status => _user_map_visibility_status;
   int get show_online_status_type => _show_online_status_type;
   // 테스트 데이터를 가져오는 메서드1
-  void getTestData() async {
+  void getTestData(String arg) async {
     // 2023.07.29, comjke33
     // network 객체 생성
     // 애뮬레이터 실습 시에는 localHost를 사용할 수 없다.
@@ -45,9 +45,15 @@ class UserInfoProvider extends ChangeNotifier {
     // => Singleton Pattern, static 키워드 공부해보기.
 
     // -------------------------------------------------------------------------
+
+    // 2023.09.01 JKE
+    // Email
     Network network = Network("${ApiUrl.address}${ApiUrl.userInfoApiUrl}");
-    var jsonData = await network.getJsonData();
+    var jsonData = await network.getJsonData(arg);
     // 가져온 jsonData(map형)을 전공, 이름, 학번으로 나누어 선언
+    print("가져온 jsonData: ");
+    print(jsonData);
+    print("\n----------");
     _userMajor = await jsonData['user_info'][0]["user_major"];
     _userName = await jsonData['user_info'][0]["user_name"];
     _userNum = await jsonData['user_info'][0]['user_num'].toString();
