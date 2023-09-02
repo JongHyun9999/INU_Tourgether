@@ -1,3 +1,4 @@
+import 'package:TourGather/providers/user_info_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -16,11 +17,9 @@ Widget? showFloatingActionButton(
   TextEditingController contentController,
 ) {
   return Padding(
-    padding: (isAppBarVisible) ? EdgeInsets.zero : EdgeInsets.only(bottom: 10),
+    padding: EdgeInsets.zero,
     child: FloatingActionButton(
-      backgroundColor: (isAppBarVisible)
-          ? ColorPalette.primaryContainer
-          : Color.fromARGB(150, 106, 174, 233),
+      backgroundColor: ColorPalette.primaryContainer,
       onPressed: (isAppBarVisible)
           ? () async {
               await showPostContent(
@@ -49,7 +48,8 @@ Widget? showFloatingActionButton(
         ),
       ),
       child: FaIcon(
-        (isAppBarVisible) ? FontAwesomeIcons.plus : FontAwesomeIcons.arrowUp,
+        // (isAppBarVisible) ? FontAwesomeIcons.plus : FontAwesomeIcons.arrowUp,
+        FontAwesomeIcons.plus,
         color: ColorPalette.whiteColor,
       ),
     ),
@@ -83,14 +83,6 @@ Future<bool> sendPost(
   // 2023.07.29, jdk
   // 글 작성(SEND) 버튼을 눌렀을 때의 동작.
   // HTTP 통신을 통해 데이터를 DB에 전달한다.
-
-  var postedTime = DateTime.now();
-  Log.logger.d("${DateTime.now().timeZoneName}");
-  Log.logger.d("current time : $postedTime");
-
-  // 유저 정보를 보관하는 Class에서 유저의 정보를 가져와야 함.
-  postData['user_name'] = "개발자정동교";
-  postData['posted_time'] = postedTime.toString().substring(0, 19);
 
   // 2023.08.07, jdk
   // 위치가 지정되지 않은 경우. GPS가 켜져 있지 않은 상태이다.
@@ -334,8 +326,15 @@ Future<dynamic> showPostContent(
                         Map<String, dynamic> postData = {};
                         postData['title'] = titleController.text;
                         postData['content'] = contentController.text;
+                        postData['user_name'] =
+                            context.read<UserInfoProvider>().userName;
 
-                        Log.logger.d("${postData['title']}");
+                        var postedTime = DateTime.now();
+                        postData['posted_time'] =
+                            postedTime.toString().substring(0, 19);
+                        Log.logger.d(
+                          "posted_time : ${postData['posted_time']}",
+                        );
 
                         // 2023.08.07, jdk
                         // 빈 곳만 hintText를 바꾸도록 코드 수정
@@ -352,6 +351,8 @@ Future<dynamic> showPostContent(
                           return;
                         }
 
+                        // 2023.09.02, jdk
+                        // 입력한 데이터를 바탕으로 post를 전송한다.
                         bool isPostSucceeded = await sendPost(
                           gpsProvider.latitude,
                           gpsProvider.longitude,

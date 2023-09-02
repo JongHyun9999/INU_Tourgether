@@ -1,16 +1,8 @@
 import 'package:TourGather/providers/main_screen_ui_provider.dart';
-import 'package:TourGather/utilities/color_palette.dart';
 import 'package:TourGather/widgets/app_bars.dart';
-import 'package:TourGather/widgets/show_post.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:TourGather/providers/gps_provider.dart';
-import 'package:TourGather/services/post_services.dart';
 import 'package:provider/provider.dart';
-import 'package:logger/logger.dart';
-
-import '../enums/alert_message_type.dart';
-import '../providers/user_info_provider.dart';
 import '../utilities/log.dart';
 import '../widgets/nav_bar.dart';
 import '../widgets/post_dialog.dart';
@@ -32,8 +24,10 @@ class _MainScreenState extends State<MainScreen> {
   // width/height 설정은 추후에 utilities로 모두 넘기기.
   // TODO
   // ------------------------------------------
-  final double backgroundImageWidth = 2470;
-  final double backgroundImageHeight = 1321;
+  final double backgroundImageWidth = 2000;
+  final double backgroundImageHeight = 1800;
+  // final double backgroundImageWidth = 2043;
+  // final double backgroundImageHeight = 1903;
 
   bool isListeningGPSPositionStream = false;
   late double currentLatitudeForPost;
@@ -75,13 +69,16 @@ class _MainScreenState extends State<MainScreen> {
       ), // getAppBar(context, appBarHeight),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       extendBody: true,
-      floatingActionButton: showFloatingActionButton(
-        context,
-        gpsProvider.isListeningGPSPositionStream,
-        Provider.of<MainScreenUIProvider>(context).isAppBarVisible,
-        titleController,
-        contentController,
-      ),
+      floatingActionButton:
+          (context.read<MainScreenUIProvider>().isAppBarVisible)
+              ? showFloatingActionButton(
+                  context,
+                  gpsProvider.isListeningGPSPositionStream,
+                  Provider.of<MainScreenUIProvider>(context).isAppBarVisible,
+                  titleController,
+                  contentController,
+                )
+              : null,
       bottomNavigationBar:
           (Provider.of<MainScreenUIProvider>(context).isAppBarVisible)
               ? getBottomAppBar(
@@ -98,149 +95,186 @@ class _MainScreenState extends State<MainScreen> {
               child: Container(
                 width: backgroundImageWidth,
                 height: backgroundImageHeight,
-                child: InteractiveViewer(
-                  transformationController: _transformationController,
-                  onInteractionStart: (details) {
+                child: GestureDetector(
+                  // 2023.08.14, jdk
+                  // InteractiveVeiwer를 GestureDetector로 감싸서 Interaction Callback을 지정하면
+                  // 이벤트를 먼저 처리해서 InteractiveViewer에서 발생하지 않도록 할 수 있다.
+                  // onTapUP 이벤트를 지정해서 사용자가 Map을 한 번 터치했을 떄는 다른 이벤트를 처리하고,
+                  // 그게 아니라면 (Pan/Scale) 다른 Callback을 처리하도록 한다.
+                  onTapUp: (_ /*TapUpDetails details*/) {
                     Log.logger
                         .d("OnInteractionStart Callback Function Called.");
 
-                    if (mainScreenUIProvider.isAppBarVisible) {
-                      mainScreenUIProvider.changeAppBarsVisibility();
-                    }
+                    mainScreenUIProvider.changeAppBarsVisibility();
                   },
-                  onInteractionEnd: (details) {
-                    Log.logger.d("OnInteractionEnd Callback Function Called.");
+                  child: InteractiveViewer(
+                    constrained: false,
+                    transformationController: _transformationController,
+                    // onInteractionStart: (details) {},
+                    onInteractionEnd: (details) {
+                      // Log.logger
+                      //    .d("OnInteractionEnd Callback Function Called.");
 
-                    Matrix4 transformationMatrix =
-                        _transformationController.value;
+                      Matrix4 transformationMatrix =
+                          _transformationController.value;
 
-                    double newScaleValue =
-                        transformationMatrix.getMaxScaleOnAxis();
+                      // Log.logger.d("${transformationMatrix}");
 
-                    // ---------------------------------------------------------------------------
-                    // 2023.08.09, jdk
-                    // InteractiveViewer에 등록한 controller는 매 업데이트마다
-                    // Matrix4 객체를 갱신한다. (transformationController.value)
-                    // Matrix4는 4x4 Size이며, Translate Matrix, Rotation Matrix로 나타내어진다.
-                    // transformationMatrix[12]와 [13]은 x, y축 이동량을 의미한다.
+                      double newScaleValue =
+                          transformationMatrix.getMaxScaleOnAxis();
 
-                    // logger.d("${transformationMatrix}");
-                    // logger.d("${transformationMatrix[12]}");
-                    // logger.d("${transformationMatrix[13]}");
-                    // ---------------------------------------------------------------------------
+                      // ---------------------------------------------------------------------------
+                      // 2023.08.09, jdk
+                      // InteractiveViewer에 등록한 controller는 매 업데이트마다
+                      // Matrix4 객체를 갱신한다. (transformationController.value)
+                      // Matrix4는 4x4 Size이며, Translate Matrix, Rotation Matrix로 나타내어진다.
+                      // transformationMatrix[12]와 [13]은 x, y축 이동량을 의미한다.
 
-                    // 2023.08.09, jdk
-                    // Scale Level의 변화를 체크하는 파트.
-                    // 만약 Scale Level이 달라진다면, MainScreenUIProvider의 변수인
-                    // currentScaleValue를 갱신한다. 이후에는 확대 레벨에 맞춰서
-                    // InteractiveViewer에 대한 margin 값을 조정하면 된다.
+                      // logger.d("${transformationMatrix}");
+                      // logger.d("${transformationMatrix[12]}");
+                      // logger.d("${transformationMatrix[13]}");
+                      // ---------------------------------------------------------------------------
 
-                    /*
-                    bool isMapScaled = false;
+                      // 2023.08.09, jdk
+                      // Scale Level의 변화를 체크하는 파트.
+                      // 만약 Scale Level이 달라진다면, MainScreenUIProvider의 변수인
+                      // currentScaleValue를 갱신한다. 이후에는 확대 레벨에 맞춰서
+                      // InteractiveViewer에 대한 margin 값을 조정하면 된다.
 
-                    // Scale Level의 변화를 감지하는 부분
-                    if (mainScreenUIProvider
-                            .compareNewScaleValueWithPrev(newScaleValue) ==
-                        false) {
-                      mainScreenUIProvider.currentScaleValue = newScaleValue;
+                      bool isMapScaled = false;
 
-                      isMapScaled = true;
-                      Log.logger.d("scaleValue is equal");
-                    }
+                      // Scale Level의 변화를 감지하는 부분
+                      // if (mainScreenUIProvider
+                      //         .compareNewScaleValueWithPrev(newScaleValue) ==
+                      //     false) {
+                      //   mainScreenUIProvider.currentScaleValue = newScaleValue;
 
-                    // 새롭게 들어온 Map의 X, Y 데이터가 이전의 데이터와 같은지 비교하는 부분.
-                    // 만약 데이터가 같다면 사용자가 Map을 한 번만 터치한 것으로 판단할 수 있다.
+                      //   isMapScaled = true;
+                      //   Log.logger.d("scaleValue is equal");
+                      // }
 
-                    double newMapPositionX =
-                        transformationMatrix[12]; // 새로운 X pos
-                    double newMapPositionY =
-                        transformationMatrix[13]; // 새로운 Y pos
+                      mainScreenUIProvider
+                          .compareNewScaleValueWithPrev(newScaleValue);
 
-                    // 디버깅용 출력
-                    Log.logger.d("newMapPosX : ${newMapPositionX}");
-                    Log.logger.d("newMapPosY : ${newMapPositionY}");
+                      // // 새롭게 들어온 Map의 X, Y 데이터가 이전의 데이터와 같은지 비교하는 부분.
+                      // // 만약 데이터가 같다면 사용자가 Map을 한 번만 터치한 것으로 판단할 수 있다.
 
-                    // 새로운 좌표가 이전 좌표와 같은지 비교한다.
-                    // 값이 true라면 사용자가 화면을 한 번 터치한 경우이거나
-                    // 화면을 Scaling한 경우라고 판단할 수 있다.
-                    if (mainScreenUIProvider.compareNewPositionWithPrev(
-                      newMapPositionX,
-                      newMapPositionY,
-                    )) {
-                      // 좌표가 같다면 현재 AppBar가 Invisible인지 파악한다.
-                      // AppBar가 Invisible이라면 AppBar의 Visibility를 Visible로 바꾼다.
-                      // 그런데, 만약 Map이 Scaled 되었다면 화면 터치가 아니므로
-                      // isMapScaled == false도 판단한다.
-                      Log.logger.d("it's true!");
+                      // double newMapPositionX =
+                      //     transformationMatrix[12]; // 새로운 X pos
+                      // double newMapPositionY =
+                      //     transformationMatrix[13]; // 새로운 Y pos
 
-                      Log.logger.d(
-                        "isAppBarVisible : ${mainScreenUIProvider.isAppBarVisible}",
-                      );
+                      // // 디버깅용 출력
+                      // Log.logger.d("newMapPosX : ${newMapPositionX}");
+                      // Log.logger.d("newMapPosY : ${newMapPositionY}");
 
-                      Log.logger.d("isMapScaled : ${isMapScaled}");
+                      // // 새로운 좌표가 이전 좌표와 같은지 비교한다.
+                      // // 값이 true라면 사용자가 화면을 한 번 터치한 경우이거나
+                      // // 화면을 Scaling한 경우라고 판단할 수 있다.
+                      // if (mainScreenUIProvider.compareNewPositionWithPrev(
+                      //   newMapPositionX,
+                      //   newMapPositionY,
+                      // )) {
+                      //   // 좌표가 같다면 현재 AppBar가 Invisible인지 파악한다.
+                      //   // AppBar가 Invisible이라면 AppBar의 Visibility를 Visible로 바꾼다.
+                      //   // 그런데, 만약 Map이 Scaled 되었다면 화면 터치가 아니므로
+                      //   // isMapScaled == false도 판단한다.
+                      //   Log.logger.d("it's true!");
 
-                      if (mainScreenUIProvider.isAppBarVisible == false &&
-                          isMapScaled == false) {
-                        Log.logger.d("Change Visibility!");
-                        mainScreenUIProvider.changeAppBarsVisibility();
-                      }
-                    }
+                      //   Log.logger.d(
+                      //     "isAppBarVisible : ${mainScreenUIProvider.isAppBarVisible}",
+                      //   );
 
-                    // 새롭게 들어온 좌표로 기존 좌표 변수를 갱신한다.
-                    mainScreenUIProvider.changeMapPosition(
-                      newMapPositionX,
-                      newMapPositionY,
-                    );
-                    */
-                  },
-                  scaleEnabled: true,
-                  maxScale: 2.0,
-                  minScale: 1.0,
-                  // 2023.07.27, jdk
-                  // 지도 위치 조정 과정 확인 필요
-                  boundaryMargin: EdgeInsets.fromLTRB(
-                    (backgroundImageWidth - screenWidth) / 2,
-                    (backgroundImageHeight - screenHeight) / 2,
-                    (backgroundImageWidth - screenWidth) / 2,
-                    (backgroundImageHeight - screenHeight) / 2 + 20,
-                    // 원래는 BottomNavigationBarHeight만큼 더해야 하나,
-                    // 아직 Custom Map이 완성되지 않아 임시로 Hard Coding 한다.
-                  ),
-                  child: Stack(
-                    children: [
-                      /* 
-                        2023.07.27, jdk
-                        Custom Map과 같은 Level에서 Message를 생성.
-                        이후에는 함수를 통해서 생성하도록 자동화한다.
-    
-                        현재는 임시적인 확인을 위해 Icon을 하드코딩으로 띄워두도록 함.
-                      */
-                      Positioned(
-                        child: Image(
-                          image: AssetImage("images/test-map4.png"),
-                          fit: BoxFit.cover,
+                      //   Log.logger.d("isMapScaled : ${isMapScaled}");
+
+                      //   if (mainScreenUIProvider.isAppBarVisible == false &&
+                      //       isMapScaled == false) {
+                      //     Log.logger.d("Change Visibility!");
+                      //     mainScreenUIProvider.changeAppBarsVisibility();
+                      //   }
+                      // }
+
+                      // // 새롭게 들어온 좌표로 기존 좌표 변수를 갱신한다.
+                      // mainScreenUIProvider.changeMapPosition(
+                      //   newMapPositionX,
+                      //   newMapPositionY,
+                      // );
+                    },
+                    scaleEnabled: false,
+                    maxScale: 1.0,
+                    minScale: 0.25,
+                    // 2023.07.27, jdk
+                    // 지도 위치 조정 과정 확인 필요
+                    boundaryMargin: EdgeInsets.fromLTRB(
+                        // (backgroundImageWidth - screenWidth) / 2 -
+                        //     520 * (mainScreenUIProvider.currentScaleValue - 1),
+                        // (backgroundImageHeight - screenHeight) / 2 -
+                        //     130 * (mainScreenUIProvider.currentScaleValue - 1),
+                        // (backgroundImageWidth - screenWidth) / 2 -
+                        //     515 * (mainScreenUIProvider.currentScaleValue - 1),
+                        // (backgroundImageHeight - screenHeight) / 2 +
+                        //     20 -
+                        //     148 * (mainScreenUIProvider.currentScaleValue - 1),
+                        (backgroundImageWidth - screenWidth) / 2,
+                        (backgroundImageHeight - screenHeight) / 2,
+                        (backgroundImageWidth - screenWidth) / 2,
+                        (backgroundImageHeight - screenHeight) / 2 -
+                            bottomNavigationBarHeight
+                        // 원래는 BottomNavigationBarHeight만큼 더해야 하나,
+                        // 아직 Custom Map이 완성되지 않아 임시로 Hard Coding 한다.
                         ),
-                      ),
-
-                      // 2023.07.29, jdk
-                      // Map Image 위에 아이콘을 표시하기 위하여
-                      // Positioned Widget을 위치시켜야 하는 부분.
-                      Positioned(
-                        left: backgroundImageWidth / 2,
-                        top: backgroundImageHeight / 2,
-                        child: IconButton(
-                          icon: Icon(Icons.local_post_office),
-                          onPressed: () {
-                            print("Touched!");
-                          },
-                          color: Colors.blueAccent,
+                    // boundaryMargin: EdgeInsets.symmetric(
+                    //   vertical: 2500,
+                    //   horizontal: 3000,
+                    // ),
+                    child: Stack(
+                      children: [
+                        /* 
+                          2023.07.27, jdk
+                          Custom Map과 같은 Level에서 Message를 생성.
+                          이후에는 함수를 통해서 생성하도록 자동화한다.
+                    
+                          현재는 임시적인 확인을 위해 Icon을 하드코딩으로 띄워두도록 함.
+                        */
+                        Positioned(
+                          child: Image(
+                            image: AssetImage("images/inu-map.png"),
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      ),
-                    ],
+
+                        // 2023.07.29, jdk
+                        // Map Image 위에 아이콘을 표시하기 위하여
+                        // Positioned Widget을 위치시켜야 하는 부분.
+                        // Positioned(
+                        //   left: backgroundImageWidth / 2,
+                        //   top: backgroundImageHeight / 2,
+                        //   child: IconButton(
+                        //     icon: Icon(Icons.local_post_office),
+                        //     onPressed: () {
+                        //       print("Touched!");
+                        //     },
+                        //     color: Colors.blueAccent,
+                        //   ),
+                        // )
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
+            // Positioned(
+            //   left: 0,
+            //   top: 0,
+            //   child: Opacity(
+            //     opacity: 0.6,
+            //     child: Container(
+            //       width: backgroundImageWidth,
+            //       height: backgroundImageHeight,
+            //       color: Colors.red,
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),

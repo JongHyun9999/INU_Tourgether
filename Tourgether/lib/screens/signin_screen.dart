@@ -114,9 +114,11 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
     PostServices.postSignup(postData);
 
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => SignUpVerifyScrren(email: userEmail)));
+      context,
+      MaterialPageRoute(
+        builder: (context) => SignUpVerifyScrren(email: userEmail),
+      ),
+    );
   }
 
   TextEditingController stringController = TextEditingController();
@@ -139,14 +141,15 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                   height: MediaQuery.of(context).size.height / 5,
                   width: MediaQuery.of(context).size.width * 0.7,
                   child: Container(
-                      padding: EdgeInsets.only(top: 90, left: 20),
-                      child: Text(
-                        '투게더에 오신걸 환영합니다!',
-                        style: TextStyle(
-                            fontSize: 25,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold),
-                      )),
+                    padding: EdgeInsets.only(top: 90, left: 20),
+                    child: Text(
+                      '투게더에 오신걸 환영합니다!',
+                      style: TextStyle(
+                          fontSize: 25,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
                 ),
               ),
               //배경을 위한 포지션
@@ -167,9 +170,10 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                         borderRadius: BorderRadius.circular(15.0),
                         boxShadow: [
                           BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
-                              blurRadius: 15,
-                              spreadRadius: 5)
+                            color: Colors.black.withOpacity(0.3),
+                            blurRadius: 15,
+                            spreadRadius: 5,
+                          )
                         ],
                       ),
                       child: SingleChildScrollView(
@@ -471,10 +475,14 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                     ),
                     child: GestureDetector(
                       onTap: () {
+                        context.read<UserInfoProvider>().setDefaultUserInfo();
+
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => MainScreen()));
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MainScreen(),
+                          ),
+                        );
                       },
                       child: Center(
                         child: Text(

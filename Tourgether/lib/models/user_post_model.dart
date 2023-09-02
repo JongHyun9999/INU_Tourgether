@@ -1,23 +1,21 @@
-class MessageModel {
+class UserPostModel {
   // 글을 입력할 경우에는 rid가 필요하지 않으므로
   // 기본값은 0으로 설정한다.
   int rid = 0;
   final String user_name;
   final String title;
   final String content;
-  final double latitude;
-  final double longitude;
+  final Map<String, dynamic> gps;
   final String posted_time;
   int liked;
   int comments_num;
 
-  MessageModel({
+  UserPostModel({
     required this.rid,
     required this.user_name,
     required this.title,
     required this.content,
-    required this.latitude,
-    required this.longitude,
+    required this.gps,
     required this.posted_time,
     required this.liked,
     required this.comments_num,
@@ -25,13 +23,12 @@ class MessageModel {
 
   // 2023.07.09, jdk
   // API를 통해 전달받은 데이터를 Json으로 변경하는 factory 메서드.
-  MessageModel.fromJson(Map<String, dynamic> json)
+  UserPostModel.fromJson(Map<String, dynamic> json)
       : rid = json['rid'],
         user_name = json['user_name'],
         title = json['title'],
         content = json['content'],
-        latitude = json['latitude'],
-        longitude = json['longitude'],
+        gps = json['gps'],
         posted_time = json['posted_time'],
         liked = json['liked'],
         comments_num = json['comments_num'];
@@ -39,7 +36,7 @@ class MessageModel {
   /*
   // 2023.07.09, jdk
   // 현재 전달된 argument에 대한 Null Checking이 없으므로 주의해야 함.
-  factory MessageModel.fromData(
+  factory UserPostModel.fromData(
     String authorArg,
     String contentArg,
     String latitudeArg,
@@ -59,7 +56,7 @@ class MessageModel {
     // 이후에 geolocator를 거치게 함으로써 문제 해결할 예정.
 
     // 객체로 반환
-    return MessageModel(
+    return UserPostModel(
       author: authorArg,
       content: contentArg,
       latitude: latitudeDouble!,

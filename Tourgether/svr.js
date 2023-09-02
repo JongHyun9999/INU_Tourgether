@@ -43,7 +43,7 @@ async function sendEmail(email, subject, content) {
     from: "premieravengers@gmail.com",
     to: email,          //이메일을 받는 주소
     subject: subject,   //이메일 제목
-    text: `Tourgather 앱을 이용해주셔서 감사합니다! \n인증을 완료하기 위해 아래 4자리 숫자를을 입력해주세요. \n  ${content}`
+    text: `Tourgather 앱을 이용해주셔서 감사합니다! \n인증을 완료하기 위해 아래 4자리 숫자를 입력해주세요. \n${content}`
   };
 
   return new Promise((resolve, reject) => {
@@ -199,8 +199,8 @@ app.post('/api/postUserContent', async (req, res) => {
   let conn = null;
   try {
 
-    let QUERY_STR = `INSERT INTO User_Posts(user_name, title, content, posted_time, latitude, longitude) \ 
-                        VALUES('${user_name}', '${title}', '${content}', '${posted_time}', '${latitude}', '${longitude}');`;
+    let QUERY_STR = `INSERT INTO User_Posts(user_name, title, content, posted_time, gps) \ 
+                        VALUES('${user_name}', '${title}', '${content}', '${posted_time}', Point(${latitude}, ${longitude}));`;
 
     conn = await new Promise((resolve, reject) => {
       pool.getConnection((err, connection) => {
@@ -232,7 +232,7 @@ app.get('/api/getUsersPostsList', async (req, res) => {
   let conn = null;
   try {
 
-    let QUERY_STR = `SELECT rid, user_name, title, content, posted_time, liked, comments_num, latitude, longitude FROM User_Posts order by posted_time desc;`;
+    let QUERY_STR = `SELECT rid, user_name, title, content, posted_time, liked, comments_num, gps FROM User_Posts order by posted_time desc;`;
 
     conn = await new Promise((resolve, reject) => {
       pool.getConnection((err, connection) => {

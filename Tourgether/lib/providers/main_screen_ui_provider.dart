@@ -62,16 +62,19 @@ class MainScreenUIProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /* 
   void changeCurrentScaleValue(double newScaleValue) {
     _currentScaleValue = newScaleValue;
   }
 
-  bool compareNewScaleValueWithPrev(double newScaleValue) {
-    print("currentScaleValue $_currentScaleValue");
-    print("newScaleValue $newScaleValue");
-
-    return (_currentScaleValue == newScaleValue);
+  void compareNewScaleValueWithPrev(double newScaleValue) {
+    // Scale 값이 다르다면 새로운 Scale 값으로 currentScaleValue를 지정한다.
+    if (_currentScaleValue != newScaleValue) {
+      print("scale value is changed");
+      print("prev : ${_currentScaleValue}");
+      _currentScaleValue = newScaleValue;
+      print("new : ${newScaleValue}");
+      notifyListeners();
+    }
   }
 
   void changeMapPosition(double newMapPositionX, double newMapPositionY) {
@@ -97,5 +100,4 @@ class MainScreenUIProvider with ChangeNotifier {
 
     return isEqual;
   }
-  */
 }

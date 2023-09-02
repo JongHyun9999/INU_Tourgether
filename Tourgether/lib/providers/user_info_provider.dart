@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:TourGather/utilities/api_url.dart';
 import '../services/network.dart';
+import '../utilities/log.dart';
 
 class UserInfoProvider extends ChangeNotifier {
   // network 통신 실시.
@@ -33,7 +34,7 @@ class UserInfoProvider extends ChangeNotifier {
     // 현재는 하드코딩 방식으로 되어 있어서 코드의 유연성이 부족하다고 할 수 있음.
     // uilities(이름은 바꿔도 됨) 폴더를 만들고, 거기에 data class를 만들어서
     // API URL들을 String으로 정리해보자.
-    // => Data Class 공부해보기.s
+    // => Data Class 공부해보기.
 
     // 2. Network Class를 Singleton Class로 생성하기.
     // 전역 변수를 예시로 생각해보자. 현재 initUserInfo() 메서드와
@@ -43,13 +44,13 @@ class UserInfoProvider extends ChangeNotifier {
     // 따라서 Network Class를 전역적인 변수(OOP에서는 Singleton Pattern 이라고 함.)로 생성,
     // API 요청을 처리해주는 단일 전역 객체를 생성해보자.
     // => Singleton Pattern, static 키워드 공부해보기.
-
     // -------------------------------------------------------------------------
 
     // 2023.09.01 JKE
     // Email
     Network network = Network("${ApiUrl.address}${ApiUrl.userInfoApiUrl}");
     var jsonData = await network.getUserInfoByEmail(arg_userEmail);
+    Log.logger.d("jsonData : ${jsonData}");
     // 가져온 jsonData(map형)을 전공, 이름, 학번으로 나누어 선언
     _userMajor = await jsonData['user_info'][0]["user_major"];
     _userName = await jsonData['user_info'][0]["user_name"];
@@ -81,5 +82,12 @@ class UserInfoProvider extends ChangeNotifier {
         update_user_map_visibility_statusData);
 
     notifyListeners();
+  }
+
+  // 2023.09.02, jdk
+  // signin screen에서 skip 버튼을 누를 경우,
+  // admin 계정으로 유저 정보를 init하는 함수.
+  void setDefaultUserInfo() {
+    this.initUserInfo('premiereavengers@gmail.com');
   }
 }

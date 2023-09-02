@@ -1,10 +1,11 @@
+import 'package:TourGather/providers/user_info_provider.dart';
 import 'package:TourGather/utilities/color_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
-import '../models/message_model.dart';
+import '../models/user_post_model.dart';
 import '../providers/user_post_provider.dart';
 import '../services/post_services.dart';
 import '../utilities/log.dart';
@@ -16,7 +17,7 @@ class UserPostDetailScreen extends StatefulWidget {
     required this.postData,
   });
 
-  final MessageModel postData;
+  final UserPostModel postData;
 
   @override
   State<UserPostDetailScreen> createState() => _MyWidgetState();
@@ -29,8 +30,7 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
   late final String user_name;
   late final String title;
   late final String content;
-  late final double latitude;
-  late final double longitude;
+  late final Map<String, dynamic> gps;
   late final String posted_time;
   late int liked;
   late int comments_num;
@@ -57,27 +57,25 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
     user_name = widget.postData.user_name;
     title = widget.postData.title;
     content = widget.postData.content;
-    latitude = widget.postData.latitude;
-    longitude = widget.postData.longitude;
+    gps = widget.postData.gps;
     posted_time = widget.postData.posted_time;
     liked = widget.postData.liked;
     comments_num = widget.postData.comments_num;
 
-    MessageModel postData = MessageModel(
+    UserPostModel postData = UserPostModel(
       rid: rid,
       user_name: user_name,
       title: title,
       content: content,
-      latitude: latitude,
-      longitude: longitude,
+      gps: gps,
       posted_time: posted_time,
       liked: liked,
       comments_num: comments_num,
     );
 
     // 2023.08.14, jdk
-    // TODO MessageModel 이름 수정. => UserPostModel
-    // Provider에 CurrentSelectedPost(MessageModel) 데이터 초기화하기.
+    // TODO UserPostModel 이름 수정. => UserPostModel
+    // Provider에 CurrentSelectedPost(UserPostModel) 데이터 초기화하기.
     context.read<UserPostProvider>().setCurrentSelectedPostData(postData);
   }
 
@@ -277,9 +275,12 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                               context.read<UserPostProvider>().isLikePressed;
                           isPressed = !isPressed;
 
+                          String likedUserName =
+                              context.read<UserInfoProvider>().userName;
+
                           Map<String, dynamic> likedPostData = {
                             "rid": rid,
-                            "user_name": "개발자정동교",
+                            "user_name": likedUserName,
                             "isPressed": isPressed,
                           };
 
@@ -303,6 +304,9 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                           // 2023.08.14, jdk
                           // API 통신 결, 좋아요 기능이 반영되었으므로
                           // UserPostProvider에서 결과를 바꿔준다.
+
+                          // 좋아요 반영이 성공할 경우, UserPostProvider의 함수를 이용하여
+                          // User_Post_List_Screen의 좋아요 결과도 재빌드 하도록 한다.
                           if (isSucceeded) {
                             context
                                 .read<UserPostProvider>()

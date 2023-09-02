@@ -6,6 +6,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:TourGather/models/gps_model.dart';
 import 'package:logger/logger.dart';
 
+import '../utilities/log.dart';
+
 // 2023.07.10 jdk
 // Provider Pattern에 따라서 GPS 관련 Logic을 처리하는 Provider Class.
 // Geolocator 관련 코드를 모두 처리하고, 관련 데이터를 보관한다.
@@ -115,6 +117,19 @@ class GPSProvider with ChangeNotifier {
           _gpsModel.currentPosition = newPosition;
           _isLoadingGPS = false;
 
+          // 2023.09.01, jdk
+          // 사용자 위치 표시를 위해 계산식 체크용으로 프린트
+
+          logger.d("longitude : ${_gpsModel.currentPosition!.longitude}");
+          logger.d(
+            "width ratio : ${126.640 - _gpsModel.currentPosition!.longitude / 0.012444}",
+          );
+
+          logger.d("latitude : ${_gpsModel.currentPosition!.latitude}");
+          logger.d(
+            "height ratio : ${37.380826 - _gpsModel.currentPosition!.latitude / 0.016231}",
+          );
+
           // 새로운 Position 데이터가 들어왔으므로, 구독자들에게 알려주어야 함.
           notifyListeners();
 
@@ -132,9 +147,19 @@ class GPSProvider with ChangeNotifier {
               _streamInterval = _endTime!.difference(_startTime!);
               _gpsModel.currentPosition = newPosition;
 
-              // logger.d(
-              //   "A new GPS data has arrived\nlatitude : ${_gpsModel.latitude}\nlongitude : ${_gpsModel.longitude}\naccuracy : ${_gpsModel.accuracy}\nstreamInterval : ${streamInterval}",
-              // );
+              logger.d("longitude : ${_gpsModel.currentPosition!.longitude}");
+              logger.d(
+                "width ratio : ${(126.640 - _gpsModel.currentPosition!.longitude) / 0.016231}",
+              );
+
+              logger.d("latitude : ${_gpsModel.currentPosition!.latitude}");
+              logger.d(
+                "height ratio : ${(37.380826 - _gpsModel.currentPosition!.latitude) / 0.012444}",
+              );
+
+              logger.d(
+                "A new GPS data has arrived\nlatitude : ${_gpsModel.latitude}\nlongitude : ${_gpsModel.longitude}\naccuracy : ${_gpsModel.accuracy}\nstreamInterval : ${streamInterval}",
+              );
 
               notifyListeners();
               _startTime = DateTime.now();
