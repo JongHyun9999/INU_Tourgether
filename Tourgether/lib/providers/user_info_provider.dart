@@ -9,7 +9,7 @@ class UserInfoProvider extends ChangeNotifier {
   String _userMajor = "null";
   String _userName = "null";
   String _userEmail = "null";
-  String _userBadge = "null";
+  String? _userBadge = "null";
   String _userNum = "null";
   bool _user_map_visibility_status = false;
   int _show_online_status_type = 0;
@@ -17,7 +17,7 @@ class UserInfoProvider extends ChangeNotifier {
   String get userMajor => _userMajor;
   String get userName => _userName;
   String get userEmail => _userEmail;
-  String get userBadge => _userBadge;
+  String? get userBadge => _userBadge;
   String get userNum => _userNum;
   bool get user_map_visibility_status => _user_map_visibility_status;
   int get show_online_status_type => _show_online_status_type;

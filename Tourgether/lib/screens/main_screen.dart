@@ -1,5 +1,6 @@
 import 'package:TourGather/providers/main_screen_ui_provider.dart';
 import 'package:TourGather/widgets/app_bars.dart';
+import 'package:TourGather/widgets/blinking_user.dart';
 import 'package:flutter/material.dart';
 import 'package:TourGather/providers/gps_provider.dart';
 import 'package:provider/provider.dart';
@@ -46,6 +47,14 @@ class _MainScreenState extends State<MainScreen> {
     // Future.microtask(
     //   () => Provider.of<UserInfoProvider>(context, listen: false).initUserInfo(),
     // );
+
+    // 2023.09.03, jdk
+    // Login 후에 main screen에 들어오면 곧바로 gps callback을 시작함.
+    // callback이 받아지지 않을 경우 지속적으로 재시도, (최대 재시도 횟수 설정 필요)
+    // 재시도 중이라는 UI를 유저에게 보여줄 수 있어야 함.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<GPSProvider>(context, listen: false).startGPSCallback();
+    });
   }
 
   @override
@@ -243,20 +252,45 @@ class _MainScreenState extends State<MainScreen> {
                           ),
                         ),
 
+                        // ------------------------------------------
                         // 2023.07.29, jdk
                         // Map Image 위에 아이콘을 표시하기 위하여
                         // Positioned Widget을 위치시켜야 하는 부분.
-                        // Positioned(
-                        //   left: backgroundImageWidth / 2,
-                        //   top: backgroundImageHeight / 2,
-                        //   child: IconButton(
-                        //     icon: Icon(Icons.local_post_office),
-                        //     onPressed: () {
-                        //       print("Touched!");
-                        //     },
-                        //     color: Colors.blueAccent,
-                        //   ),
-                        // )
+                        // ------------------------------------------
+                        // 2023.09.03, jdk
+                        // User를 표시하는 부분.
+                        // ------------------------------------------
+                        Consumer<GPSProvider>(
+                          builder: (context, gpsProvider, child) {
+                            Log.logger.d(gpsProvider.userWidthPosition);
+                            Log.logger.d(gpsProvider.userHeightPosition);
+
+                            return (gpsProvider.isListeningGPSPositionStream)
+                                ? Positioned(
+                                    left: gpsProvider.userWidthPosition,
+                                    top: gpsProvider.userHeightPosition,
+                                    child: IconButton(
+                                      icon: BlinkingIcon(
+                                        iconData: Icons.circle,
+                                      ),
+                                      onPressed: () {
+                                        print("Touched!");
+                                      },
+                                      color: Colors.blueAccent,
+                                    ),
+                                  )
+                                // GPS를 받고 있지 않을 경우 중앙에 transparent로 표시
+                                // 이후에 변경하기.
+                                : Positioned(
+                                    left: backgroundImageWidth / 2,
+                                    top: backgroundImageHeight / 2,
+                                    child: Icon(
+                                      Icons.circle,
+                                      color: Colors.transparent,
+                                    ),
+                                  );
+                          },
+                        )
                       ],
                     ),
                   ),

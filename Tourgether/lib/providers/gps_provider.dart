@@ -57,8 +57,13 @@ class GPSProvider with ChangeNotifier {
     distanceFilter: 0,
   );
 
+  double widthRatio = 0;
+  double heightRatio = 0;
+  double userWidthPosition = 0;
+  double userHeightPosition = 0;
+
   // 2023.07.10, jdk
-  startGPSCallback() async {
+  Future<void> startGPSCallback() async {
     _isLoadingGPS = true;
     notifyListeners();
 
@@ -117,19 +122,6 @@ class GPSProvider with ChangeNotifier {
           _gpsModel.currentPosition = newPosition;
           _isLoadingGPS = false;
 
-          // 2023.09.01, jdk
-          // 사용자 위치 표시를 위해 계산식 체크용으로 프린트
-
-          logger.d("longitude : ${_gpsModel.currentPosition!.longitude}");
-          logger.d(
-            "width ratio : ${126.640 - _gpsModel.currentPosition!.longitude / 0.012444}",
-          );
-
-          logger.d("latitude : ${_gpsModel.currentPosition!.latitude}");
-          logger.d(
-            "height ratio : ${37.380826 - _gpsModel.currentPosition!.latitude / 0.016231}",
-          );
-
           // 새로운 Position 데이터가 들어왔으므로, 구독자들에게 알려주어야 함.
           notifyListeners();
 
@@ -147,19 +139,24 @@ class GPSProvider with ChangeNotifier {
               _streamInterval = _endTime!.difference(_startTime!);
               _gpsModel.currentPosition = newPosition;
 
-              logger.d("longitude : ${_gpsModel.currentPosition!.longitude}");
               logger.d(
-                "width ratio : ${(126.640 - _gpsModel.currentPosition!.longitude) / 0.016231}",
+                "latitude : ${_gpsModel.currentPosition!.latitude}\nheight ratio : ${(37.380826 - _gpsModel.currentPosition!.latitude) / 0.012444}",
               );
-
-              logger.d("latitude : ${_gpsModel.currentPosition!.latitude}");
-              logger.d(
-                "height ratio : ${(37.380826 - _gpsModel.currentPosition!.latitude) / 0.012444}",
-              );
+              heightRatio =
+                  (37.381506 - _gpsModel.currentPosition!.latitude) / 0.013024;
 
               logger.d(
-                "A new GPS data has arrived\nlatitude : ${_gpsModel.latitude}\nlongitude : ${_gpsModel.longitude}\naccuracy : ${_gpsModel.accuracy}\nstreamInterval : ${streamInterval}",
+                "longitude : ${_gpsModel.currentPosition!.longitude}\nwidth ratio : ${(126.640 - _gpsModel.currentPosition!.longitude) / 0.016231}",
               );
+              widthRatio =
+                  (126.64023 - _gpsModel.currentPosition!.longitude) / 0.016461;
+
+              // logger.d(
+              //   "A new GPS data has arrived\nlatitude : ${_gpsModel.latitude}\nlongitude : ${_gpsModel.longitude}\naccuracy : ${_gpsModel.accuracy}\nstreamInterval : ${streamInterval}",
+              // );
+
+              userWidthPosition = 2000 * (1 - widthRatio);
+              userHeightPosition = 1800 * heightRatio;
 
               notifyListeners();
               _startTime = DateTime.now();

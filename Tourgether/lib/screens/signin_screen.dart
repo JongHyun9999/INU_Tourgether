@@ -476,7 +476,8 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                     child: GestureDetector(
                       onTap: () {
                         context.read<UserInfoProvider>().setDefaultUserInfo();
-
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, '/signin', (_) => false);
                         Navigator.push(
                           context,
                           MaterialPageRoute(
