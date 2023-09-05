@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import '../utilities/color_palette.dart';
 
 class UserPostComment extends StatelessWidget {
-  const UserPostComment({super.key, required this.screenWidth});
-
-  final double screenWidth;
+  const UserPostComment({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+
     return Padding(
       padding: const EdgeInsets.symmetric(
         vertical: 5,
@@ -52,7 +52,7 @@ class UserPostComment extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
                         child: Text(
-                          "지나가는 인천대생1",
+                          "",
                           style: TextStyle(
                             fontFamily: 'Pretendard',
                             fontWeight: FontWeight.bold,
@@ -67,7 +67,7 @@ class UserPostComment extends StatelessWidget {
                           bottom: 5,
                         ),
                         child: Text(
-                          "헐 개발자세요? 투게더 너무 재밌어요!!! 기능 더 많이 만들어주세요ㅎㅎ",
+                          "",
                           style: TextStyle(
                             fontSize: 13,
                           ),

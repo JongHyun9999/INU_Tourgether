@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
+import '../models/user_comment.dart';
 import '../models/user_post_model.dart';
 import '../providers/user_post_provider.dart';
 import '../services/post_services.dart';
@@ -529,14 +530,27 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                 child: Flexible(
                   child: Container(
                     width: screenWidth * 0.95,
-                    child: Column(
-                      children: [
-                        // 2023.08.11, jdk
-                        // User Post Comment는 따로 Widget으로 분리하였음.
-                        UserPostComment(
-                          screenWidth: screenWidth,
-                        ),
-                      ],
+                    child: FutureBuilder<List<UserComment>>(
+                      future: PostServices.getUserComments(rid),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        } else if (snapshot.hasData) {
+                          List<UserComment> comments = snapshot.data!;
+                          return ListView.builder(
+                            itemCount: comments.length,
+                            itemBuilder: (context, index) {
+                              return UserPostComment();
+                            },
+                          );
+                        } else {
+                          // 에러 처리 자세하게 필요.
+                          return Text("Error.");
+                        }
+                      },
                     ),
                   ),
                 ),
