@@ -59,7 +59,7 @@ class UserInfoProvider with ChangeNotifier {
     _show_online_status_type =
         await jsonData['user_info'][0]['show_online_status_type'];
     _userEmail = await jsonData['user_info'][0]['user_email'];
-    _userBadge = await jsonData['user_info'][0]['user_badge'];
+    // _userBadge = await jsonData['user_info'][0]['user_badge'];
 
     // 새로고침
     notifyListeners();

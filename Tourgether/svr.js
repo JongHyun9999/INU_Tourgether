@@ -705,7 +705,7 @@ app.post('/api/postGetMessage', async (req, res) => {
   let conn = null;
   try {
 
-    let QUERY_STR = `SELECT content, latitude, longitude, gps FROM User_Posts`;
+    let QUERY_STR = `SELECT content, gps FROM User_Posts`;
 
     conn = await new Promise((resolve, reject) => {
       pool.getConnection((err, connection) => {
