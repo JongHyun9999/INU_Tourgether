@@ -45,6 +45,50 @@ class _MainScreenState extends State<MainScreen> {
   TransformationController _transformationController =
       TransformationController();
 
+  final List<Widget> pages = [
+    Container(
+      color: Colors.blue,
+      child: Center(
+        child: Text(
+          '페이지 1',
+          style: TextStyle(color: Colors.white, fontSize: 24.0),
+        ),
+      ),
+    ),
+    Container(
+      color: Colors.green,
+      child: Center(
+        child: Text(
+          '페이지 2',
+          style: TextStyle(color: Colors.white, fontSize: 24.0),
+        ),
+      ),
+    ),
+    Container(
+      color: Colors.orange,
+      child: Center(
+        child: Text(
+          '페이지 3',
+          style: TextStyle(color: Colors.white, fontSize: 24.0),
+        ),
+      ),
+    ),
+  ];
+  void show_post(context, title, image, description) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.7,
+              height: 380,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10), color: Colors.red),
+            ),
+          );
+        });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -61,12 +105,12 @@ class _MainScreenState extends State<MainScreen> {
     final double statusBarHeight = MediaQuery.of(context).viewPadding.top;
     final double bottomNavigationBarHeight = 60;
     final double appBarHeight = 50;
-
+    bool isShowPost = false;
     final gpsProvider = Provider.of<GPSProvider>(context, listen: false);
     final mainScreenUIProvider =
         Provider.of<MainScreenUIProvider>(context, listen: false);
-
-    bool showPostThing = false;
+    final PageController controller =
+        PageController(initialPage: 0, viewportFraction: 0.8);
     return Scaffold(
       drawer: const NavBar(),
       extendBodyBehindAppBar: true,
@@ -232,10 +276,39 @@ class _MainScreenState extends State<MainScreen> {
                           icon: Icon(Icons.local_post_office),
                           onPressed: () {
                             print("Touched!");
+                            PageView(
+                              scrollDirection: Axis.horizontal,
+                              controller: controller,
+                              children: [
+                                FutureBuilder(
+                                  future: ShowPostDetail(context),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      return CircularProgressIndicator();
+                                    }
+                                    final name = snapshot.data;
+                                    if (name.isEmpty) {
+                                      return Text('');
+                                    } else {
+                                      return ListView.builder(
+                                        itemCount: name.length,
+                                        itemBuilder: (context, index) {
+                                          return CheckboxListTile(
+                                            title: Text(name[index]),
+                                            value: null,
+                                            onChanged: null,
+                                          ); // 괄호 추가: ListView.builder 내부
+                                        }, // 괄호 추가: ListView.builder의 itemBuilder 블록 종료
+                                      ); // 괄호 추가: ListView.builder
+                                    }
+                                  },
+                                ),
+                              ],
+                            ); // 괄호 추가: PageView 종료
                           },
                           color: Colors.blueAccent,
-                        ),
-                      ),
+                        ), // 괄호 추가: IconButton 종료
+                      ), // 괄호 추가: Positioned 종료
                     ],
                   ),
                 ),
