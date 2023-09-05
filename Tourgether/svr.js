@@ -700,6 +700,38 @@ app.post('/update_user_map_visibility_status', async (req, res) => {
   }
 })
 
+// 유저 등록
+app.post('/api/postGetMessage', async (req, res) => {
+  console.log('/api/postGetMessage 호출됨');
+  let conn = null;
+  try {
+
+    let QUERY_STR = `SELECT content, gps FROM User_Posts`;
+
+    conn = await new Promise((resolve, reject) => {
+      pool.getConnection((err, connection) => {
+        if (err) reject(err);
+        resolve(connection);
+      });
+    }).catch((err) => {
+      throw err;
+    })
+    const [rows] = await conn.promise().query(QUERY_STR);
+
+    console.log(rows);
+    console.log('Successfully fetched the users posts list. [/api/postGetMessage]');
+    if (rows[0]) res.status(200).json(rows);
+    else res.status(404).json(null);
+  } catch (err) {
+    console.log(err);
+    res.status(404).json({
+      error: "An error occurred while /api/postGetMessage"
+    });
+  } finally {
+    if (conn) conn.release();
+  }
+})
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

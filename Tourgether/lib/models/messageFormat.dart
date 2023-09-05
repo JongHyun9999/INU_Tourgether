@@ -1,15 +1,24 @@
 // pjh. 메인페이지 메세지 리스트 전용 class.
-class messageProduct {
-  final String imagePath;
-  final String userName;
-  final String textContent;
-  final String department;
-  int goodCount;
+import 'package:flutter/material.dart';
 
-  messageProduct(
-      {required this.imagePath,
-      required this.userName,
-      required this.textContent,
+class MessageProduct with ChangeNotifier {
+  final String image_path;
+  final String user_name;
+  final String title;
+  final String content;
+  final String department;
+  final Map<String, dynamic> gps;
+  final String posted_time;
+  final int liked;
+  final int comments_num;
+
+  MessageProduct({required this.image_path,
+      required this.user_name,
+      required this.title,
+      required this.content,
       required this.department,
-      required this.goodCount});
+      required this.gps,
+      required this.posted_time,
+      required this.liked,
+      required this.comments_num});
 }

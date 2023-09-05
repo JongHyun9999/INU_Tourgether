@@ -20,6 +20,7 @@ class PostServices {
   static const String emailVerifyUrl = "/api/emailVerify";
   static const String addUserUrl = "/api/addUser";
   static const String checkDupNameUrl = "/api/checkDupName";
+  static const String postGetMessageUrl = "/api/postGetMessage";
 
   static Future<bool> postUserContent(Map<String, dynamic> postData) async {
     Log.logger.d(
@@ -304,6 +305,42 @@ class PostServices {
           );
           throw Exception();
         }
+      });
+    } catch (error) {
+      Log.logger.e("error", error: error);
+      return false;
+    }
+  }
+
+  static Future<dynamic> postGetMessage(Map<String, dynamic> postData) async {
+    print('getMessage 호출');
+    Log.logger.d(
+        "postUserContent : URL[${baseUrl + postGetMessageUrl}]\npassed data : ${postData}");
+    String jsonData = jsonEncode(postData);
+
+    try {
+      return await http
+          .post(
+        Uri.parse(baseUrl + postGetMessageUrl),
+        headers: headers,
+        body: jsonData,
+      )
+          .then((response) {
+        var jsonResponse = convert.jsonDecode(response.body);
+        if (jsonResponse is! List) {
+          jsonResponse = [jsonResponse];
+          Log.logger.d("converted to List");
+          print('배열로 만듬');
+        }
+
+        // for(int i =0; i< jsonResponse.length; i++){
+        //   if(jsonResponse[i]['gps']['x'] < MapInfo.left_down_gps['x'] || jsonResponse[i]['gps']['x'] > MapInfo.left_up_gps['x'] ||
+        //       jsonResponse[i]['gps']['y'] < MapInfo.left_down_gps['y'] || jsonResponse[i]['gps']['y'] > MapInfo.right_down_gps['y']){
+
+        //   }
+        // }
+
+        return jsonResponse;
       });
     } catch (error) {
       Log.logger.e("error", error: error);

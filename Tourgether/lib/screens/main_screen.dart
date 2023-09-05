@@ -1,4 +1,5 @@
 import 'package:TourGather/providers/main_screen_ui_provider.dart';
+import 'package:TourGather/screens/message_screen.dart';
 import 'package:TourGather/widgets/app_bars.dart';
 import 'package:TourGather/widgets/blinking_user.dart';
 import 'package:flutter/material.dart';
@@ -251,7 +252,8 @@ class _MainScreenState extends State<MainScreen> {
                             fit: BoxFit.cover,
                           ),
                         ),
-
+                        // MessageScreen(),
+                        
                         // ------------------------------------------
                         // 2023.07.29, jdk
                         // Map Image 위에 아이콘을 표시하기 위하여
@@ -309,6 +311,7 @@ class _MainScreenState extends State<MainScreen> {
             //     ),
             //   ),
             // ),
+            // MessageScreen(),
           ],
         ),
       ),
