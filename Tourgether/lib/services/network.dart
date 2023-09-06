@@ -73,4 +73,43 @@ class Network {
     }
     //return json.decode(utf8.decode(response.bodyBytes));
   }
+
+  // userEmail로 친구 목록을 불러옴
+  Future<dynamic> getFriendListById(String arg_userId) async {
+    Map<String, String> data = {'user_id': arg_userId};
+    http.Response response = await http.get(Uri.parse(url), headers: data);
+    var userJson = response.body;
+    var parsingData = jsonDecode(userJson);
+    return parsingData;
+  }
+
+  // 특정 친구 관계를 검색
+  Future<dynamic> getFriendRelationById(
+      String userId, String targetUserId) async {
+    Map<String, String> data = {'user_id': userId};
+    http.Response response = await http.get(Uri.parse(url), headers: data);
+    var userJson = response.body;
+    var parsingData = jsonDecode(userJson);
+    return parsingData;
+  }
+
+  // 새로운 친구 목록을 추가함
+  Future<dynamic> updateFriendList(
+      String arg_friendFirst, String arg_friendSecond) async {
+    Map<String, String> data = {
+      "friendFirst": arg_friendFirst,
+      "friendSecond": arg_friendSecond
+    };
+
+    var response = await http.post(Uri.parse(url), body: data);
+
+    // check the status code for the result
+    if (response.statusCode == 201) {
+      print(response.body);
+    } else if (response.statusCode == 200) {
+      print("친구 목록 추가 완료: " + data['friendFirst'].toString());
+    } else {
+      print('Request failed with status: ${response.statusCode}.');
+    }
+  }
 }

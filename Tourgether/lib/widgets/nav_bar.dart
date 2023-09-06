@@ -248,8 +248,22 @@ class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
                               controller: _tabController,
                               children: [
                                 Scaffold(
-                                  backgroundColor: Colors.amber,
-                                ),
+                                    backgroundColor: Colors.amber,
+                                    body: ListView(
+                                      children: [
+                                        Container(
+                                          child: Consumer<UserInfoProvider>(
+                                            builder:
+                                                (context, userinfo, child) {
+                                              return Text(
+                                                "${userinfo.userName}",
+                                                style: TextStyle(fontSize: 15),
+                                              );
+                                            },
+                                          ),
+                                        )
+                                      ],
+                                    )),
                                 Scaffold(backgroundColor: Colors.pink),
                                 Scaffold(
                                   backgroundColor: Colors.blueGrey,
