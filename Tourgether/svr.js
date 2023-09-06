@@ -331,6 +331,8 @@ app.post('/api/isLikeButtonPressed', async (req, res) => {
   const rid = likedPostData.rid;
   const user_name = likedPostData.user_name;
 
+  console.log('user name is ', user_name);
+
   const QUERY_STR = `SELECT EXISTS (
     SELECT 1
     FROM User_Posts_Like

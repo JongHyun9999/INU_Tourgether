@@ -4,6 +4,7 @@ import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
 import '../models/user_post_model.dart';
+import '../providers/user_info_provider.dart';
 import '../providers/user_post_provider.dart';
 import '../screens/user_post_detail_screen.dart';
 import '../services/post_services.dart';
@@ -27,26 +28,32 @@ class UserPost extends StatelessWidget {
     return InkWell(
       onTap: () {
         // 사용자의 좋아요 정보를 가져옴.
+        // 2023.09.05, jdk
+        // 로그인한 유저의 이름으로 좋아요를 체크하기 위해서
+        // UserInfoProvider를 참조한다.
         Map<String, dynamic> postDataForLikeCheking = {
           'rid': postData.rid,
-          'user_name': postData.user_name,
+          'user_name': context.read<UserInfoProvider>().userName,
         };
 
         PostServices.isLikeButtonPressed(postDataForLikeCheking).then(
-          (likeValue) async {
+          (likedValue) async {
             context.read<UserPostProvider>().selectedPostLikeNum =
                 postData.liked;
 
-            if (likeValue == true) {
+            if (likedValue == true) {
               // 2023.08.14, jdk
               // API 통신 결과 이미 좋아요를 눌렀다면 UserPostProvider에서 값을 true로 변경한다.
               context.read<UserPostProvider>().isLikePressed = true;
-            } else if (likeValue == false) {
+            } else if (likedValue == false) {
               context.read<UserPostProvider>().isLikePressed = false;
             }
 
             // 2023.08.14, jdk
             // 좋아요 결과를 반영하기 위해서 provider에 현재 index 기록.
+            // selectedPostIndex는 현재 유저가 선택한 게시글의 index이다.
+            // 이를 기록해 두었다가 좋아요 또는 댓글 등의 상태 변화를
+            // post_list에 반영한다.
             context.read<UserPostProvider>().selectedPostIndex = index;
 
             await Navigator.push(
@@ -57,7 +64,6 @@ class UserPost extends StatelessWidget {
                 ),
               ),
             );
-
             // Detail Screen에 들어갔다가 나온 이후, selectedPost 관련한 변수를 리셋한다.
             // 코드 일관성을 위해서는, selectedPost도 리셋해주는 것이 좋다.
             // 현재 UserPostProvider의 selectedPost가 nullable이 아니기 때문에

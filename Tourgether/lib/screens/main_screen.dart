@@ -352,8 +352,12 @@ class _MainScreenState extends State<MainScreen> {
                                       icon: BlinkingIcon(
                                         iconData: Icons.circle,
                                       ),
-                                      onPressed: () {
-                                        print("Touched!");
+                                      onPressed: () async {
+                                        await showPostContent(
+                                            context,
+                                            isListeningGPSPositionStream,
+                                            titleController,
+                                            contentController);
                                       },
                                       color: Colors.blueAccent,
                                     ),
