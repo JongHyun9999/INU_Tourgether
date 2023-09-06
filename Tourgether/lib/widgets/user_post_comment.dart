@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import '../utilities/color_palette.dart';
 
 class UserPostComment extends StatelessWidget {
-  const UserPostComment({super.key, required this.screenWidth});
-
-  final double screenWidth;
+  const UserPostComment({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+
     return Padding(
       padding: const EdgeInsets.symmetric(
         vertical: 5,

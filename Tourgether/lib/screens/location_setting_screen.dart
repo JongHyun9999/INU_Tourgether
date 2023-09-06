@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:TourGather/utilities/color_palette.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

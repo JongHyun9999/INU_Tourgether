@@ -6,6 +6,8 @@ import 'package:TourGather/providers/message_provider.dart';
 import 'package:TourGather/services/post_services.dart';
 import 'package:flutter/material.dart';
 
+import '../widgets/show_post.dart';
+
 class MessageScreen extends StatefulWidget {
   const MessageScreen({super.key});
 
@@ -55,6 +57,9 @@ class _MessageScreenState extends State<MessageScreen> {
   }
 
   Widget makeMessageList() {
+    final PageController controller =
+        PageController(initialPage: 0, viewportFraction: 0.8);
+
     return Stack(
       children: [
         for (int i = 0; i < content!.length; i++)
@@ -70,6 +75,38 @@ class _MessageScreenState extends State<MessageScreen> {
               onPressed: () {
                 // getMessageList();
                 print('${i} 메세지 눌림');
+
+                // 2023.09.06, jdk
+                // Message 터치할 시 modal 띄우기.
+                PageView(
+                  scrollDirection: Axis.horizontal,
+                  controller: controller,
+                  children: [
+                    FutureBuilder(
+                      future: ShowPostDetail(context),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return CircularProgressIndicator();
+                        }
+                        final name = snapshot.data;
+                        if (name.isEmpty) {
+                          return Text('');
+                        } else {
+                          return ListView.builder(
+                            itemCount: name.length,
+                            itemBuilder: (context, index) {
+                              return CheckboxListTile(
+                                title: Text(name[index]),
+                                value: null,
+                                onChanged: null,
+                              ); // 괄호 추가: ListView.builder 내부
+                            }, // 괄호 추가: ListView.builder의 itemBuilder 블록 종료
+                          ); // 괄호 추가: ListView.builder
+                        }
+                      },
+                    ),
+                  ],
+                );
               },
             ),
           )

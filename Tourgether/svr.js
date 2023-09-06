@@ -261,6 +261,46 @@ app.get('/api/getUsersPostsList', async (req, res) => {
   }
 })
 
+app.post('/api/getUserComments', async (req, res) => {
+
+  const body = req.body;
+  const rid = body['rid'];
+
+  let conn = null;
+  try {
+
+    // 2023.09.06, jdk
+    // rid를 가져올 필요는 없기 때문에 rid 가져오는 건 나중에 수정하기.
+    let QUERY_STR = `SELECT * from User_Comment where rid='${rid}'`;
+
+    conn = await new Promise((resolve, reject) => {
+      pool.getConnection((err, connection) => {
+        if (err) reject(err);
+        resolve(connection);
+      });
+    }).catch((err) => {
+      throw err;
+    })
+
+    const [rows] = await conn.promise().query(QUERY_STR);
+    console.log("rows : ", rows);
+
+    // 2023.08.04, jdk
+    // node.js에도 logger 도입 필요.
+    // 또한, log나 error에 API 이름을 직접 드러내지 말고 간접적으로 에러 문구 바꾸기.
+
+    console.log(rows);
+    console.log('Successfully fetched the users posts list. [/api/getUserComments]');
+    res.status(200).json(rows);
+  } catch (err) {
+    res.status(404).json({
+      error: "An error occurred while /api/getUserComments"
+    });
+  } finally {
+    if (conn) conn.release();
+  }
+})
+
 // 2023.08.11, jdk
 // 유저가 특정 게시글에 좋아요를 눌렀거나 취소했을 때 사용되는 API.
 app.post('/api/pressedLikeButton', async (req, res) => {
