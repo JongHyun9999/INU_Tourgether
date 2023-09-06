@@ -33,7 +33,7 @@ class _MessageScreenState extends State<MessageScreen> {
       'user_gps_y': 126.33
     };
     content = await PostServices.postGetMessage(postData);
-    
+
     print('받은 content');
     print(content!);
     print('========================');
@@ -88,23 +88,28 @@ class _MessageScreenState extends State<MessageScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: getMessageList(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          print('그리기');
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(snapshot.error.toString()),
-            );
+    return Container(
+      width: 2000,
+      height: 1800,
+      child: FutureBuilder(
+        future: getMessageList(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            print('그리기');
+            if (snapshot.hasError) {
+              print(snapshot.error.toString());
+              return Center(
+                child: Text(snapshot.error.toString()),
+              );
+            } else {
+              return makeMessageList();
+            }
           } else {
-            return makeMessageList();
+            return CircularProgressIndicator();
           }
-        } else {
-          return CircularProgressIndicator();
-        }
-      },
-      // child: makeMessageList()
+        },
+        // child: makeMessageList()
+      ),
     );
   }
 }

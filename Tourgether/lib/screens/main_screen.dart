@@ -252,7 +252,7 @@ class _MainScreenState extends State<MainScreen> {
                             fit: BoxFit.cover,
                           ),
                         ),
-                        // MessageScreen(),
+                        MessageScreen(),
                         
                         // ------------------------------------------
                         // 2023.07.29, jdk
