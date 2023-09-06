@@ -1,43 +1,52 @@
 import 'package:TourGather/services/post_services.dart';
 import 'package:flutter/material.dart';
 
-import '../models/message_model.dart';
+import '../models/user_post_model.dart';
 import '../utilities/log.dart';
 
 class UserPostProvider with ChangeNotifier {
-  late List<MessageModel> _userPostList;
+  late List<UserPostModel> _userPostList;
 
-  late MessageModel _selectedPost;
+  late UserPostModel _selectedPost;
+  int _selectedPostIndex = 0;
   bool _isLikePressed = false;
   int _selectedPostLikeNum = 0;
 
   // 2023.08.13, jdk
-  // MessageModel과 List<MessageModel>의 Class를 구분할 수 있다면 구분하기.
-  List<MessageModel> get userPostList => _userPostList;
+  // UserPostModel과 List<UserPostModel>의 Class를 구분할 수 있다면 구분하기.
 
-  MessageModel get currentSelectedPost => _selectedPost;
+  // ----------------------------------------------------------
+  // Getters
+  List<UserPostModel> get userPostList => _userPostList;
+
+  UserPostModel get currentSelectedPost => _selectedPost;
+  int get selectedPostIndex => _selectedPostIndex;
+
   bool get isLikePressed => _isLikePressed;
   int get selectedPostLikeNum => _selectedPostLikeNum;
+  // ----------------------------------------------------------
 
-  // 2023.08.14, jdk
-  // 변수명이 너무 길어서 그런지 가독성이 매우 떨어져서 한 번 수정해야 할듯.
-  set userPostList(List<MessageModel> userPostList) =>
+  // ----------------------------------------------------------
+  // Setters
+  set userPostList(List<UserPostModel> userPostList) =>
       _userPostList = userPostList;
 
-  set currentSelectedPost(MessageModel selectedPost) =>
+  set currentSelectedPost(UserPostModel selectedPost) =>
       _selectedPost = selectedPost;
 
+  set selectedPostIndex(int index) => _selectedPostIndex = index;
   set isLikePressed(bool isLikePressed) => _isLikePressed = isLikePressed;
 
   set selectedPostLikeNum(int selectedPostLikeNum) =>
       _selectedPostLikeNum = selectedPostLikeNum;
+  // ----------------------------------------------------------
 
   // 2023.08.13, jdk
   // static method local method로 변경하기.
   PostServices postServices = PostServices();
 
-  Future<List<MessageModel>> getUsersPostsList() async {
-    List<MessageModel> userPostLists = await PostServices.getUsersPostsList();
+  Future<List<UserPostModel>> getUsersPostsList() async {
+    List<UserPostModel> userPostLists = await PostServices.getUsersPostsList();
     _userPostList = userPostLists;
 
     return _userPostList;
@@ -46,19 +55,29 @@ class UserPostProvider with ChangeNotifier {
   // 2023.08.14, jdk
   // Detail Screen을 처음 들어가는 경우, 혹은 한 Screen에 들어갔다가
   // 나와서 다시 새로운 Screen을 들어가는 경우. 데이터를 새롭게 초기화 해야 한다.
-  void setCurrentSelectedPostData(MessageModel postData) {
+  void setCurrentSelectedPostData(UserPostModel postData) {
     _selectedPost = postData;
   }
 
   // 2023.08.14, jdk
-  // 우선 임시로 누를 경우 좋아요 수까지 같이 바뀌도록 설정.
+  // -------------------------------------------------------------------------------
+  // user가 detail screen에서 post에 좋아요를 누르거나 취소할 경우 사용되는 메서드.
+  // isLikePressed 상태를 바꿔서, 삼항 연산자로 상태가 나뉘어진 UI를 재빌드 한다.
+  // 이때 selectedPostLikeNum은 현재 들어온 post의 좋아요 숫자이고, 이것을 바탕으로
+  // detail screen의 좋아요를 갱신한다.
+
+  // 또한 userPostList[selectedPostIndex].liked를 변경해서, User_Post_List_Screen에서
+  // 유저가 interaction한 좋아요 결과도 반영되도록 한다.
+  // -------------------------------------------------------------------------------
   void changeCurrentPostLikeButtonState() {
     if (isLikePressed == true) {
       isLikePressed = false;
       selectedPostLikeNum--;
+      userPostList[selectedPostIndex].liked--;
     } else {
       isLikePressed = true;
       selectedPostLikeNum++;
+      userPostList[selectedPostIndex].liked++;
     }
 
     notifyListeners();

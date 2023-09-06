@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ColorPalette {
-  static const Color primaryContainer = Color.fromARGB(255, 106, 174, 233);
+  static const Color primaryContainer = Color(0xff448AFF);
   static const Color onPrimaryContainer = Color.fromARGB(255, 241, 247, 253);
 
   static const Color secondaryContainer = Color.fromARGB(255, 203, 224, 245);

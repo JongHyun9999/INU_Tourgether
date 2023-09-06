@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'dart:convert' as convert;
-import '../models/message_model.dart';
+import '../models/user_post_model.dart';
 import '../utilities/log.dart';
 
 class PostServices {
@@ -51,7 +51,7 @@ class PostServices {
     }
   }
 
-  static Future<List<MessageModel>> getUsersPostsList() async {
+  static Future<List<UserPostModel>> getUsersPostsList() async {
     Log.logger.d("getUsersPostsList : URL[${baseUrl + getUsersPostsListUrl}]");
 
     // TODO
@@ -78,7 +78,7 @@ class PostServices {
         String formattedDateTime =
             DateFormat('yyyy-MM-dd HH:mm:ss').format(correctedDateTime);
         model['posted_time'] = formattedDateTime;
-        return MessageModel.fromJson(model);
+        return UserPostModel.fromJson(model);
       }).toList();
     } catch (error) {
       Log.logger

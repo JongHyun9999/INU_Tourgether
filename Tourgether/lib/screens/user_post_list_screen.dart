@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:TourGather/screens/user_post_detail_screen.dart';
 import 'package:provider/provider.dart';
-import '../models/message_model.dart';
+import '../models/user_post_model.dart';
 import '../services/post_services.dart';
 
 class UsersPostsListScreen extends StatefulWidget {
@@ -47,8 +47,8 @@ class _UserPostListScreenState extends State<UsersPostsListScreen> {
         ),
       ),
       body: Container(
-        child: FutureBuilder<List<MessageModel>>(
-          future: PostServices.getUsersPostsList(),
+        child: FutureBuilder<List<UserPostModel>>(
+          future: context.read<UserPostProvider>().getUsersPostsList(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Container(

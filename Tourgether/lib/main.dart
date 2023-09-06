@@ -1,7 +1,7 @@
+import 'package:TourGather/providers/gps_ui_provider.dart';
 import 'package:TourGather/providers/main_screen_ui_provider.dart';
 import 'package:TourGather/providers/user_info_provider.dart';
 import 'package:TourGather/providers/user_post_provider.dart';
-import 'package:TourGather/utilities/color_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:TourGather/providers/gps_provider.dart';
 import 'package:TourGather/screens/location_setting_screen.dart';
@@ -36,12 +36,18 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => MainScreenUIProvider(),
         ),
+        // ChangeNotifierProxyProvider<GPSProvider, GPSUIProvider>(
+        //   create: (context) => GPSUIProvider(),
+        //   update: (context, gpsUIProvider, prevGpsUIProvider) {
+        //     return GPSUIProvider();
+        //   },
+        // ),
         ChangeNotifierProvider(
           create: (context) => UserPostProvider(),
         ),
         ChangeNotifierProvider(
           create: (context) => UserInfoProvider(),
-        )
+        ),
       ],
       child: MaterialApp(
         title: 'TourGather',
@@ -68,7 +74,6 @@ class MyApp extends StatelessWidget {
           ),
           useMaterial3: true,
         ),
-        home: LoginSignupScreen(),
       ),
     );
   }

@@ -115,7 +115,12 @@ Widget getBottomAppBar(BuildContext context, double bottomNavigationBarHeight) {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(
+                        context,
+                        "/locationSetting",
+                      );
+                    },
                     icon: FaIcon(
                       FontAwesomeIcons.trophy,
                       color: ColorPalette.onPrimaryContainer,

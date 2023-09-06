@@ -6,6 +6,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:TourGather/models/gps_model.dart';
 import 'package:logger/logger.dart';
 
+import '../utilities/log.dart';
+
 // 2023.07.10 jdk
 // Provider Pattern에 따라서 GPS 관련 Logic을 처리하는 Provider Class.
 // Geolocator 관련 코드를 모두 처리하고, 관련 데이터를 보관한다.
@@ -55,8 +57,13 @@ class GPSProvider with ChangeNotifier {
     distanceFilter: 0,
   );
 
+  double widthRatio = 0;
+  double heightRatio = 0;
+  double userWidthPosition = 0;
+  double userHeightPosition = 0;
+
   // 2023.07.10, jdk
-  startGPSCallback() async {
+  Future<void> startGPSCallback() async {
     _isLoadingGPS = true;
     notifyListeners();
 
@@ -132,9 +139,24 @@ class GPSProvider with ChangeNotifier {
               _streamInterval = _endTime!.difference(_startTime!);
               _gpsModel.currentPosition = newPosition;
 
+              logger.d(
+                "latitude : ${_gpsModel.currentPosition!.latitude}\nheight ratio : ${(37.380826 - _gpsModel.currentPosition!.latitude) / 0.012444}",
+              );
+              heightRatio =
+                  (37.381506 - _gpsModel.currentPosition!.latitude) / 0.013024;
+
+              logger.d(
+                "longitude : ${_gpsModel.currentPosition!.longitude}\nwidth ratio : ${(126.640 - _gpsModel.currentPosition!.longitude) / 0.016231}",
+              );
+              widthRatio =
+                  (126.64023 - _gpsModel.currentPosition!.longitude) / 0.016461;
+
               // logger.d(
               //   "A new GPS data has arrived\nlatitude : ${_gpsModel.latitude}\nlongitude : ${_gpsModel.longitude}\naccuracy : ${_gpsModel.accuracy}\nstreamInterval : ${streamInterval}",
               // );
+
+              userWidthPosition = 2000 * (1 - widthRatio);
+              userHeightPosition = 1800 * heightRatio;
 
               notifyListeners();
               _startTime = DateTime.now();
