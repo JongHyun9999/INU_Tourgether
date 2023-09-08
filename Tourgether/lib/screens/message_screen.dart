@@ -26,6 +26,7 @@ class _MessageScreenState extends State<MessageScreen> {
   final double? mapRight = MapInfo.right_down_gps['y'];
 
   List<dynamic>? content;
+  MessageProvider message_list = MessageProvider();
 
   Future getMessageList() async {
     Map<String, dynamic> postData = {
@@ -33,6 +34,7 @@ class _MessageScreenState extends State<MessageScreen> {
       'user_gps_y': 126.33
     };
     content = await PostServices.postGetMessage(postData);
+    // message_list.makeList(content!);
 
     print('받은 content');
     print(content!);
@@ -89,8 +91,8 @@ class _MessageScreenState extends State<MessageScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 2000,
-      height: 1800,
+      width: MapInfo.backgroundImageWidth,
+      height: MapInfo.backgroundImageHeight,
       child: FutureBuilder(
         future: getMessageList(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
