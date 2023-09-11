@@ -262,37 +262,37 @@ class _MainScreenState extends State<MainScreen> {
                         // 2023.09.03, jdk
                         // User를 표시하는 부분.
                         // ------------------------------------------
-                        // Consumer<GPSProvider>(
-                        //   builder: (context, gpsProvider, child) {
-                        //     Log.logger.d(gpsProvider.userWidthPosition);
-                        //     Log.logger.d(gpsProvider.userHeightPosition);
+                        Consumer<GPSProvider>(
+                          builder: (context, gpsProvider, child) {
+                            Log.logger.d(gpsProvider.userWidthPosition);
+                            Log.logger.d(gpsProvider.userHeightPosition);
 
-                        //     return (gpsProvider.isListeningGPSPositionStream)
-                        //         ? Positioned(
-                        //             left: gpsProvider.userWidthPosition,
-                        //             top: gpsProvider.userHeightPosition,
-                        //             child: IconButton(
-                        //               icon: BlinkingIcon(
-                        //                 iconData: Icons.circle,
-                        //               ),
-                        //               onPressed: () {
-                        //                 print("Touched!");
-                        //               },
-                        //               color: Colors.blueAccent,
-                        //             ),
-                        //           )
-                        //         // GPS를 받고 있지 않을 경우 중앙에 transparent로 표시
-                        //         // 이후에 변경하기.
-                        //         : Positioned(
-                        //             left: backgroundImageWidth / 2,
-                        //             top: backgroundImageHeight / 2,
-                        //             child: Icon(
-                        //               Icons.circle,
-                        //               color: Colors.transparent,
-                        //             ),
-                        //           );
-                        //   },
-                        // )
+                            return (gpsProvider.isListeningGPSPositionStream)
+                                ? Positioned(
+                                    left: gpsProvider.userWidthPosition,
+                                    top: gpsProvider.userHeightPosition,
+                                    child: IconButton(
+                                      icon: BlinkingIcon(
+                                        iconData: Icons.circle,
+                                      ),
+                                      onPressed: () {
+                                        print("Touched!");
+                                      },
+                                      color: Colors.blueAccent,
+                                    ),
+                                  )
+                                // GPS를 받고 있지 않을 경우 중앙에 transparent로 표시
+                                // 이후에 변경하기.
+                                : Positioned(
+                                    left: backgroundImageWidth / 2,
+                                    top: backgroundImageHeight / 2,
+                                    child: Icon(
+                                      Icons.circle,
+                                      color: Colors.transparent,
+                                    ),
+                                  );
+                          },
+                        )
                       ],
                     ),
                   ),

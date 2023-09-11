@@ -1,7 +1,6 @@
 class UserComment {
   // 글을 입력할 경우에는 rid가 필요하지 않으므로
   // 기본값은 0으로 설정한다.
-  final int comment_id;
   final int rid;
   final int comment_idx;
   final bool is_reply;
@@ -11,7 +10,6 @@ class UserComment {
   final int liked_num;
 
   UserComment({
-    required this.comment_id,
     required this.rid,
     required this.comment_idx,
     required this.is_reply,
@@ -24,8 +22,7 @@ class UserComment {
   // 2023.07.09, jdk
   // API를 통해 전달받은 데이터를 Json으로 변경하는 factory 메서드.
   UserComment.fromJson(Map<String, dynamic> json)
-      : comment_id = json['comment_id'],
-        rid = json['rid'],
+      : rid = json['rid'],
         comment_idx = json['comment_idx'],
         is_reply = json['is_reply'],
         reply_idx = json['reply_idx'],

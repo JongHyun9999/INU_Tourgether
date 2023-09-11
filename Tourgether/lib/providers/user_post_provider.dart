@@ -1,6 +1,7 @@
 import 'package:TourGather/services/post_services.dart';
 import 'package:flutter/material.dart';
 
+import '../models/user_comment.dart';
 import '../models/user_post_model.dart';
 import '../utilities/log.dart';
 
@@ -8,9 +9,11 @@ class UserPostProvider with ChangeNotifier {
   late List<UserPostModel> _userPostList;
 
   late UserPostModel _selectedPost;
-  int _selectedPostIndex = 0;
+  int _selectedPostIndex = -1; // index는 0부터 시작이므로 -1을 기본값으로 설정.
   bool _isLikePressed = false;
   int _selectedPostLikeNum = 0;
+
+  List<UserComment> userCommentList = [];
 
   // 2023.08.13, jdk
   // UserPostModel과 List<UserPostModel>의 Class를 구분할 수 있다면 구분하기.

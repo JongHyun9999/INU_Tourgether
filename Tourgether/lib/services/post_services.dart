@@ -14,7 +14,6 @@ class PostServices {
   static const baseUrl = "http://10.0.2.2:3000";
   static const String postUserContentUrl = "/api/postUserContent";
   static const String getUsersPostsListUrl = "/api/getUsersPostsList";
-  static const String getUserCommentsUrl = "/api/getUserComments";
   static const String pressedLikeButtonUrl = "/api/pressedLikeButton";
   static const String isLikeButtonPressedUrl = "/api/isLikeButtonPressed";
   static const String postSigninUrl = "/api/postSignin";
@@ -23,6 +22,7 @@ class PostServices {
   static const String addUserUrl = "/api/addUser";
   static const String checkDupNameUrl = "/api/checkDupName";
   static const String postGetMessageUrl = "/api/postGetMessage";
+  static const String getUserCommentsUrl = "/api/getUserComments";
 
   static Future<bool> postUserContent(Map<String, dynamic> postData) async {
     Log.logger.d(
@@ -51,54 +51,6 @@ class PostServices {
     } catch (error) {
       Log.logger.e("error", error: error);
       return false;
-    }
-  }
-
-  static Future<List<UserComment>> getUserComments(int rid) async {
-    Log.logger.d("getUserComments : URL[${baseUrl + getUserCommentsUrl}]");
-
-    Map<String, dynamic> comment_json_data = {
-      "rid": rid,
-    };
-
-    var jsonData = jsonEncode(comment_json_data);
-
-    try {
-      final response = await http.post(
-        Uri.parse(baseUrl + getUserCommentsUrl),
-        headers: headers,
-        body: jsonData,
-      );
-
-      Log.logger.d(response.body);
-      var jsonResponse = convert.jsonDecode(response.body);
-
-      if (jsonResponse is! List) {
-        jsonResponse = [jsonResponse];
-        Log.logger.d("converted to List");
-      }
-
-      List<UserComment> user_comments_list = jsonResponse.map((model) {
-        // 2023.08.07, jdk
-        // 시간 보정 추가, 우선 임시적으로 18시간을 더해 줌.
-        // 추후에 문제 해결을 위해 제대로 확인이 필요함.
-        DateTime initialDateTime = DateTime.parse(model['posted_time']);
-        DateTime correctedDateTime = initialDateTime.add(Duration(hours: 18));
-        String formattedDateTime =
-            DateFormat('yyyy-MM-dd HH:mm:ss').format(correctedDateTime);
-        model['posted_time'] = formattedDateTime;
-        return UserComment.fromJson(model);
-      }).toList();
-
-      // 2023.09.06, jdk
-      // 전달받은 comment 데이터를 정렬해야 함.
-      // TODO
-
-      return user_comments_list;
-    } catch (error) {
-      Log.logger
-          .e("An error occurred while fetching users posts", error: error);
-      throw Exception("An error occurred while fetching users posts");
     }
   }
 
@@ -395,6 +347,55 @@ class PostServices {
     } catch (error) {
       Log.logger.e("error", error: error);
       return false;
+    }
+  }
+
+  static Future<List<UserComment>> getUserComments(int rid) async {
+    Log.logger.d("getUserComments : URL[${baseUrl + getUserCommentsUrl}]");
+
+    // 몇 번 게시글의 댓글을 가져올 것인지 rid 전달.
+    Map<String, dynamic> comment_json_data = {
+      "rid": rid,
+    };
+
+    var jsonData = jsonEncode(comment_json_data);
+
+    try {
+      final response = await http.post(
+        Uri.parse(baseUrl + getUserCommentsUrl),
+        headers: headers,
+        body: jsonData,
+      );
+
+      Log.logger.d(response.body);
+      var jsonResponse = convert.jsonDecode(response.body);
+
+      // Map으로 json data가 반환된다.
+      // List 형태가 아닐 경우 List로 변환한다.
+      if (jsonResponse is! List) {
+        jsonResponse = [jsonResponse];
+        Log.logger.d("converted to List [/api/getUserComments]");
+      }
+
+      List<UserComment> user_comments_list = jsonResponse.map((model) {
+        Log.logger.d("is_reply : ${model['is_reply']}");
+        if (model['is_reply'] == 0) {
+          model['is_reply'] = false;
+        } else if (model['is_reply'] == 1) {
+          model['is_reply'] = true;
+        }
+
+        return UserComment.fromJson(model);
+      }).toList();
+
+      // 2023.09.06, jdk
+      // 전달받은 comment 데이터를 정렬해야 함.
+
+      return user_comments_list;
+    } catch (error) {
+      Log.logger
+          .e("An error occurred while fetching users posts", error: error);
+      throw Exception("An error occurred while fetching users posts");
     }
   }
 }

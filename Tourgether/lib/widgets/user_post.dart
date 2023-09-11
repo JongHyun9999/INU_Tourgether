@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
+import '../models/user_comment.dart';
 import '../models/user_post_model.dart';
 import '../providers/user_info_provider.dart';
 import '../providers/user_post_provider.dart';
@@ -24,48 +25,85 @@ class UserPost extends StatelessWidget {
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
+    final userPostProvider = context.read<UserPostProvider>();
 
     return InkWell(
-      onTap: () {
+      onTap: () async {
         // 사용자의 좋아요 정보를 가져옴.
         Map<String, dynamic> postDataForLikeCheking = {
           'rid': postData.rid,
           'user_name': context.read<UserInfoProvider>().userName,
         };
 
-        PostServices.isLikeButtonPressed(postDataForLikeCheking).then(
-          (likedValue) async {
-            context.read<UserPostProvider>().selectedPostLikeNum =
-                postData.liked;
+        // 두 개의 API 동시 실행.
+        // results[0] : bool
+        // results[1] : List
+        final List<dynamic> results = await Future.wait([
+          PostServices.isLikeButtonPressed(postDataForLikeCheking),
+          PostServices.getUserComments(postData.rid)
+        ]);
 
-            if (likedValue == true) {
-              // 2023.08.14, jdk
-              // API 통신 결과 이미 좋아요를 눌렀다면 UserPostProvider에서 값을 true로 변경한다.
-              context.read<UserPostProvider>().isLikePressed = true;
-            } else if (likedValue == false) {
-              context.read<UserPostProvider>().isLikePressed = false;
-            }
+        // 선택한 게시글에 좋아요를 눌렀는지 검사한다.
+        bool isLikeButtonPrseed = results[0];
 
-            // 2023.08.14, jdk
-            // 좋아요 결과를 반영하기 위해서 provider에 현재 index 기록.
-            context.read<UserPostProvider>().selectedPostIndex = index;
+        // 선택한 게시글에 작성된 comment의 list를 받아온다.
+        List<UserComment> commentList = results[1];
 
-            await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => UserPostDetailScreen(
-                  postData: postData,
-                ),
-              ),
-            );
+        // 현재 게시글의 좋아요 수를 provider에 저장.
+        userPostProvider.selectedPostLikeNum = postData.liked;
+        userPostProvider.selectedPostIndex = index;
 
-            // Detail Screen에 들어갔다가 나온 이후, selectedPost 관련한 변수를 리셋한다.
-            // 코드 일관성을 위해서는, selectedPost도 리셋해주는 것이 좋다.
-            // 현재 UserPostProvider의 selectedPost가 nullable이 아니기 때문에
-            // 이후에 nullable로 수정해서, list screen으로 넘어올 때는 null로 바뀌도록 하자.
-            context.read<UserPostProvider>().selectedPostIndex = 0;
-          },
+        // 현재 게시글에 작성된 댓글의 리스트를 provider에 저장.
+        userPostProvider.userCommentList = commentList;
+        Log.logger.d("length : ${userPostProvider.userCommentList.length}");
+
+        // detail screen으로 이동, await을 통해서 사용자가 화면을 나오길 기다린다.
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => UserPostDetailScreen(
+              postData: postData,
+            ),
+          ),
         );
+
+        // detail screen을 나온 후, UserPostProvider의 세팅을 변경한다.
+        userPostProvider.selectedPostLikeNum = 0;
+        userPostProvider.selectedPostIndex = -1;
+
+        // PostServices.isLikeButtonPressed(postDataForLikeCheking).then(
+        //   (likedValue) async {
+        //     context.read<UserPostProvider>().selectedPostLikeNum =
+        //         postData.liked;
+
+        //     if (likedValue == true) {
+        //       // 2023.08.14, jdk
+        //       // API 통신 결과 이미 좋아요를 눌렀다면 UserPostProvider에서 값을 true로 변경한다.
+        //       context.read<UserPostProvider>().isLikePressed = true;
+        //     } else if (likedValue == false) {
+        //       context.read<UserPostProvider>().isLikePressed = false;
+        //     }
+
+        //     // 2023.08.14, jdk
+        //     // 좋아요 결과를 반영하기 위해서 provider에 현재 index 기록.
+        //     context.read<UserPostProvider>().selectedPostIndex = index;
+
+        //     await Navigator.push(
+        //       context,
+        //       MaterialPageRoute(
+        //         builder: (context) => UserPostDetailScreen(
+        //           postData: postData,
+        //         ),
+        //       ),
+        //     );
+
+        //     // Detail Screen에 들어갔다가 나온 이후, selectedPost 관련한 변수를 리셋한다.
+        //     // 코드 일관성을 위해서는, selectedPost도 리셋해주는 것이 좋다.
+        //     // 현재 UserPostProvider의 selectedPost가 nullable이 아니기 때문에
+        //     // 이후에 nullable로 수정해서, list screen으로 넘어올 때는 null로 바뀌도록 하자.
+        //     context.read<UserPostProvider>().selectedPostIndex = 0;
+        //   },
+        // );
       },
       child: Container(
         decoration: BoxDecoration(

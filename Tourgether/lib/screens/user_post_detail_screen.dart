@@ -105,6 +105,7 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
     final double statusBarHeight = MediaQuery.of(context).viewPadding.top;
+    final userPostProvider = context.read<UserPostProvider>();
 
     // 2023.08.10, jdk
     // Build Method 안에 TextEditingController를 설정하면
@@ -529,33 +530,42 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                     const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 child: Flexible(
                   child: Container(
-                    width: screenWidth * 0.95,
-                    child: FutureBuilder<List<UserComment>>(
-                      future: PostServices.getUserComments(rid),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Text('Error: ${snapshot.error}');
-                        } else if (snapshot.hasData) {
-                          Log.logger
-                              .d("fetched comment data : ${snapshot.data}");
+                      width: screenWidth * 0.95,
+                      child: Column(
+                        children: [
+                          UserPostComment(),
+                          UserPostComment(),
+                          UserPostComment(),
+                          UserPostComment(),
+                          UserPostComment(),
+                        ],
+                      )
+                      // child: FutureBuilder<List<UserComment>>(
+                      //   future: PostServices.getUserComments(rid),
+                      //   builder: (context, snapshot) {
+                      //     if (snapshot.connectionState ==
+                      //         ConnectionState.waiting) {
+                      //       return CircularProgressIndicator();
+                      //     } else if (snapshot.hasError) {
+                      //       return Text('Error: ${snapshot.error}');
+                      //     } else if (snapshot.hasData) {
+                      //       Log.logger
+                      //           .d("fetched comment data : ${snapshot.data}");
 
-                          List<UserComment> comments = snapshot.data!;
-                          return ListView.builder(
-                            itemCount: comments.length,
-                            itemBuilder: (context, index) {
-                              return UserPostComment();
-                            },
-                          );
-                        } else {
-                          // 에러 처리 자세하게 필요.
-                          return Text("Error.");
-                        }
-                      },
-                    ),
-                  ),
+                      //       List<UserComment> comments = snapshot.data!;
+                      //       return ListView.builder(
+                      //         itemCount: comments.length,
+                      //         itemBuilder: (context, index) {
+                      //           return UserPostComment();
+                      //         },
+                      //       );
+                      //     } else {
+                      //       // 에러 처리 자세하게 필요.
+                      //       return Text("Error.");
+                      //     }
+                      //   },
+                      // ),
+                      ),
                 ),
               ),
             ],
