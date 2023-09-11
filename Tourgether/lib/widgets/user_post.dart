@@ -43,8 +43,10 @@ class UserPost extends StatelessWidget {
           PostServices.getUserComments(postData.rid)
         ]);
 
-        // 선택한 게시글에 좋아요를 눌렀는지 검사한다.
-        bool isLikeButtonPrseed = results[0];
+        // 선택한 게시글에 좋아요 등록 여부를 provider에 기록한다.
+        if (results[0]) {
+          userPostProvider.isLikePressed = results[0];
+        }
 
         // 선택한 게시글에 작성된 comment의 list를 받아온다.
         List<UserComment> commentList = results[1];
@@ -67,7 +69,8 @@ class UserPost extends StatelessWidget {
           ),
         );
 
-        // detail screen을 나온 후, UserPostProvider의 세팅을 변경한다.
+        // detail screen을 나온 후, UserPostProvider의 세팅을 default로 변경한다.
+        userPostProvider.isLikePressed = false;
         userPostProvider.selectedPostLikeNum = 0;
         userPostProvider.selectedPostIndex = -1;
 

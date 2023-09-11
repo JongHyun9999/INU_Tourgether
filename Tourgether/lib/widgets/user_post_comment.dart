@@ -1,13 +1,22 @@
+import 'package:TourGather/providers/user_post_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../utilities/color_palette.dart';
 
 class UserPostComment extends StatelessWidget {
-  const UserPostComment({super.key});
+  const UserPostComment({required this.index, super.key});
+
+  // 2023.09.12, jdk
+  // 현재 게시글에 comment가 등록되어 있는 경우 UserPostComment가 생성됨.
+  // 생성자로 index를 전달받아서 userPostProvider에 있는 UserComment List에서
+  // 댓글 정보를 가져온다.
+  final int index;
 
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
+    final userPostProvider = context.read<UserPostProvider>();
 
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -52,7 +61,7 @@ class UserPostComment extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
                         child: Text(
-                          "지나가는 인천대생1",
+                          userPostProvider.userCommentList[index].user_name,
                           style: TextStyle(
                             fontFamily: 'Pretendard',
                             fontWeight: FontWeight.bold,
@@ -67,7 +76,7 @@ class UserPostComment extends StatelessWidget {
                           bottom: 5,
                         ),
                         child: Text(
-                          "헐 개발자세요? 투게더 너무 재밌어요!!! 기능 더 많이 만들어주세요ㅎㅎ",
+                          userPostProvider.userCommentList[index].content,
                           style: TextStyle(
                             fontSize: 13,
                           ),

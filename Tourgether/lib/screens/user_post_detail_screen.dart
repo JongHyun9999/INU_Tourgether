@@ -531,14 +531,12 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                 child: Flexible(
                   child: Container(
                       width: screenWidth * 0.95,
-                      child: Column(
-                        children: [
-                          UserPostComment(),
-                          UserPostComment(),
-                          UserPostComment(),
-                          UserPostComment(),
-                          UserPostComment(),
-                        ],
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          return UserPostComment(index: index);
+                        },
+                        itemCount: userPostProvider.userCommentList.length,
                       )
                       // child: FutureBuilder<List<UserComment>>(
                       //   future: PostServices.getUserComments(rid),
