@@ -92,14 +92,14 @@ class UserPostComment extends StatelessWidget {
                   children: [
                     // 2023.08.11, jdk
                     // reply 기능은 일시적으로 비활성화
-                    // IconButton(
-                    //   onPressed: () {},
-                    //   icon: Icon(
-                    //     Icons.reply,
-                    //     size: 20,
-                    //     color: ColorPalette.normalColor,
-                    //   ),
-                    // ),
+                    IconButton(
+                      onPressed: () {},
+                      icon: Icon(
+                        Icons.reply,
+                        size: 20,
+                        color: ColorPalette.normalColor,
+                      ),
+                    ),
                   ],
                 ),
               ),

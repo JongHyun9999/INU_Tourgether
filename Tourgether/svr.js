@@ -273,7 +273,7 @@ app.post('/api/getUserComments', async (req, res) => {
 
     // 2023.09.06, jdk
     // rid를 가져올 필요는 없기 때문에 rid 가져오는 건 나중에 수정하기.
-    const QUERY_STR = `SELECT rid, comment_idx, is_reply, reply_idx, content, user_name, liked_num 
+    const QUERY_STR = `SELECT rid, comment_idx, content, user_name, liked_num 
     from User_Comments where rid='${rid}'`;
 
     conn = await new Promise((resolve, reject) => {
@@ -341,17 +341,36 @@ app.post('/api/pressedLikeButton', async (req, res) => {
       throw err;
     })
 
+    let post_succeeded = false;
+    let like_succeeded = false;
+
     // 2023.08.13, jdk
     // catch를 추가하여 error handling이 필요함.
-    await conn.promise().query(QUERY_STR_UPDATE_LIKED);
-    await conn.promise().query(QUERY_STR_UPDATE_LIKE_ROW);
+    const [post_result] = await conn.promise().query(QUERY_STR_UPDATE_LIKED);
 
-    // rows 반환이 필요함?
-    // 필요하지 않은 것으로 생각되어, sendStatus로 교체
-    // console.log(rows);
+    // 2023.09.12, jdk
+    // 좋아요 입력이 성공한 경우에만 좋아요 수를 늘리도록 변경.
 
+    if (post_result.affectedRows > 0) {
+      post_succeeded = true;
+      const [like_result] = await conn.promise().query(QUERY_STR_UPDATE_LIKE_ROW);
+
+      if (like_result.affectedRows > 0) {
+        like_succeeded = true;
+      }
+    }
+
+    // 2023.09.12, jdk
+    // succeeded boolean 변수를 참조하여 결과를 확인,
+    // 이후에 결과에 따라 response를 다르게 설정한다.
     console.log('Successfully update a post liking. [/api/pressedLikeButton]');
-    res.sendStatus(200);
+
+    if (post_succeeded && like_succeeded) {
+      res.sendStatus(200);
+    }
+    else {
+      throw Error();
+    }
   } catch (err) {
     console.error(err);
 
@@ -768,6 +787,72 @@ app.post('/api/postGetMessage', async (req, res) => {
     console.log(err);
     res.status(404).json({
       error: "An error occurred while /api/postGetMessage"
+    });
+  } finally {
+    if (conn) conn.release();
+  }
+})
+
+// 유저 등록
+app.post('/api/postUserComment', async (req, res) => {
+
+  const body = req.body;
+  const rid = body['rid'];
+  const user_name = body['user_name'];
+  const content = body['content'];
+  const liked_num = body['liked_num'];
+
+  const QUERY_STR_POST_COMMENT = `insert into User_Comments(rid, user_name, content, liked_num)
+    values(${rid}, '${user_name}', '${content}', ${liked_num})`;
+
+  const QUERY_STR_ADD_CNT = `UPDATE User_Posts set comments_num = comments_num + 1 where rid = ${rid}`;
+
+  let conn = null;
+  try {
+    conn = await new Promise((resolve, reject) => {
+      pool.getConnection((err, connection) => {
+        if (err) reject(err);
+        resolve(connection);
+      });
+    }).catch((err) => {
+      throw err;
+    })
+
+    let post_succeeded = false;
+    let cnt_add_succeeded = false;
+    let comment_idx = null;
+
+    const [comment_post_result] = await conn.promise().query(QUERY_STR_POST_COMMENT);
+    console.log("comment_post_result : ", comment_post_result);
+
+    // 2023.09.12, jdk
+    // 댓글이 DB 상에 성공적으로 저장된 경우
+    if (comment_post_result.affectedRows > 0) {
+      post_succeeded = true;
+
+      const [cnt_add_result] = await conn.promise().query(QUERY_STR_ADD_CNT);
+
+      // 2023.09.12, jdk
+      // 댓글 개수 증가가 반영된 경우
+      if (cnt_add_result.affectedRows > 0) {
+        cnt_add_succeeded = true;
+      }
+    }
+
+    // 2023.09.12, jdk
+    // post, cnt_add boolean을 이용해서 추후에 error message handling code 추가.
+    console.log('Successfully posted user comment [/api/postUserComment]');
+    if (post_succeeded && cnt_add_succeeded) {
+      console.log('not executed??');
+      res.status(200).send();
+    }
+    else {
+      res.status(404).send();
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(404).json({
+      error: "An error occurred while /api/postUserComment"
     });
   } finally {
     if (conn) conn.release();

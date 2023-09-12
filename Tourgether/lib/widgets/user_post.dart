@@ -73,40 +73,6 @@ class UserPost extends StatelessWidget {
         userPostProvider.isLikePressed = false;
         userPostProvider.selectedPostLikeNum = 0;
         userPostProvider.selectedPostIndex = -1;
-
-        // PostServices.isLikeButtonPressed(postDataForLikeCheking).then(
-        //   (likedValue) async {
-        //     context.read<UserPostProvider>().selectedPostLikeNum =
-        //         postData.liked;
-
-        //     if (likedValue == true) {
-        //       // 2023.08.14, jdk
-        //       // API 통신 결과 이미 좋아요를 눌렀다면 UserPostProvider에서 값을 true로 변경한다.
-        //       context.read<UserPostProvider>().isLikePressed = true;
-        //     } else if (likedValue == false) {
-        //       context.read<UserPostProvider>().isLikePressed = false;
-        //     }
-
-        //     // 2023.08.14, jdk
-        //     // 좋아요 결과를 반영하기 위해서 provider에 현재 index 기록.
-        //     context.read<UserPostProvider>().selectedPostIndex = index;
-
-        //     await Navigator.push(
-        //       context,
-        //       MaterialPageRoute(
-        //         builder: (context) => UserPostDetailScreen(
-        //           postData: postData,
-        //         ),
-        //       ),
-        //     );
-
-        //     // Detail Screen에 들어갔다가 나온 이후, selectedPost 관련한 변수를 리셋한다.
-        //     // 코드 일관성을 위해서는, selectedPost도 리셋해주는 것이 좋다.
-        //     // 현재 UserPostProvider의 selectedPost가 nullable이 아니기 때문에
-        //     // 이후에 nullable로 수정해서, list screen으로 넘어올 때는 null로 바뀌도록 하자.
-        //     context.read<UserPostProvider>().selectedPostIndex = 0;
-        //   },
-        // );
       },
       child: Container(
         decoration: BoxDecoration(
@@ -253,7 +219,7 @@ class UserPost extends StatelessWidget {
                             child: Consumer<UserPostProvider>(
                               builder: (context, userPostProvider, child) {
                                 return Text(
-                                  "0",
+                                  "${userPostProvider.userPostList[index].comments_num}",
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,

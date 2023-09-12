@@ -85,4 +85,20 @@ class UserPostProvider with ChangeNotifier {
 
     notifyListeners();
   }
+
+  // 2023.09.12, jdk
+  // 현재 유저가 확인 중인 게시글에서 댓글 상태에 변화가 생길 경우
+  // 변화되는 내용을 처리해 주는 함수.
+  // 1) 댓글의 개수를 변화시킨다. 다시 fetch할 때까지 자신의 변화만 처리한다.
+  // 2) list 상에 댓글을 새롭게 추가한다.
+  void updateCurrentPostCommentsState(Map<String, dynamic> commentData) {
+    // 1) 댓글의 개수 변화. Consumer를 통해 listen하고 있던 widget들이 변화됨.
+    // 현재는 댓글을 추가하는 경우만 처리한다.
+    this.userPostList[selectedPostIndex].comments_num++;
+
+    UserComment userComment = UserComment.fromJson(commentData);
+    this.userCommentList.add(userComment);
+
+    notifyListeners();
+  }
 }

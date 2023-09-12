@@ -23,6 +23,7 @@ class PostServices {
   static const String checkDupNameUrl = "/api/checkDupName";
   static const String postGetMessageUrl = "/api/postGetMessage";
   static const String getUserCommentsUrl = "/api/getUserComments";
+  static const String postUserCommentUrl = "/api/postUserComment";
 
   static Future<bool> postUserContent(Map<String, dynamic> postData) async {
     Log.logger.d(
@@ -378,13 +379,6 @@ class PostServices {
       }
 
       List<UserComment> user_comments_list = jsonResponse.map((model) {
-        Log.logger.d("is_reply : ${model['is_reply']}");
-        if (model['is_reply'] == 0) {
-          model['is_reply'] = false;
-        } else if (model['is_reply'] == 1) {
-          model['is_reply'] = true;
-        }
-
         return UserComment.fromJson(model);
       }).toList();
 
@@ -396,6 +390,38 @@ class PostServices {
       Log.logger
           .e("An error occurred while fetching users posts", error: error);
       throw Exception("An error occurred while fetching users posts");
+    }
+  }
+
+  static Future<bool> postUserComment(Map<String, dynamic> commentData) async {
+    Log.logger.d(
+      "postUserContent : URL[${baseUrl + postUserCommentUrl}]\npassed data : ${commentData}",
+    );
+
+    // 서버로 보낼 데이터를 jsonEncode
+    String jsonData = jsonEncode(commentData);
+
+    try {
+      return await http
+          .post(
+        Uri.parse(baseUrl + postUserCommentUrl),
+        headers: headers,
+        body: jsonData,
+      )
+          .then((response) {
+        if (response.statusCode == 200) {
+          Log.logger.d("The comment successfully uploaded on DB.");
+          return true;
+        } else {
+          Log.logger.e(
+            "An error occurred while uploading a comment on DB. (statusCode is not 200)",
+          );
+          throw Exception();
+        }
+      });
+    } catch (error) {
+      Log.logger.e("error", error: error);
+      return false;
     }
   }
 }

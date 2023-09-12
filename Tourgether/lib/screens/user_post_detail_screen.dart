@@ -63,6 +63,7 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
     liked = widget.postData.liked;
     comments_num = widget.postData.comments_num;
 
+    // 작성된 게시글에 대한 정보이다. (접속한 유저에 대한 정보가 아님.)
     UserPostModel postData = UserPostModel(
       rid: rid,
       user_name: user_name,
@@ -100,12 +101,75 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
   //   );
   // }
 
+  // 2023.09.12, jdk
+  // 유저가 댓글을 입력한 후 포스팅할 때 사용되는 함수.
+  void postComment() async {
+    // 서버로 전송할 Map 데이터 생성
+    Map<String, dynamic> commentData = {};
+    String content = commentController.text;
+
+    // 입력한 내용이 비어있는지 확인
+    if (checkContentEmpty(content)) {
+      Log.logger.d("내용을 작성해 주세요.");
+      // TODO : 사용자에게 알림 전달 필요
+      return;
+    }
+
+    // 현재 접속한 유저의 정보를 얻기 위해서 context를 통해
+    // UserInfoProvider의 정보를 얻어냄.
+    var userInfoProvider = context.read<UserInfoProvider>();
+
+    // 입력한 내용이 비어있지 않은 경우.
+    // 여기서 comment_idx를 설정해야 하는데, 동시에 댓글 작성을 요청할 경우
+    // comment_idx가 duplicated 될 가능성이 있으므로 이에 주의해야 한다.
+    commentData['content'] = content;
+    commentData['user_name'] = userInfoProvider.userName;
+    commentData['rid'] = rid;
+    commentData['liked_num'] = 0;
+
+    // 2023.09.12, jdk
+    // 유저가 작성한 post를 전송함.
+    Log.logger.d("check here? 1");
+    bool isSucceeded = await PostServices.postUserComment(commentData);
+    Log.logger.d("check here? 2");
+
+    // 2023.09.12, jdk
+    // 성공 여부에 따른 동작 필요.
+    if (isSucceeded) {
+      var userPostProvider = context.read<UserPostProvider>();
+
+      Log.logger.d("succeeded...");
+      // 2023.09.12, jdk
+      // TODO
+      // 작성한 댓글을 현재 디스플레이에 추가
+      // 현재 userPostProvider를 전역변수 var로 생성해서 instruction이 잘 안됨.
+      // 이후에 변수를 수정해서 잘 출력될 수 있도록 해야할 듯.
+      userPostProvider.updateCurrentPostCommentsState(commentData);
+      Log.logger.d("check here 1");
+      commentController.clear(); // 입력한 내용 지우기
+      Log.logger.d("check here 2");
+
+      FocusManager.instance.primaryFocus?.unfocus();
+
+      Log.logger.d("댓글 업로드 성공.");
+    } else {
+      // TODO
+    }
+  }
+
+  bool checkContentEmpty(String content) {
+    if (content == "") {
+      return true;
+    }
+
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
     final double statusBarHeight = MediaQuery.of(context).viewPadding.top;
-    final userPostProvider = context.read<UserPostProvider>();
 
     // 2023.08.10, jdk
     // Build Method 안에 TextEditingController를 설정하면
@@ -396,29 +460,29 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                               // 2023.08.13, jdk
                               // TODO
                               // 즐겨찾기는 적절한 구현법을 구상하기 전까지 주석처리.
-                              // Padding(
-                              //   padding: const EdgeInsets.fromLTRB(10, 5, 5, 5),
-                              //   child: Icon(
-                              //     (isBookMarked)
-                              //         ? Icons.star
-                              //         : Icons.star_border,
-                              //     color: (isBookMarked)
-                              //         ? Colors.yellow
-                              //         : ColorPalette.whiteColor,
-                              //   ),
-                              // ),
-                              // Padding(
-                              //   padding: const EdgeInsets.fromLTRB(5, 5, 10, 5),
-                              //   child: Container(
-                              //     child: Text(
-                              //       "즐겨찾기",
-                              //       style: TextStyle(
-                              //         color: ColorPalette.whiteColor,
-                              //         fontSize: 15,
-                              //       ),
-                              //     ),
-                              //   ),
-                              // ),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(10, 5, 5, 5),
+                                child: Icon(
+                                  (isBookMarked)
+                                      ? Icons.star
+                                      : Icons.star_border,
+                                  color: (isBookMarked)
+                                      ? Colors.yellow
+                                      : ColorPalette.whiteColor,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(5, 5, 10, 5),
+                                child: Container(
+                                  child: Text(
+                                    "북마크",
+                                    style: TextStyle(
+                                      color: ColorPalette.whiteColor,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -487,7 +551,7 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                                 color: ColorPalette.accentColor,
                               ),
                               iconSize: 25,
-                              onPressed: () {},
+                              onPressed: postComment,
                             ),
                           ),
                         ),
@@ -514,7 +578,7 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                   alignment: Alignment.topLeft,
                   child: Container(
                     child: Text(
-                      "댓글 ${comments_num}",
+                      "댓글 ${context.read<UserPostProvider>().userCommentList.length}",
                       style: TextStyle(
                         fontFamily: 'Pretendard',
                         fontSize: 20,
@@ -531,12 +595,17 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                 child: Flexible(
                   child: Container(
                       width: screenWidth * 0.95,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          return UserPostComment(index: index);
+                      child: Consumer<UserPostProvider>(
+                        builder: (_, userPostProvider, __) {
+                          return ListView.builder(
+                            physics: NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              return UserPostComment(index: index);
+                            },
+                            itemCount: userPostProvider.userCommentList.length,
+                          );
                         },
-                        itemCount: userPostProvider.userCommentList.length,
                       )
                       // child: FutureBuilder<List<UserComment>>(
                       //   future: PostServices.getUserComments(rid),
