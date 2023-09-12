@@ -49,6 +49,8 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   fluttertoast: ^8.2.2
   intl: ^0.18.1
+  latlong2: ^0.9.0
+  flutter_latlong: ^1.0.3
 
 dev_dependencies:
   flutter_test:

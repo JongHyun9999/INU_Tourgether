@@ -4,6 +4,7 @@ import 'package:TourGather/providers/message_provider.dart';
 import 'package:TourGather/providers/user_info_provider.dart';
 import 'package:TourGather/providers/user_post_provider.dart';
 import 'package:TourGather/screens/message_screen.dart';
+import 'package:TourGather/utilities/CommonRouteObserver.dart';
 import 'package:flutter/material.dart';
 import 'package:TourGather/providers/gps_provider.dart';
 import 'package:TourGather/screens/location_setting_screen.dart';
@@ -76,6 +77,7 @@ class MyApp extends StatelessWidget {
           ),
           useMaterial3: true,
         ),
+        navigatorObservers: [CommonRouteObserver()],
       ),
     );
   }

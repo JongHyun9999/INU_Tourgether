@@ -19,7 +19,7 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   // ------------------------------------------
   // 2023.07.29, jdk
   // 왜 이 변수는 const로 선언될 수 없는가?
@@ -45,6 +45,8 @@ class _MainScreenState extends State<MainScreen> {
   TransformationController _transformationController =
       TransformationController();
 
+  late AnimationController _animationController;
+
   @override
   void initState() {
     super.initState();
@@ -59,11 +61,15 @@ class _MainScreenState extends State<MainScreen> {
     // 재시도 중이라는 UI를 유저에게 보여줄 수 있어야 함.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<GPSProvider>(context, listen: false).startGPSCallback();
-      // Provider.of<MessageProvider>(context, listen: false).getMessageList();
     });
+
+    _animationController = AnimationController(
+        duration: Duration(seconds: 1),
+        vsync: this,
+        lowerBound: 0.0,
+        upperBound: 0.4);
   }
 
-  // final MessageProvider test = MessageProvider();
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -104,7 +110,8 @@ class _MainScreenState extends State<MainScreen> {
               : null,
       body: MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (context) => MessageProvider()),
+          ChangeNotifierProvider(
+              create: (context) => MessageProvider(_animationController)),
         ],
         child: Center(
           child: Stack(
@@ -265,13 +272,12 @@ class _MainScreenState extends State<MainScreen> {
                           // MessageScreen(),
                           Consumer<MessageProvider>(
                             builder: (context, messageProvider, child) {
-                              print('프로바이더 내용물 : ');
-                              // print(test.content);
-                              print(messageProvider.content);
                               return Container(
                                   width: MapInfo.backgroundImageWidth,
                                   height: MapInfo.backgroundImageHeight,
-                                  child: messageProvider.content);
+                                  child: Stack(
+                                      children:
+                                          messageProvider.positioned_list));
                             },
                           ),
                           // ------------------------------------------
@@ -284,6 +290,8 @@ class _MainScreenState extends State<MainScreen> {
                           // ------------------------------------------
                           Consumer<GPSProvider>(
                             builder: (context, gpsProvider, child) {
+                              print(gpsProvider.latitude);
+                              print(gpsProvider.longitude);
                               // Log.logger.d(gpsProvider.userWidthPosition);
                               // Log.logger.d(gpsProvider.userHeightPosition);
 
