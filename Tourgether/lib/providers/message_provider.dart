@@ -19,7 +19,10 @@ class MessageProvider extends ChangeNotifier {
   List<Widget> positioned_list = [];
 
   // 임시 현재 내 좌표
-  LatLng current_position = LatLng(37.3744767, 126.6336167);
+  Map<String, dynamic> current_position = {
+    'latitude': 37.3744767,
+    'longitude': 126.6336167
+  };
 
   Timer? timer;
   Timer? timer2;
@@ -43,16 +46,18 @@ class MessageProvider extends ChangeNotifier {
   // DB에서 메세지 리스트를 가지고 오는 함수
   Future<void> getMessageList() async {
     Map<String, dynamic> postData = {
-      'user_gps_x': current_position.latitude,
-      'user_gps_y': current_position.longitude,
+      'user_gps_x': current_position['latitude'],
+      'user_gps_y': current_position['longitude'],
       'last_date': last_date
     };
 
     jsoncontent = await PostServices.postGetMessage(postData);
     print('DB에서 post 받아옴 : ${jsoncontent.length}개');
     for (int i = 0; i < jsoncontent.length; i++) {
-      LatLng gps_point =
-          LatLng(jsoncontent[i]['gps']['x'], jsoncontent[i]['gps']['y']);
+      Map<String, dynamic> gps_point = {
+        'latitude': jsoncontent[i]['gps']['x'],
+        'longitude': jsoncontent[i]['gps']['y']
+      };
       // 좌우 위치보정
       jsoncontent[i]['gps']['y'] = (jsoncontent[i]['gps']['y'] - mapLeft) /
           (mapRight! - mapLeft!) *
@@ -74,7 +79,10 @@ class MessageProvider extends ChangeNotifier {
             title: jsoncontent[i]['title'],
             content: jsoncontent[i]['content'],
             department: '소속학과',
-            gps: LatLng(gps_point.latitude, gps_point.longitude),
+            gps: {
+              'latitude': gps_point['latitude'],
+              'longitude': gps_point['longitude']
+            },
             location_map: {
               'x': jsoncontent[i]['gps']['y'],
               'y': jsoncontent[i]['gps']['x']
@@ -90,7 +98,10 @@ class MessageProvider extends ChangeNotifier {
             title: jsoncontent[i]['title'],
             content: jsoncontent[i]['content'],
             department: '소속학과',
-            gps: LatLng(gps_point.latitude, gps_point.longitude),
+            gps: {
+              'latitude': gps_point['latitude'],
+              'longitude': gps_point['longitude']
+            },
             location_map: {
               'x': jsoncontent[i]['gps']['y'],
               'y': jsoncontent[i]['gps']['x']
@@ -148,9 +159,9 @@ class MessageProvider extends ChangeNotifier {
   }
 
   // 현재 나와 최단거리인 메세지의 인덱스를 반환하는 함수
-  double calculateDistance(LatLng a, LatLng b) {
-    return sqrt(
-        pow(a.latitude - b.latitude, 2) + pow(a.longitude - b.longitude, 2));
+  double calculateDistance(Map<String, dynamic> a, Map<String, dynamic> b) {
+    return sqrt(pow(a['latitude']! - b['latitude']!, 2) +
+        pow(a['longitude']! - b['longitude']!, 2));
   }
 
   List<int> getShortestDistance() {

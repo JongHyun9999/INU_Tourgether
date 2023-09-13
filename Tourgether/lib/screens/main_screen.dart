@@ -64,7 +64,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     });
 
     _animationController = AnimationController(
-      duration: Duration(milliseconds: 500),
+      duration: Duration(milliseconds: 1000),
       vsync: this,
     );
   }
