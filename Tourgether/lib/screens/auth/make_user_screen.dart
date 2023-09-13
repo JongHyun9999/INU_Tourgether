@@ -1,11 +1,11 @@
-import 'package:TourGather/screens/signin_screen.dart';
-import 'package:TourGather/screens/signup_verify_screen.dart';
+import 'package:TourGather/screens/auth/signin_screen.dart';
+import 'package:TourGather/screens/auth/signup_verify_screen.dart';
 import 'package:TourGather/services/post_services.dart';
 import 'package:flutter/material.dart';
 import 'package:TourGather/main.dart';
 import 'package:TourGather/screens/main_screen.dart';
 
-import '../utilities/color_palette.dart';
+import '../../utilities/color_palette.dart';
 
 class Palette {
   static const Color iconColor = Color(0xFFB6C7D1);
@@ -56,8 +56,7 @@ class _MakeUserScreenState extends State<MakeUserScreen> {
         "/signin",
         (_) => false,
       );
-    }
-    else{
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('중복되는 이름이 존재합니다. 다른 이름을 입력해주세요.')));
     }
@@ -280,45 +279,39 @@ class _MakeUserScreenState extends State<MakeUserScreen> {
                                       height: 8,
                                     ),
                                     TextFormField(
-                                      key: const ValueKey(7),
-                                      onSaved: (value) {
-                                        userName = value!;
-                                      },
-                                      validator: (value) {
-                                        if (value!.isEmpty ||
-                                            value.length < 1 ||
-                                            value.length > 10) {
-                                          return 'Please enter name in 2~10 length';
-                                        }
-                                        return null;
-                                      },
-                                      decoration: const InputDecoration(
-                                        prefixIcon: Icon(
-                                          Icons.account_circle,
-                                          color: Palette.iconColor,
-                                        ),
-                                        enabledBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                                color:
-                                                    Palette.textColor1),
-                                            borderRadius:
-                                                BorderRadius.all(
-                                                    Radius.circular(
-                                                        35.0))),
-                                        focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                                color:
-                                                    Palette.textColor1),
-                                            borderRadius:
-                                                BorderRadius.all(
-                                                    Radius.circular(
-                                                        35.0))),
-                                        hintText: '닉네임',
-                                        hintStyle: TextStyle(
-                                            fontSize: 14,
-                                            color: Palette.textColor1),
-                                        contentPadding:
-                                            EdgeInsets.all(10))),
+                                        key: const ValueKey(7),
+                                        onSaved: (value) {
+                                          userName = value!;
+                                        },
+                                        validator: (value) {
+                                          if (value!.isEmpty ||
+                                              value.length < 1 ||
+                                              value.length > 10) {
+                                            return 'Please enter name in 2~10 length';
+                                          }
+                                          return null;
+                                        },
+                                        decoration: const InputDecoration(
+                                            prefixIcon: Icon(
+                                              Icons.account_circle,
+                                              color: Palette.iconColor,
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Palette.textColor1),
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(35.0))),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Palette.textColor1),
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(35.0))),
+                                            hintText: '닉네임',
+                                            hintStyle: TextStyle(
+                                                fontSize: 14,
+                                                color: Palette.textColor1),
+                                            contentPadding:
+                                                EdgeInsets.all(10))),
                                     const SizedBox(
                                       height: 8,
                                     ),

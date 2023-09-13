@@ -2,12 +2,12 @@ import 'package:TourGather/providers/user_info_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import '../enums/alert_message_type.dart';
-import '../providers/gps_provider.dart';
-import '../providers/main_screen_ui_provider.dart';
-import '../services/post_services.dart';
-import '../utilities/color_palette.dart';
-import '../utilities/log.dart';
+import '../../enums/alert_message_type.dart';
+import '../../providers/gps_provider.dart';
+import '../../providers/main_screen_ui_provider.dart';
+import '../../services/post_services.dart';
+import '../../utilities/color_palette.dart';
+import '../../utilities/log.dart';
 
 Widget? showFloatingActionButton(
   BuildContext context,

@@ -1,8 +1,8 @@
 import 'package:TourGather/services/post_services.dart';
 import 'package:flutter/material.dart';
 
-import '../models/user_comment.dart';
-import '../models/user_post_model.dart';
+import '../models/comments/user_comment.dart';
+import '../models/message/user_post_model.dart';
 import '../utilities/log.dart';
 
 class UserPostProvider with ChangeNotifier {

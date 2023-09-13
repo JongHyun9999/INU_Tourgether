@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
-import '../models/user_comment.dart';
-import '../models/user_post_model.dart';
-import '../providers/user_info_provider.dart';
-import '../providers/user_post_provider.dart';
-import '../screens/user_post_detail_screen.dart';
-import '../services/post_services.dart';
-import '../utilities/log.dart';
+import '../../models/comments/user_comment.dart';
+import '../../models/message/user_post_model.dart';
+import '../../providers/user_info_provider.dart';
+import '../../providers/user_post_provider.dart';
+import '../../screens/nav/user_post_detail_screen.dart';
+import '../../services/post_services.dart';
+import '../../utilities/log.dart';
 
 class UserPost extends StatelessWidget {
   UserPost({

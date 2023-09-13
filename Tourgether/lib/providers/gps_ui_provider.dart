@@ -1,4 +1,4 @@
-import 'package:TourGather/models/gps_model.dart';
+import 'package:TourGather/models/gps/gps_model.dart';
 import 'package:flutter/material.dart';
 
 class GPSUIProvider with ChangeNotifier {

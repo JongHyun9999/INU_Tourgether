@@ -2,7 +2,7 @@ import 'package:TourGather/providers/user_post_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../utilities/color_palette.dart';
+import '../../utilities/color_palette.dart';
 
 class UserPostComment extends StatelessWidget {
   const UserPostComment({required this.index, super.key});

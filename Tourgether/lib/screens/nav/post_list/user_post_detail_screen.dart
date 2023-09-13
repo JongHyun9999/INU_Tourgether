@@ -5,12 +5,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
-import '../models/user_comment.dart';
-import '../models/user_post_model.dart';
-import '../providers/user_post_provider.dart';
-import '../services/post_services.dart';
-import '../utilities/log.dart';
-import '../widgets/user_post_comment.dart';
+import '../../models/comments/user_comment.dart';
+import '../../models/user_post_model.dart';
+import '../../providers/user_post_provider.dart';
+import '../../services/post_services.dart';
+import '../../utilities/log.dart';
+import '../../widgets/post_list/user_post_comment.dart';
 
 class UserPostDetailScreen extends StatefulWidget {
   UserPostDetailScreen({

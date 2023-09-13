@@ -761,13 +761,15 @@ app.post('/update_user_map_visibility_status', async (req, res) => {
   }
 })
 
-// 유저 등록
 app.post('/api/postGetMessage', async (req, res) => {
   console.log('/api/postGetMessage 호출됨');
   let conn = null;
+  console.log(req.body)
   try {
-
-    let QUERY_STR = `SELECT content, gps FROM User_Posts`;
+    let QUERY_STR = `SELECT user_name, title, content, posted_time, liked, comments_num, gps FROM User_Posts WHERE posted_time >= '${req.body.last_date}';`;
+    if (req.body.last_date === '2000-12-02 00:00:00') {
+      QUERY_STR = `SELECT user_name, title, content, posted_time, liked, comments_num, gps FROM User_Posts;`;
+    }
 
     conn = await new Promise((resolve, reject) => {
       pool.getConnection((err, connection) => {
@@ -779,10 +781,10 @@ app.post('/api/postGetMessage', async (req, res) => {
     })
     const [rows] = await conn.promise().query(QUERY_STR);
 
-    console.log(rows);
+    // console.log(rows);
     console.log('Successfully fetched the users posts list. [/api/postGetMessage]');
-    if (rows[0]) res.status(200).json(rows);
-    else res.status(404).json(null);
+    res.status(200).json(rows);
+    // else res.status(404).json(null);
   } catch (err) {
     console.log(err);
     res.status(404).json({

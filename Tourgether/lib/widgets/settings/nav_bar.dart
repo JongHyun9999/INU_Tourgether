@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 //import 'package:tourgether/screens/setting.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/user_info_provider.dart';
+import '../../providers/user_info_provider.dart';
 
 //import 'package:badges/badges.dart' as badges;
 //import 'dart:convert';

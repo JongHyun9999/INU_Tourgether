@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'dart:convert' as convert;
-import '../models/user_comment.dart';
-import '../models/user_post_model.dart';
+import '../models/comments/user_comment.dart';
+import '../models/message/user_post_model.dart';
 import '../utilities/log.dart';
 
 class PostServices {
