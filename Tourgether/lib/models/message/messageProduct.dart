@@ -1,6 +1,5 @@
 // pjh. 메인페이지 메세지 리스트 전용 class.
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MessageProduct with ChangeNotifier {
   final String image_path;
@@ -8,7 +7,7 @@ class MessageProduct with ChangeNotifier {
   final String title;
   final String content;
   final String department;
-  final LatLng gps;
+  final Map<String, dynamic> gps;
   final Map<String, dynamic> location_map;
   final String posted_time;
   final int liked;
