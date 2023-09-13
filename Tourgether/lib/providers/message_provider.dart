@@ -1,14 +1,11 @@
 import 'dart:async';
 import 'dart:math';
-
 import 'package:TourGather/models/map/map_info.dart';
 import 'package:TourGather/models/message/messageProduct.dart';
 import 'package:TourGather/services/post_services.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
-
-import '../utilities/log.dart';
 
 class MessageProvider extends ChangeNotifier {
   // DB에서 post정보 받아오는 일회용 변수
@@ -54,6 +51,7 @@ class MessageProvider extends ChangeNotifier {
     jsoncontent = await PostServices.postGetMessage(postData);
     print('DB에서 post 받아옴 : ${jsoncontent.length}개');
     for (int i = 0; i < jsoncontent.length; i++) {
+      print(jsoncontent[i]['gps']);
       LatLng gps_point =
           LatLng(jsoncontent[i]['gps']['x'], jsoncontent[i]['gps']['y']);
       // 좌우 위치보정
@@ -72,37 +70,35 @@ class MessageProvider extends ChangeNotifier {
 
       message_info_list.add(
         MessageProduct(
-          image_path: 'image_path_testing',
-          user_name: jsoncontent[i]['user_name'],
-          title: jsoncontent[i]['title'],
-          content: jsoncontent[i]['content'],
-          department: '소속학과',
-          gps: LatLng(gps_point.latitude, gps_point.longitude),
-          location_map: {
-            'x': jsoncontent[i]['gps']['y'],
-            'y': jsoncontent[i]['gps']['x']
-          },
-          posted_time: jsoncontent[i]['posted_time'],
-          liked: jsoncontent[i]['liked'],
-          comments_num: jsoncontent[i]['comments_num'],
-        ),
+            image_path: 'image_path_testing',
+            user_name: jsoncontent[i]['user_name'],
+            title: jsoncontent[i]['title'],
+            content: jsoncontent[i]['content'],
+            department: '소속학과',
+            gps: LatLng(gps_point.latitude, gps_point.longitude),
+            location_map: {
+              'x': jsoncontent[i]['gps']['y'],
+              'y': jsoncontent[i]['gps']['x']
+            },
+            posted_time: jsoncontent[i]['posted_time'],
+            liked: jsoncontent[i]['liked'],
+            comments_num: jsoncontent[i]['comments_num']),
       );
       message_info_list_new.add(
         MessageProduct(
-          image_path: 'image_path_testing',
-          user_name: jsoncontent[i]['user_name'],
-          title: jsoncontent[i]['title'],
-          content: jsoncontent[i]['content'],
-          department: '소속학과',
-          gps: LatLng(gps_point.latitude, gps_point.longitude),
-          location_map: {
-            'x': jsoncontent[i]['gps']['y'],
-            'y': jsoncontent[i]['gps']['x']
-          },
-          posted_time: jsoncontent[i]['posted_time'],
-          liked: jsoncontent[i]['liked'],
-          comments_num: jsoncontent[i]['comments_num'],
-        ),
+            image_path: 'image_path_testing',
+            user_name: jsoncontent[i]['user_name'],
+            title: jsoncontent[i]['title'],
+            content: jsoncontent[i]['content'],
+            department: '소속학과',
+            gps: LatLng(gps_point.latitude, gps_point.longitude),
+            location_map: {
+              'x': jsoncontent[i]['gps']['y'],
+              'y': jsoncontent[i]['gps']['x']
+            },
+            posted_time: jsoncontent[i]['posted_time'],
+            liked: jsoncontent[i]['liked'],
+            comments_num: jsoncontent[i]['comments_num']),
       );
     }
   }
@@ -118,11 +114,19 @@ class MessageProvider extends ChangeNotifier {
           top: message_info_list[i].location_map['y'],
           left: message_info_list[i].location_map['x'],
           child: IconButton(
-            icon: Icon(
-              Icons.mail,
-              size: 50,
-              color: Colors.blueAccent,
-            ),
+            icon:
+                (calculateDistance(current_position, message_info_list[i].gps) <
+                        0.00018)
+                    ? Icon(
+                        Icons.mail,
+                        size: 50,
+                        color: Colors.blueAccent,
+                      )
+                    : Icon(
+                        Icons.brightness_1,
+                        size: 30,
+                        color: Colors.blueAccent,
+                      ),
             onPressed: () {
               print('${i} 메세지 눌림');
             },
@@ -132,8 +136,8 @@ class MessageProvider extends ChangeNotifier {
       }
 
       notifyListeners();
-      message_info_list_new.clear();
       // addStreamDistance();
+      message_info_list_new.clear();
 
       timer = _startTimer();
       timer2 = _addMessage();
@@ -150,20 +154,22 @@ class MessageProvider extends ChangeNotifier {
         pow(a.latitude - b.latitude, 2) + pow(a.longitude - b.longitude, 2));
   }
 
-  int getShortestDistance() {
-    List<double> distance_list = [];
+  List<int> getShortestDistance() {
+    List<int> distance_list = [];
     for (int i = 0; i < message_info_list.length; i++) {
       // print('조사 대상 ${message_info_list[i].gps}');
-      distance_list.add(calculateDistance(
-          this.current_position, this.message_info_list[i].gps));
+      if (calculateDistance(
+              this.current_position, this.message_info_list[i].gps) <
+          0.00148) {
+        distance_list.add(i);
+      }
     }
-    // print(distance_list);
+    print(distance_list);
 
-    double minDistance = distance_list.reduce(min);
-    int minIndex = distance_list.indexOf(minDistance);
-    // Widget nearestPoint = positioned_list[minIndex];
+    // double minDistance = distance_list.reduce(min);
+    // int minIndex = distance_list.indexOf(minDistance);
 
-    return minIndex;
+    return distance_list;
   }
 
   // Stream<void> addStreamDistance() {
@@ -174,37 +180,38 @@ class MessageProvider extends ChangeNotifier {
 
   // 첫 빌드 후 주기적으로 가장 가까운 메세지의 크기 키우기.
   Timer _startTimer() {
-    return Timer.periodic(const Duration(seconds: 3), (timer) {
-      int shortest_index = getShortestDistance();
-      print('제일 가까운 인덱스 : ${shortest_index}');
+    return Timer.periodic(const Duration(seconds: 5), (timer) {
+      List<int> shortest_index = getShortestDistance();
 
-      positioned_list[shortest_index] = Positioned(
-        top: message_info_list[shortest_index].location_map['y'],
-        left: message_info_list[shortest_index].location_map['x'],
-        child: ScaleTransition(
-          scale: Tween(begin: 1.0, end: 1.5).animate(CurvedAnimation(
-              parent: _animationController!,
-              curve: Curves.fastEaseInToSlowEaseOut)),
-          child: IconButton(
-            icon: Icon(
-              Icons.mail,
-              size: 50,
-              color: Colors.blueAccent,
+      for (int i = 0; i < shortest_index.length; i++) {
+        print('제일 가까운 인덱스 : ${shortest_index[i]}');
+        positioned_list[shortest_index[i]] = Positioned(
+          top: message_info_list[shortest_index[i]].location_map['y'],
+          left: message_info_list[shortest_index[i]].location_map['x'],
+          child: ScaleTransition(
+            scale: Tween(begin: 1.0, end: 1.5).animate(CurvedAnimation(
+                parent: _animationController!, curve: Curves.elasticOut)),
+            child: IconButton(
+              icon: Icon(
+                Icons.mail,
+                size: 50,
+                color: Colors.blueAccent,
+              ),
+              onPressed: () {
+                if (!is_clicked) {
+                  is_clicked = true;
+                  _animationController!.forward();
+                } else {
+                  is_clicked = false;
+                  _animationController!.reverse();
+                }
+
+                print('${shortest_index[i]} 메세지 눌림');
+              },
             ),
-            onPressed: () {
-              if (!is_clicked) {
-                is_clicked = true;
-                _animationController!.forward();
-              } else {
-                is_clicked = false;
-                _animationController!.reverse();
-              }
-
-              print('${shortest_index} 메세지 눌림');
-            },
           ),
-        ),
-      );
+        );
+      }
       _animationController!.forward();
       is_clicked = true;
       notifyListeners();
@@ -225,7 +232,6 @@ class MessageProvider extends ChangeNotifier {
       print('====== ${timer.tick}번째 새로운 메세지 확인 =======');
       getMessageList().then((_) {
         for (int i = 0; i < message_info_list_new.length; i++) {
-          Log.logger.d("executed???");
           Positioned positioned = Positioned(
             top: message_info_list[i].location_map['y'],
             left: message_info_list[i].location_map['x'],
@@ -242,10 +248,8 @@ class MessageProvider extends ChangeNotifier {
           );
           positioned_list.add(positioned);
         }
-
         notifyListeners();
         message_info_list_new.clear();
-        // last_date = dateFormat.format(DateTime.now());
         last_date = DateTime.now().toString().split('.')[0];
         // print(last_date);
       }).catchError((err) {

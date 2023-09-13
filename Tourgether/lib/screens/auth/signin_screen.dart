@@ -117,6 +117,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => SignUpVerifyScrren(email: userEmail),
+        // settings: RouteSettings(name: '/Route - signup'),
       ),
     );
   }
@@ -457,34 +458,28 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                   top: MediaQuery.of(context).size.height - 150,
                   left: 0,
                   right: 0,
-                  child: Container(
-                    width: 200,
-                    padding: EdgeInsets.all(10),
-                    margin: EdgeInsets.all(30),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.5),
-                          spreadRadius: 1,
-                          blurRadius: 1,
-                          offset: const Offset(0, 1),
-                        ),
-                      ],
-                    ),
-                    child: GestureDetector(
-                      onTap: () {
-                        context.read<UserInfoProvider>().setDefaultUserInfo();
-                        Navigator.pushNamedAndRemoveUntil(
-                            context, '/signin', (_) => false);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MainScreen(),
+                  child: GestureDetector(
+                    onTap: () {
+                      context.read<UserInfoProvider>().setDefaultUserInfo();
+                      Navigator.of(context)
+                          .pushNamedAndRemoveUntil('/main', (_) => false);
+                    },
+                    child: Container(
+                      width: 200,
+                      padding: EdgeInsets.all(10),
+                      margin: EdgeInsets.all(30),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.5),
+                            spreadRadius: 1,
+                            blurRadius: 1,
+                            offset: const Offset(0, 1),
                           ),
-                        );
-                      },
+                        ],
+                      ),
                       child: Center(
                         child: Text(
                           'Skip',

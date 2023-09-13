@@ -7,7 +7,7 @@ import '../../models/comments/user_comment.dart';
 import '../../models/message/user_post_model.dart';
 import '../../providers/user_info_provider.dart';
 import '../../providers/user_post_provider.dart';
-import '../../screens/nav/user_post_detail_screen.dart';
+import '../../screens/nav/post_list/user_post_detail_screen.dart';
 import '../../services/post_services.dart';
 import '../../utilities/log.dart';
 

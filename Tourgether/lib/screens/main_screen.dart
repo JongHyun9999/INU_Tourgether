@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:TourGather/models/map/map_info.dart';
 import 'package:TourGather/providers/main_screen_ui_provider.dart';
 import 'package:TourGather/providers/message_provider.dart';
-import 'package:TourGather/screens/message_screen.dart';
 import 'package:TourGather/widgets/main/app_bars.dart';
 import 'package:TourGather/widgets/main/blinking_user.dart';
 import 'package:flutter/material.dart';

@@ -1,16 +1,17 @@
 import 'package:TourGather/providers/user_info_provider.dart';
 import 'package:TourGather/utilities/color_palette.dart';
+import 'package:TourGather/utilities/log.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/comments/user_comment.dart';
-import '../../models/user_post_model.dart';
-import '../../providers/user_post_provider.dart';
-import '../../services/post_services.dart';
-import '../../utilities/log.dart';
-import '../../widgets/post_list/user_post_comment.dart';
+// import 'package:TourGather/models/comments/user_comment.dart';
+import 'package:TourGather/models/message/user_post_model.dart';
+import 'package:TourGather/providers/user_post_provider.dart';
+import 'package:TourGather/services/post_services.dart';
+import 'package:TourGather/widgets/post/user_post_comment.dart';
+
 
 class UserPostDetailScreen extends StatefulWidget {
   UserPostDetailScreen({

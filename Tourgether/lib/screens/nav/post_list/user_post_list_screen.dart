@@ -3,10 +3,10 @@ import 'package:TourGather/utilities/color_palette.dart';
 import 'package:TourGather/widgets/post/user_post.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'package:TourGather/screens/nav/user_post_detail_screen.dart';
+// import 'package:TourGather/screens/nav/post_list/user_post_detail_screen.dart';
 import 'package:provider/provider.dart';
-import '../../models/user_post_model.dart';
-import '../../services/post_services.dart';
+import 'package:TourGather/models/message/user_post_model.dart';
+// import 'package:TourGather/services/post_services.dart';
 
 class UsersPostsListScreen extends StatefulWidget {
   const UsersPostsListScreen({super.key});
