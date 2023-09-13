@@ -703,7 +703,7 @@ app.post('/update_user_map_visibility_status', async (req, res) => {
 app.post('/api/postGetMessage', async (req, res) => {
   console.log('/api/postGetMessage 호출됨');
   let conn = null;
-  console.log(req.body)
+  // console.log(req.body)
   try {
     let QUERY_STR = `SELECT user_name, title, content, posted_time, liked, comments_num, gps FROM User_Posts WHERE posted_time >= '${req.body.last_date}';`;
     if (req.body.last_date === '2000-12-02 00:00:00') {
