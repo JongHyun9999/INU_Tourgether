@@ -111,8 +111,10 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         providers: [
           ChangeNotifierProxyProvider<GPSProvider, MessageProvider>(
             create: (context) => MessageProvider(_animationController),
-            update: (BuildContext context, gpsProvider, messageProvider) =>
-                messageProvider!..update(gpsProvider),
+            update: (BuildContext context, gpsProvider,
+                MessageProvider? messageProvider) {
+              return messageProvider!..update(gpsProvider);
+            },
           ),
         ],
         child: Center(

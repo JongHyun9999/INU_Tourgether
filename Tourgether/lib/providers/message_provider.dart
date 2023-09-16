@@ -31,6 +31,8 @@ class MessageProvider with ChangeNotifier {
 
   bool is_clicked = false;
 
+  List<int> shortest_index = [];
+
   final double backgroundImageWidth = MapInfo.backgroundImageWidth;
   final double backgroundImageHeight = MapInfo.backgroundImageHeight;
 
@@ -69,10 +71,6 @@ class MessageProvider with ChangeNotifier {
       jsoncontent[i]['gps']['x'] =
           (1 - (jsoncontent[i]['gps']['x'] - mapDown) / (mapUp! - mapDown!)) *
               backgroundImageHeight;
-
-      // print('저장되는 실제 gps : ${gps_point.latitude} , ${gps_point.longitude}');
-      // print(
-      //     '변경후 : ${jsoncontent[i]['gps']['x']} , ${jsoncontent[i]['gps']['y']}');
 
       message_info_list.add(
         MessageProduct(
@@ -125,7 +123,7 @@ class MessageProvider with ChangeNotifier {
     getMessageList().then((_) {
       print('then 시작');
       for (int i = 0; i < message_info_list.length; i++) {
-        Positioned positioned = Positioned(
+        Positioned? positioned = Positioned(
           top: message_info_list[i].location_map['y'],
           left: message_info_list[i].location_map['x'],
           child: IconButton(
@@ -150,88 +148,16 @@ class MessageProvider with ChangeNotifier {
         positioned_list.add(positioned);
       }
 
-      print('생성자에서 알릴까??');
       notifyListeners();
-      print('생성자에서 알렸다!!');
       // addStreamDistance();
       message_info_list_new.clear();
 
-      // timer = _startTimer();
-      // timer2 = _addMessage();
+      timer = _startTimer();
+      timer2 = _addMessage();
       last_date = DateTime.now().toString().split('.')[0];
       print('마지막 측정 시간 : ${last_date}');
     }).catchError((err) {
       print(err);
-    });
-  }
-
-  // 현재 나와 최단거리인 메세지의 인덱스를 반환하는 함수
-  double calculateDistance(Map<String, dynamic> a, Map<String, dynamic> b) {
-    return sqrt(pow(a['latitude']! - b['latitude']!, 2) +
-        pow(a['longitude']! - b['longitude']!, 2));
-  }
-
-  List<int> getShortestDistance() {
-    List<int> distance_list = [];
-    for (int i = 0; i < message_info_list.length; i++) {
-      // print('조사 대상 ${message_info_list[i].gps}');
-      if (calculateDistance(
-              this.current_position, this.message_info_list[i].gps) <
-          0.00148) {
-        distance_list.add(i);
-      }
-    }
-    print(distance_list);
-
-    // double minDistance = distance_list.reduce(min);
-    // int minIndex = distance_list.indexOf(minDistance);
-
-    return distance_list;
-  }
-
-  // Stream<void> addStreamDistance() {
-  //   print('Stream 시작');
-  //   return Stream<void>.periodic(
-  //       const Duration(seconds: 5), (timer) => _startTimer());
-  // }
-
-  // 첫 빌드 후 주기적으로 가장 가까운 메세지의 크기 키우기.
-  Timer _startTimer() {
-    return Timer.periodic(const Duration(seconds: 5), (timer) {
-      List<int> shortest_index = getShortestDistance();
-      print('혹시 바로 시작하니?');
-      for (int i = 0; i < shortest_index.length; i++) {
-        print('제일 가까운 인덱스 : ${shortest_index[i]}');
-        positioned_list[shortest_index[i]] = Positioned(
-          top: message_info_list[shortest_index[i]].location_map['y'],
-          left: message_info_list[shortest_index[i]].location_map['x'],
-          child: ScaleTransition(
-            scale: Tween(begin: 1.0, end: 1.5).animate(CurvedAnimation(
-                parent: _animationController!, curve: Curves.elasticOut)),
-            child: IconButton(
-              icon: Icon(
-                Icons.mail,
-                size: 50,
-                color: Colors.blueAccent,
-              ),
-              onPressed: () {
-                if (!is_clicked) {
-                  is_clicked = true;
-                  _animationController!.forward();
-                } else {
-                  is_clicked = false;
-                  _animationController!.reverse();
-                }
-
-                print('${shortest_index[i]} 메세지 눌림');
-              },
-            ),
-          ),
-        );
-      }
-      _animationController!.forward();
-      is_clicked = true;
-      notifyListeners();
     });
   }
 
@@ -242,7 +168,6 @@ class MessageProvider with ChangeNotifier {
   // 수정사항을 화면에 반영한다.
   // 리스트 사이즈가 커진다면 리스트 전체를 화면에 다시 그리는게 불필요한 작업같아 개선하고 싶음.
   // 추가적으로, 첫 로딩외에 주기적으로 새로 추가되는 메세지를 화면에 반영해주는 작업이 필요하다.
-
   // 첫 로딩후 5초마다 주기적인 추가 메세지 확인
   Timer _addMessage() {
     return Timer.periodic(const Duration(seconds: 5), (timer) async {
@@ -275,12 +200,133 @@ class MessageProvider with ChangeNotifier {
     });
   }
 
+  // 현재 나와 최단거리인 메세지의 인덱스를 반환하는 함수
+  double calculateDistance(Map<String, dynamic> a, Map<String, dynamic> b) {
+    return sqrt(pow(a['latitude']! - b['latitude']!, 2) +
+        pow(a['longitude']! - b['longitude']!, 2));
+  }
+
+  Map<String, dynamic> getShortestDistance() {
+    List<int> distance_list = [];
+    for (int i = 0; i < message_info_list.length; i++) {
+      // print('조사 대상 ${message_info_list[i].gps}');
+      if (calculateDistance(
+              this.current_position, this.message_info_list[i].gps) <
+          0.00148) {
+        distance_list.add(i);
+      }
+    }
+
+    // double minDistance = distance_list.reduce(min);
+    // int minIndex = distance_list.indexOf(minDistance);
+
+    // 새로 조사한 인접 메세지 배열과 기존 인접메세지를 비교했을때
+    // 1. 이전에는 인접했지만 새 배열에는 존재하지 않을때,
+    // 2. 이전에는 없었지만 새 배열에는 추가되었을 때,
+    // 를 구분하여 메세지 위젯을 업데이트 해준다.
+
+    print('기존 : ${shortest_index}');
+    print('새거 : ${distance_list}');
+    Set<int> firstSet = Set.from(shortest_index);
+    Set<int> secondSet = Set.from(distance_list);
+    Map<String, dynamic> difference_list = {
+      'new': secondSet.difference(firstSet).toList(),
+      'old': firstSet.difference(secondSet).toList()
+    };
+    // List<int> difference_new = secondSet.difference(firstSet).toList();
+    // List<int> difference_old = firstSet.difference(secondSet).toList();
+    print('추가된거 : ${difference_list['new']}');
+    print('없어진거 : ${difference_list['old']}');
+
+    return difference_list;
+  }
+
+  // 첫 빌드 후 주기적으로 일정 범위 내의 메세지 키우기
+  Timer _startTimer() {
+    return Timer.periodic(const Duration(seconds: 3), (timer) {
+      Map<String, dynamic> difference_list = getShortestDistance();
+      shortest_index = difference_list['new'];
+      List<int> removed_index = difference_list['old'];
+
+      // 가까워져서 메세지로 만드는 코드
+      for (int i = 0; i < shortest_index.length; i++) {
+        print('가까운 인덱스 : ${shortest_index[i]}');
+        positioned_list[shortest_index[i]] = Positioned(
+          top: message_info_list[shortest_index[i]].location_map['y'],
+          left: message_info_list[shortest_index[i]].location_map['x'],
+          child: ScaleTransition(
+            scale: Tween(begin: 1.0, end: 1.5).animate(CurvedAnimation(
+                parent: _animationController!, curve: Curves.elasticOut)),
+            child: IconButton(
+              icon: Icon(
+                Icons.mail,
+                size: 30,
+                color: Colors.blueAccent,
+              ),
+              onPressed: () {
+                if (!is_clicked) {
+                  is_clicked = true;
+                  _animationController!.forward();
+                } else {
+                  is_clicked = false;
+                  _animationController!.reverse();
+                }
+
+                print('${shortest_index[i]} 메세지 눌림');
+              },
+            ),
+          ),
+        );
+      }
+
+      // 멀어져서 원으로 만드는 코드
+      for (int i = 0; i < removed_index.length; i++) {
+        print('사라진 인덱스 : ${removed_index[i]}');
+        positioned_list[removed_index[i]] = Positioned(
+          top: message_info_list[removed_index[i]].location_map['y'],
+          left: message_info_list[removed_index[i]].location_map['x'],
+          child: ScaleTransition(
+            scale: Tween(begin: 0.8, end: 1.0).animate(CurvedAnimation(
+                parent: _animationController!, curve: Curves.elasticOut)),
+            child: IconButton(
+              icon: Icon(
+                Icons.brightness_1,
+                size: 30,
+                color: Colors.blueAccent,
+              ),
+              onPressed: () {
+                if (!is_clicked) {
+                  is_clicked = true;
+                  _animationController!.forward();
+                } else {
+                  is_clicked = false;
+                  _animationController!.reverse();
+                }
+
+                print('${removed_index[i]} 메세지 눌림');
+              },
+            ),
+          ),
+        );
+      }
+      _animationController!.forward();
+      
+      is_clicked = true;
+      current_position['longitude'] = current_position['longitude'] - 0.001;
+      notifyListeners();
+    });
+  }
+
+  // =============================================
   // proxyprovier를 위한 update 함수
   void update(GPSProvider gpsProvider) {
-    current_position['latitude'] = gpsProvider.latitude;
-    current_position['longitude'] = gpsProvider.longitude;
-    print('update 실행');
+    // pjh. 프로바이더 생성시에도 update가 호출되는데,
+    // 아직 gps가 들어오지 않았을수 있기 때문에 null일 경우 pass.
+    if (gpsProvider.latitude == null) return;
 
+    // current_position['latitude'] = gpsProvider.latitude;
+    // current_position['longitude'] = gpsProvider.longitude;
+    print('update 실행');
     return;
   }
 
