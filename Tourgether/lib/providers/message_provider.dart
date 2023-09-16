@@ -2,12 +2,13 @@ import 'dart:async';
 import 'dart:math';
 import 'package:TourGather/models/map/map_info.dart';
 import 'package:TourGather/models/message/messageProduct.dart';
+import 'package:TourGather/providers/gps_provider.dart';
 import 'package:TourGather/services/post_services.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 
-class MessageProvider extends ChangeNotifier {
+class MessageProvider with ChangeNotifier {
   // DB에서 post정보 받아오는 일회용 변수
   List<dynamic> jsoncontent = [];
 
@@ -50,6 +51,7 @@ class MessageProvider extends ChangeNotifier {
       'user_gps_y': current_position['longitude'],
       'last_date': last_date
     };
+    print(postData['last_date']);
 
     jsoncontent = await PostServices.postGetMessage(postData);
     print('DB에서 post 받아옴 : ${jsoncontent.length}개');
@@ -117,8 +119,11 @@ class MessageProvider extends ChangeNotifier {
   MessageProvider(AnimationController animationController) {
     _animationController = animationController;
     print('생성자');
+    print(positioned_list);
+    positioned_list.clear();
 
     getMessageList().then((_) {
+      print('then 시작');
       for (int i = 0; i < message_info_list.length; i++) {
         Positioned positioned = Positioned(
           top: message_info_list[i].location_map['y'],
@@ -145,12 +150,14 @@ class MessageProvider extends ChangeNotifier {
         positioned_list.add(positioned);
       }
 
+      print('생성자에서 알릴까??');
       notifyListeners();
+      print('생성자에서 알렸다!!');
       // addStreamDistance();
       message_info_list_new.clear();
 
-      timer = _startTimer();
-      timer2 = _addMessage();
+      // timer = _startTimer();
+      // timer2 = _addMessage();
       last_date = DateTime.now().toString().split('.')[0];
       print('마지막 측정 시간 : ${last_date}');
     }).catchError((err) {
@@ -192,7 +199,7 @@ class MessageProvider extends ChangeNotifier {
   Timer _startTimer() {
     return Timer.periodic(const Duration(seconds: 5), (timer) {
       List<int> shortest_index = getShortestDistance();
-
+      print('혹시 바로 시작하니?');
       for (int i = 0; i < shortest_index.length; i++) {
         print('제일 가까운 인덱스 : ${shortest_index[i]}');
         positioned_list[shortest_index[i]] = Positioned(
@@ -266,6 +273,15 @@ class MessageProvider extends ChangeNotifier {
         print(err);
       });
     });
+  }
+
+  // proxyprovier를 위한 update 함수
+  void update(GPSProvider gpsProvider) {
+    current_position['latitude'] = gpsProvider.latitude;
+    current_position['longitude'] = gpsProvider.longitude;
+    print('update 실행');
+
+    return;
   }
 
   @override

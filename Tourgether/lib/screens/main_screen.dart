@@ -81,6 +81,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         Provider.of<MainScreenUIProvider>(context, listen: false);
 
     bool showPostThing = false;
+
     return Scaffold(
       drawer: const NavBar(),
       extendBodyBehindAppBar: true,
@@ -108,8 +109,11 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
               : null,
       body: MultiProvider(
         providers: [
-          ChangeNotifierProvider(
-              create: (context) => MessageProvider(_animationController)),
+          ChangeNotifierProxyProvider<GPSProvider, MessageProvider>(
+            create: (context) => MessageProvider(_animationController),
+            update: (BuildContext context, gpsProvider, messageProvider) =>
+                messageProvider!..update(gpsProvider),
+          ),
         ],
         child: Center(
           child: Stack(
@@ -288,8 +292,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                           // ------------------------------------------
                           Consumer<GPSProvider>(
                             builder: (context, gpsProvider, child) {
-                              print(gpsProvider.latitude);
-                              print(gpsProvider.longitude);
+                              // print(gpsProvider.latitude);
+                              // print(gpsProvider.longitude);
                               // Log.logger.d(gpsProvider.userWidthPosition);
                               // Log.logger.d(gpsProvider.userHeightPosition);
 
