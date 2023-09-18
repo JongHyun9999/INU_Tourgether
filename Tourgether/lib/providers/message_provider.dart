@@ -31,7 +31,7 @@ class MessageProvider with ChangeNotifier {
 
   bool is_clicked = false;
 
-  List<int> shortest_index = [];
+  List<int> adjacent_index = [];
 
   final double backgroundImageWidth = MapInfo.backgroundImageWidth;
   final double backgroundImageHeight = MapInfo.backgroundImageHeight;
@@ -122,6 +122,8 @@ class MessageProvider with ChangeNotifier {
 
     getMessageList().then((_) {
       print('then 시작');
+      copyNewToList();
+
       for (int i = 0; i < message_info_list.length; i++) {
         Positioned? positioned = Positioned(
           top: message_info_list[i].location_map['y'],
@@ -173,6 +175,8 @@ class MessageProvider with ChangeNotifier {
     return Timer.periodic(const Duration(seconds: 5), (timer) async {
       print('====== ${timer.tick}번째 새로운 메세지 확인 =======');
       getMessageList().then((_) {
+        copyNewToList();
+
         for (int i = 0; i < message_info_list_new.length; i++) {
           Positioned positioned = Positioned(
             top: message_info_list[i].location_map['y'],
@@ -225,18 +229,33 @@ class MessageProvider with ChangeNotifier {
     // 2. 이전에는 없었지만 새 배열에는 추가되었을 때,
     // 를 구분하여 메세지 위젯을 업데이트 해준다.
 
-    print('기존 : ${shortest_index}');
-    print('새거 : ${distance_list}');
-    Set<int> firstSet = Set.from(shortest_index);
-    Set<int> secondSet = Set.from(distance_list);
+    print('과거 인접한 메세지들 : ${adjacent_index}');
+    print('현재 인접한 메세지들 : ${distance_list}');
+    Set<int> before_adjacent_set = Set.from(adjacent_index);
+    Set<int> after_adjacent_set = Set.from(distance_list);
+
+    // 과거엔 없었는데 새로 인접하게 된 메세지들
+    Set<int> new_adjacent_set =
+        after_adjacent_set.difference(before_adjacent_set);
+    // 과거에도 인접했고 현재도 인접한 메세지들
+    Set<int> alive_adjacent_set = after_adjacent_set
+        .difference(after_adjacent_set.difference(before_adjacent_set));
+
     Map<String, dynamic> difference_list = {
-      'new': secondSet.difference(firstSet).toList(),
-      'old': firstSet.difference(secondSet).toList()
+      // 새로 추가된 놈들만 뽑기
+      'new': new_adjacent_set.toList(),
+      // 멀어진 놈들만 뽑기
+      'rem': before_adjacent_set.difference(after_adjacent_set).toList(),
+      // 살아 있는 놈들
+      'old': alive_adjacent_set.toList()
     };
-    // List<int> difference_new = secondSet.difference(firstSet).toList();
-    // List<int> difference_old = firstSet.difference(secondSet).toList();
+
     print('추가된거 : ${difference_list['new']}');
-    print('없어진거 : ${difference_list['old']}');
+    print('멀어진거 : ${difference_list['rem']}');
+    print('살아있는거 : ${difference_list['old']}');
+
+    // 인접 메세지들 업데이트
+    adjacent_index = distance_list;
 
     return difference_list;
   }
@@ -245,15 +264,60 @@ class MessageProvider with ChangeNotifier {
   Timer _startTimer() {
     return Timer.periodic(const Duration(seconds: 3), (timer) {
       Map<String, dynamic> difference_list = getShortestDistance();
-      shortest_index = difference_list['new'];
-      List<int> removed_index = difference_list['old'];
+
+      print(message_info_list.length);
+      // _animationController!.reset();
+      // 멀어져서 원으로 만드는 코드
+      for (int i = 0; i < difference_list['rem'].length; i++) {
+        print('사라진 인덱스 : ${difference_list['rem'][i]}');
+        positioned_list[difference_list['rem'][i]] = Positioned(
+          top: message_info_list[difference_list['rem'][i]].location_map['y'],
+          left: message_info_list[difference_list['rem'][i]].location_map['x'],
+          child: IconButton(
+            icon: Icon(
+              Icons.brightness_1,
+              size: 30,
+              color: Colors.blueAccent,
+            ),
+            onPressed: () {
+              print('${difference_list['rem'][i]} 메세지 눌림');
+            },
+          ),
+        );
+      }
+
+      for (int i = 0; i < difference_list['old'].length; i++) {
+        print('가까운 인덱스 : ${difference_list['old'][i]}');
+        positioned_list[difference_list['old'][i]] = Positioned(
+          top: message_info_list[difference_list['old'][i]].location_map['y'],
+          left: message_info_list[difference_list['old'][i]].location_map['x'],
+          child: IconButton(
+            icon: Icon(
+              Icons.mail,
+              size: 30,
+              color: Colors.blueAccent,
+            ),
+            onPressed: () {
+              if (!is_clicked) {
+                is_clicked = true;
+                _animationController!.forward();
+              } else {
+                is_clicked = false;
+                _animationController!.reverse();
+              }
+
+              print('${difference_list['old'][i]} 메세지 눌림');
+            },
+          ),
+        );
+      }
 
       // 가까워져서 메세지로 만드는 코드
-      for (int i = 0; i < shortest_index.length; i++) {
-        print('가까운 인덱스 : ${shortest_index[i]}');
-        positioned_list[shortest_index[i]] = Positioned(
-          top: message_info_list[shortest_index[i]].location_map['y'],
-          left: message_info_list[shortest_index[i]].location_map['x'],
+      for (int i = 0; i < difference_list['new'].length; i++) {
+        print('가까운 인덱스 : ${difference_list['new'][i]}');
+        positioned_list[difference_list['new'][i]] = Positioned(
+          top: message_info_list[difference_list['new'][i]].location_map['y'],
+          left: message_info_list[difference_list['new'][i]].location_map['x'],
           child: ScaleTransition(
             scale: Tween(begin: 1.0, end: 1.5).animate(CurvedAnimation(
                 parent: _animationController!, curve: Curves.elasticOut)),
@@ -272,49 +336,27 @@ class MessageProvider with ChangeNotifier {
                   _animationController!.reverse();
                 }
 
-                print('${shortest_index[i]} 메세지 눌림');
+                print('${difference_list['new'][i]} 메세지 눌림');
               },
             ),
           ),
         );
       }
 
-      // 멀어져서 원으로 만드는 코드
-      for (int i = 0; i < removed_index.length; i++) {
-        print('사라진 인덱스 : ${removed_index[i]}');
-        positioned_list[removed_index[i]] = Positioned(
-          top: message_info_list[removed_index[i]].location_map['y'],
-          left: message_info_list[removed_index[i]].location_map['x'],
-          child: ScaleTransition(
-            scale: Tween(begin: 0.8, end: 1.0).animate(CurvedAnimation(
-                parent: _animationController!, curve: Curves.elasticOut)),
-            child: IconButton(
-              icon: Icon(
-                Icons.brightness_1,
-                size: 30,
-                color: Colors.blueAccent,
-              ),
-              onPressed: () {
-                if (!is_clicked) {
-                  is_clicked = true;
-                  _animationController!.forward();
-                } else {
-                  is_clicked = false;
-                  _animationController!.reverse();
-                }
-
-                print('${removed_index[i]} 메세지 눌림');
-              },
-            ),
-          ),
-        );
-      }
-      _animationController!.forward();
-      
       is_clicked = true;
+      _animationController!
+          .forward()
+          .then((value) => _animationController!.reverse());
+
       current_position['longitude'] = current_position['longitude'] - 0.001;
       notifyListeners();
     });
+  }
+
+  void copyNewToList() {
+    for (int i = 0; i < message_info_list_new.length; i++) {
+      message_info_list.add(message_info_list_new[i]);
+    }
   }
 
   // =============================================
