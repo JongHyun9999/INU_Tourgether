@@ -6,23 +6,40 @@ import '../models/message/user_post_model.dart';
 import '../utilities/log.dart';
 
 class UserPostProvider with ChangeNotifier {
+  // user_post_list_screen에서 출력되는 post들의 인스턴스를 가지고 있는 리스트
   late List<UserPostModel> _userPostList;
 
-  late UserPostModel _selectedPost;
-  int _selectedPostIndex = -1; // index는 0부터 시작이므로 -1을 기본값으로 설정.
+  // user_post_detail_screen에서 현재 선택된
+  // post에 작성된 댓글의 인스턴스를 가지고 있는 리스트
+  List<UserComment> userCommentList = [];
+
+  // 현재 선택한 post의 data model 인스턴스
+  // post의 내용 등의 데이터를 포함한다.
+  UserPostModel? _selectedPost;
+
+  // 현재 선택된 post의 index.
+  // index는 0부터 시작이므로 -1을 기본값으로 설정
+  int _selectedPostIndex = -1;
+
+  // 현재 로그인한 유저가
+  // 현재 선택한 post에 좋아요를 눌렀는지 여부
   bool _isLikePressed = false;
+
+  // 현재 선택한 post에 등록된 좋아요의 개수
   int _selectedPostLikeNum = 0;
 
-  List<UserComment> userCommentList = [];
+  // 2023.08.13, jdk
+  // PostServices의 static method들을
+  // local method로 변경하기.
+  PostServices postServices = PostServices();
 
   // 2023.08.13, jdk
   // UserPostModel과 List<UserPostModel>의 Class를 구분할 수 있다면 구분하기.
-
   // ----------------------------------------------------------
   // Getters
   List<UserPostModel> get userPostList => _userPostList;
 
-  UserPostModel get currentSelectedPost => _selectedPost;
+  UserPostModel? get currentSelectedPost => _selectedPost;
   int get selectedPostIndex => _selectedPostIndex;
 
   bool get isLikePressed => _isLikePressed;
@@ -34,8 +51,11 @@ class UserPostProvider with ChangeNotifier {
   set userPostList(List<UserPostModel> userPostList) =>
       _userPostList = userPostList;
 
-  set currentSelectedPost(UserPostModel selectedPost) =>
+  set currentSelectedPost(UserPostModel? selectedPost) {
+    if (selectedPost != null) {
       _selectedPost = selectedPost;
+    }
+  }
 
   set selectedPostIndex(int index) => _selectedPostIndex = index;
   set isLikePressed(bool isLikePressed) => _isLikePressed = isLikePressed;
@@ -44,15 +64,11 @@ class UserPostProvider with ChangeNotifier {
       _selectedPostLikeNum = selectedPostLikeNum;
   // ----------------------------------------------------------
 
-  // 2023.08.13, jdk
-  // static method local method로 변경하기.
-  PostServices postServices = PostServices();
-
   Future<List<UserPostModel>> getUsersPostsList() async {
     List<UserPostModel> userPostLists = await PostServices.getUsersPostsList();
     _userPostList = userPostLists;
 
-    return _userPostList;
+    return userPostLists;
   }
 
   // 2023.08.14, jdk
@@ -94,11 +110,31 @@ class UserPostProvider with ChangeNotifier {
   void updateCurrentPostCommentsState(Map<String, dynamic> commentData) {
     // 1) 댓글의 개수 변화. Consumer를 통해 listen하고 있던 widget들이 변화됨.
     // 현재는 댓글을 추가하는 경우만 처리한다.
-    this.userPostList[selectedPostIndex].comments_num++;
+    userPostList[selectedPostIndex].comments_num++;
 
+    // 2) list에 댓글 추가. 가장 끝번 idx로 추가한다.
     UserComment userComment = UserComment.fromJson(commentData);
-    this.userCommentList.add(userComment);
+    userCommentList.add(userComment);
 
+    // 변경사항을 listener들에게 알림.
     notifyListeners();
+  }
+
+  // 2023.09.19, jdk
+  // 함수의 인자로 전달된 index에 해당되는 post의 인스턴스를
+  // userPostList로부터 제거하는 메서드
+  void removePostFromListByIndex(int index) {
+    // index가 음수이거나, list의 길이보다 길다면 잘못된 경우이므로 return한다.
+    if (index >= userPostList.length || index < 0) {
+      return;
+    }
+
+    Log.logger.d("jdk, ${index}");
+
+    // 전달받은 index에 있는 post instance를 제거한다.
+    Log.logger.d("jdk, length of list ${userPostList.length}");
+    this.userPostList.removeAt(index);
+    Log.logger.d("jdk, check?");
+    notifyListeners(); // 변경 사항을 listener들에게 전달한다.
   }
 }

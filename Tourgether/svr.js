@@ -273,7 +273,7 @@ app.post('/api/getUserComments', async (req, res) => {
 
     // 2023.09.06, jdk
     // rid를 가져올 필요는 없기 때문에 rid 가져오는 건 나중에 수정하기.
-    const QUERY_STR = `SELECT rid, comment_idx, content, user_name, liked_num 
+    const QUERY_STR = `SELECT rid, comment_idx, content, user_name, liked_num, posted_time
     from User_Comments where rid='${rid}'`;
 
     conn = await new Promise((resolve, reject) => {
@@ -803,9 +803,10 @@ app.post('/api/postUserComment', async (req, res) => {
   const user_name = body['user_name'];
   const content = body['content'];
   const liked_num = body['liked_num'];
+  const posted_time = body['posted_time'];
 
-  const QUERY_STR_POST_COMMENT = `insert into User_Comments(rid, user_name, content, liked_num)
-    values(${rid}, '${user_name}', '${content}', ${liked_num})`;
+  const QUERY_STR_POST_COMMENT = `insert into User_Comments(rid, user_name, content, liked_num, posted_time)
+    values(${rid}, '${user_name}', '${content}', ${liked_num}, '${posted_time}')`;
 
   const QUERY_STR_ADD_CNT = `UPDATE User_Posts set comments_num = comments_num + 1 where rid = ${rid}`;
 
@@ -845,7 +846,6 @@ app.post('/api/postUserComment', async (req, res) => {
     // post, cnt_add boolean을 이용해서 추후에 error message handling code 추가.
     console.log('Successfully posted user comment [/api/postUserComment]');
     if (post_succeeded && cnt_add_succeeded) {
-      console.log('not executed??');
       res.status(200).send();
     }
     else {
@@ -855,6 +855,70 @@ app.post('/api/postUserComment', async (req, res) => {
     console.log(err);
     res.status(404).json({
       error: "An error occurred while /api/postUserComment"
+    });
+  } finally {
+    if (conn) conn.release();
+  }
+})
+
+// 유저 게시글 삭제
+app.post('/api/deleteUserPost', async (req, res) => {
+
+  const body = req.body;
+  const rid = body['rid'];
+
+  const QUERY_STR_DELETE_COMMENTS = `delete from User_Comments where rid=${rid};`; // 댓글 삭제
+  const QUERY_STR_DELETE_LIKES = `delete from User_Posts_Like where rid=${rid};`; // 좋아요 삭제
+  const QUERY_STR_DELETE_POST = `delete from User_Posts where rid=${rid};`; // 게시글 삭제
+
+  let conn = null;
+
+  try {
+    conn = await new Promise((resolve, reject) => {
+      pool.getConnection((err, connection) => {
+        if (err) reject(err);
+        resolve(connection);
+      });
+    }).catch((err) => {
+      throw err;
+    })
+
+    let comments_delete_succeeded = false;
+    let likes_delete_succeeded = false;
+    let post_delete_succeeded = false;
+
+    // multipleStatements : delete the comments, likes and post
+    const [results] = await conn.promise().query(QUERY_STR_DELETE_COMMENTS + QUERY_STR_DELETE_LIKES + QUERY_STR_DELETE_POST);
+
+    // 2023.09.19, jdk
+    // 각 query의 실행 결과를 체크한다. DB에서 무결성 관리를 잘 한다면
+    // 각 query에서 문제가 발생할 가능성이 없기 때문에, 이와 같이
+    // affectedRows를 체크하지 않아도 될 것으로 생각된다. 좀 더 고민할 부분임.
+    if (results[0].affectedRows !== undefined) {
+      comments_delete_succeeded = true;
+    }
+
+    if (results[1].affectedRows !== undefined) {
+      likes_delete_succeeded = true;
+    }
+
+    if (results[2].affectedRows !== undefined) {
+      post_delete_succeeded = true;
+    }
+
+    // 2023.09.19, jdk
+    // result boolean을 이용해서 추후에 error message handling code 추가.
+    console.log('Successfully deleted the user post [/api/deleteUserPost]');
+    if (comments_delete_succeeded && likes_delete_succeeded && post_delete_succeeded) {
+      res.status(200).send();
+    }
+    else {
+      throw new Error();
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(404).json({
+      error: "An error occurred while /api/deleteUserPost"
     });
   } finally {
     if (conn) conn.release();

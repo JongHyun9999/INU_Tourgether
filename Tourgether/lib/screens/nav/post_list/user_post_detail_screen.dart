@@ -1,6 +1,10 @@
+import 'package:TourGather/enums/page_movement_reason.dart';
+import 'package:TourGather/enums/user_post_interaction.dart';
 import 'package:TourGather/providers/user_info_provider.dart';
+import 'package:TourGather/utilities/my_timer.dart';
 import 'package:TourGather/utilities/color_palette.dart';
 import 'package:TourGather/utilities/log.dart';
+import 'package:TourGather/widgets/post/post_interactions.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
@@ -11,7 +15,6 @@ import 'package:TourGather/models/message/user_post_model.dart';
 import 'package:TourGather/providers/user_post_provider.dart';
 import 'package:TourGather/services/post_services.dart';
 import 'package:TourGather/widgets/post/user_post_comment.dart';
-
 
 class UserPostDetailScreen extends StatefulWidget {
   UserPostDetailScreen({
@@ -82,31 +85,37 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
     context.read<UserPostProvider>().setCurrentSelectedPostData(postData);
   }
 
-  // checkLikeButtonPressed() {
-  //   Map<String, dynamic> postData = {
-  //     'rid': rid,
-  //     'user_name': user_name,
-  //   };
+  bool checkContentEmpty(String content) {
+    if (content == "") {
+      return true;
+    }
 
-  //   PostServices.isPressedPostLike(postData).then(
-  //     (isPressedPostLike) {
-  //       if (isPressedPostLike == true) {
-  //         isLikePressed = true;
-  //         Log.logger.d("check : ${isLikePressed}");
+    return false;
+  }
 
-  //         // 2023.08.14, jdk
-  //         // API 통신 결과 이미 좋아요를 눌렀다면 UserPostProvider에서 값을 true로 변경한다.
-  //         context.read<UserPostProvider>().changeCurrentPostLikeButtonState();
-  //       }
-  //     },
-  //   );
-  // }
-
-  // 2023.09.12, jdk
-  // 유저가 댓글을 입력한 후 포스팅할 때 사용되는 함수.
-  void postComment() async {
+  // 2023.09.16, jdk
+  // 유저가 입력한 댓글 내용을 바탕으로
+  // 업로드한 데이터의 Map 객체를 만드는 함수.
+  Map<String, dynamic> makeCommentMapData(String content) {
     // 서버로 전송할 Map 데이터 생성
     Map<String, dynamic> commentData = {};
+    UserInfoProvider userInfoProvider = context.read<UserInfoProvider>();
+    MyTimer timer = MyTimer();
+
+    // 여기서 comment_idx를 설정해야 하는데, 동시에 댓글 작성을 요청할 경우
+    // comment_idx가 duplicated 될 가능성이 있으므로 이에 주의해야 한다.
+    commentData['content'] = content;
+    commentData['user_name'] = userInfoProvider.userName;
+    commentData['rid'] = rid;
+    commentData['liked_num'] = 0;
+    commentData['posted_time'] = timer.getCurrentTimeFormatted();
+
+    return commentData;
+  }
+
+  // 2023.09.12, jdk
+  // 유저가 입력한 댓글을 포스팅하는 함수.
+  void postComment() async {
     String content = commentController.text;
 
     // 입력한 내용이 비어있는지 확인
@@ -116,54 +125,118 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
       return;
     }
 
-    // 현재 접속한 유저의 정보를 얻기 위해서 context를 통해
-    // UserInfoProvider의 정보를 얻어냄.
-    var userInfoProvider = context.read<UserInfoProvider>();
+    // 전송할 데이터 생성
+    Map<String, dynamic> commentData = makeCommentMapData(content);
 
-    // 입력한 내용이 비어있지 않은 경우.
-    // 여기서 comment_idx를 설정해야 하는데, 동시에 댓글 작성을 요청할 경우
-    // comment_idx가 duplicated 될 가능성이 있으므로 이에 주의해야 한다.
-    commentData['content'] = content;
-    commentData['user_name'] = userInfoProvider.userName;
-    commentData['rid'] = rid;
-    commentData['liked_num'] = 0;
-
-    // 2023.09.12, jdk
-    // 유저가 작성한 post를 전송함.
-    Log.logger.d("check here? 1");
+    // 유저가 작성한 comment를 전송함.
     bool isSucceeded = await PostServices.postUserComment(commentData);
-    Log.logger.d("check here? 2");
 
-    // 2023.09.12, jdk
-    // 성공 여부에 따른 동작 필요.
     if (isSucceeded) {
       var userPostProvider = context.read<UserPostProvider>();
 
-      Log.logger.d("succeeded...");
-      // 2023.09.12, jdk
-      // TODO
       // 작성한 댓글을 현재 디스플레이에 추가
-      // 현재 userPostProvider를 전역변수 var로 생성해서 instruction이 잘 안됨.
-      // 이후에 변수를 수정해서 잘 출력될 수 있도록 해야할 듯.
       userPostProvider.updateCurrentPostCommentsState(commentData);
-      Log.logger.d("check here 1");
       commentController.clear(); // 입력한 내용 지우기
-      Log.logger.d("check here 2");
-
-      FocusManager.instance.primaryFocus?.unfocus();
-
-      Log.logger.d("댓글 업로드 성공.");
+      FocusManager.instance.primaryFocus?.unfocus(); // 키보드가 올라와 있을 경우 내리기
     } else {
       // TODO
     }
   }
 
-  bool checkContentEmpty(String content) {
-    if (content == "") {
+  void onMenuInteraction(UserPostInteraction interaction) {
+    switch (interaction) {
+      case UserPostInteraction.edit:
+        // 2023.09.19, jdk
+        // TODO : edit할 때 동작 추가, 추후 개발.
+        onEditPost();
+        break;
+      case UserPostInteraction.delete:
+        onDeletePost();
+        break;
+      default:
+        break;
+    }
+  }
+
+  // 2023.09.21, jdk
+  // 유저가 현재 게시글을 지울 수 있는지 검사하는 함수
+  bool canUserDeletePost() {
+    String current_user_name = context.read<UserInfoProvider>().userName;
+
+    if (current_user_name == user_name || current_user_name == "admin") {
       return true;
     }
 
     return false;
+  }
+
+  // 2023.09.17, jdk
+  // 현재 선택한 게시글을 수정하는 함수
+  void onEditPost() {}
+
+  // 2023.09.17, jdk
+  // 현재 선택한 게시글을 제거하는 함수
+  void onDeletePost() async {
+    if (canUserDeletePost() == false) {
+      Log.logger.d("jdk, false!");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('본인의 게시글만 삭제할 수 있습니다.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+
+      return;
+    }
+    Log.logger.d("jdk, true!");
+
+    // action을 표시하는데 필요한 widget들을 가져온다.
+    PostInteractions postInteractions = PostInteractions(context);
+
+    // alertDialog 인스턴스 생성
+    AlertDialog postInteractionDialog = postInteractions.postInteractionDialog!;
+
+    // 생성한 AlertDialog를 띄운다.
+    bool isDeleteing = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return postInteractionDialog;
+      },
+    );
+
+    // 삭제를 선택한 경우
+    if (isDeleteing) {
+      Map<String, int> postData = {};
+      postData['rid'] = rid;
+
+      // 삭제 API 실시
+      bool isDeleteSucceeded = await PostServices.deleteUserPost(postData);
+
+      // post 삭제 성공
+      if (isDeleteSucceeded) {
+        // 이전 페이지 (user_post_list_screen.dart)로 이동한다.
+        // 사유는 delete이므로 PageMovementReason Enum을 이용해 Map을 반환한다.
+        Navigator.of(context).pop({"reason": PageMovementReason.delete});
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('성공적으로 삭제되었습니다.'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+      // post 삭제 실패
+      else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('삭제에 실패했습니다. 잠시 후에 다시 시도해 주세요.'),
+          ),
+        );
+      }
+    }
+    // 취소를 선택한 경우
+    else {
+      // TODO
+    }
   }
 
   @override
@@ -202,7 +275,7 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
               // TODO 사용자 이미지 프로필 이미지도 추가하기
 
               // Container 1)
-              // user_image, user_id, posted_time
+              // user_image, user_id, posted_time and interaction button(more_vert)
               Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
@@ -223,46 +296,105 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                           ),
                         ),
                       ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // user_id, posted_time
-                          Container(
-                            child: Text(
-                              "${user_name}",
-                              style: TextStyle(
-                                fontFamily: 'Pretendard',
-                                fontSize: 13,
-                                color: ColorPalette.normalColor,
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // user_id, posted_time
+                            Container(
+                              child: Text(
+                                "${user_name}",
+                                style: TextStyle(
+                                  fontFamily: 'Pretendard',
+                                  fontSize: 13,
+                                  color: ColorPalette.normalColor,
+                                ),
                               ),
                             ),
-                          ),
-                          Container(
-                            child: Text(
-                              "${posted_time.substring(0, 16)}",
-                              style: TextStyle(
-                                fontFamily: 'Pretendard',
-                                fontSize: 13,
-                                color: ColorPalette.normalColor,
+                            Container(
+                              child: Text(
+                                "${posted_time.substring(0, 16)}",
+                                style: TextStyle(
+                                  fontFamily: 'Pretendard',
+                                  fontSize: 13,
+                                  color: ColorPalette.normalColor,
+                                ),
                               ),
                             ),
-                          ),
-                          Container(
-                            child: Text(
-                              // TODO 매칭 알고리즘 추가 필요
-                              "인천대학교 어딘가",
-                              maxLines: 1,
-                              style: TextStyle(
-                                fontFamily: 'Pretendard',
-                                fontSize: 13,
-                                color: ColorPalette.accentColor,
-                                fontWeight: FontWeight.bold,
+                            Container(
+                              child: Text(
+                                // TODO 매칭 알고리즘 추가 필요
+                                "인천대학교 어딘가",
+                                maxLines: 1,
+                                style: TextStyle(
+                                  fontFamily: 'Pretendard',
+                                  fontSize: 13,
+                                  color: ColorPalette.accentColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            // 게시글 수정 기능
+                            // TODO : 나중에 추가
+                            Container(
+                                width: 40,
+                                height: 40,
+                                child: PopupMenuButton<UserPostInteraction>(
+                                  padding: EdgeInsets.zero,
+                                  icon: Icon(
+                                    Icons.more_vert,
+                                    color: ColorPalette.accentColor,
+                                  ),
+                                  // PopupMenu에서 특정 Item을 선택할 경우 실행하는 Callback 함수
+                                  onSelected:
+                                      (UserPostInteraction interaction) {
+                                    onMenuInteraction(interaction);
+                                  },
+                                  itemBuilder: (BuildContext context) {
+                                    return [
+                                      PopupMenuItem(
+                                        value: UserPostInteraction.edit,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            Icon(
+                                              Icons.edit,
+                                              color: ColorPalette.accentColor,
+                                            ),
+                                            Text("수정"),
+                                          ],
+                                        ),
+                                      ),
+                                      PopupMenuItem(
+                                        value: UserPostInteraction.delete,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            Icon(
+                                              Icons.delete,
+                                              color: ColorPalette.accentColor,
+                                            ),
+                                            Text("삭제"),
+                                          ],
+                                        ),
+                                      ),
+                                    ];
+                                  },
+                                )),
+                          ],
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -275,9 +407,6 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                   horizontal: 10,
                 ),
                 child: Container(
-                  decoration: BoxDecoration(
-                      // color: Colors.red,
-                      ),
                   child: Row(
                     children: [
                       // Title
@@ -302,9 +431,6 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 10, 10, 50),
                 child: Container(
-                  decoration: BoxDecoration(
-                      // color: Colors.amber,
-                      ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -351,18 +477,6 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                             "isPressed": isPressed,
                           };
 
-                          // // 좋아요를 누른 경우.
-                          // if (context.read<UserPostProvider>().isLikePressed == false) {
-                          //   // liked++;
-                          //   likedPostData['isPressed'] = true;
-                          //   Log.logger.d("true");
-                          //   // 좋아요를 취소한 경우.
-                          // } else {
-                          //   // liked--;
-                          //   likedPostData['isPressed'] = false;
-                          //   Log.logger.d("false");
-                          // }
-
                           bool isSucceeded =
                               await PostServices.pressedLikeButton(
                             likedPostData,
@@ -385,14 +499,6 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                         },
                         child: Consumer<UserPostProvider>(
                           builder: (context, userPostProvider, child) {
-                            Log.logger.d(
-                              "userPostProvider : ${userPostProvider.isLikePressed}",
-                            );
-
-                            Log.logger.d(
-                              "userPostProvider : ${userPostProvider.selectedPostLikeNum}",
-                            );
-
                             return Container(
                               height: 40,
                               decoration: BoxDecoration(
@@ -435,6 +541,9 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                       SizedBox(
                         width: 10,
                       ),
+                      // 2023.09.16, jdk
+                      // TODO
+                      // 북마크 코드 개선 필요
                       InkWell(
                         onTap: () {
                           Log.logger.d("Bookmark touched!");
@@ -458,9 +567,6 @@ class _MyWidgetState extends State<UserPostDetailScreen> {
                           ),
                           child: Row(
                             children: [
-                              // 2023.08.13, jdk
-                              // TODO
-                              // 즐겨찾기는 적절한 구현법을 구상하기 전까지 주석처리.
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(10, 5, 5, 5),
                                 child: Icon(

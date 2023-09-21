@@ -62,19 +62,26 @@ dev_dependencies:
   flutter_lints: ^2.0.0
 
 flutter_native_splash:
-  color: "#5EB6E4"
-  dark_color: "#5EB6E4"
+  color: "#2396C2"
+  branding: "images/tourgather-branding.png"
+  image: "images/logo-image.png"
   fullscreen: true
   android: true
   ios: true
-  image: images/TourGather-Logo.png
-  dark_image: images/TourGather-Logo.png
+  web: false
+  # image: images/logo-background-removed3.png
+  # dark_image: images/TourGather_Logo.png
 
   android_12:
-    image: images/TourGather-Logo.png
-    icon_background_color: "#5EB6E4"
-    dark_image: images/TourGather-Logo.png 
-    icon_background_color_dark: "#5EB6E4"
+    # image: images/logo-background-removed3.png
+    # icon_background_color: "#5EB6E4"
+    # dark_image: images/TourGather-Logo.png 
+    # icon_background_color_dark: "#5EB6E4"
+    color: "#2396C2"
+    branding: "images/tourgather-branding.png"
+    image: "images/logo-image.png"
+
+
 
 flutter_icons:
   android: true

@@ -60,8 +60,11 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
     final isValid = _formKey.currentState!.validate();
     if (!isValid) {
       // 입력 양식이 올바르지 않을때.
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('올바르지 않은 이메일 양식입니다.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('올바르지 않은 이메일 양식입니다.'),
+        ),
+      );
     } else {
       // onSaved 함수 실행.
       _formKey.currentState!.save();
@@ -100,8 +103,11 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
           (_) => false,
         );
       } else {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('등록되지 않은 이메일 혹은 비밀번호입니다.')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('등록되지 않은 이메일 혹은 비밀번호입니다.'),
+          ),
+        );
       }
     }
   }

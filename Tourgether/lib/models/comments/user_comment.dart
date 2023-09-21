@@ -2,27 +2,27 @@ class UserComment {
   // 글을 입력할 경우에는 rid가 필요하지 않으므로
   // 기본값은 0으로 설정한다.
   final int rid;
-  final int comment_idx;
   final String user_name;
   final String content;
   final int liked_num;
+  final String posted_time;
 
   UserComment({
     required this.rid,
-    required this.comment_idx,
     required this.user_name,
     required this.content,
     required this.liked_num,
+    required this.posted_time,
   });
 
   // 2023.07.09, jdk
   // API를 통해 전달받은 데이터를 Json으로 변경하는 factory 메서드.
   UserComment.fromJson(Map<String, dynamic> json)
-      : comment_idx = json['comment_idx'],
-        rid = json['rid'],
+      : rid = json['rid'],
         user_name = json['user_name'],
         content = json['content'],
-        liked_num = json['liked_num'];
+        liked_num = json['liked_num'],
+        posted_time = json['posted_time'];
   /*
   // 2023.07.09, jdk
   // 현재 전달된 argument에 대한 Null Checking이 없으므로 주의해야 함.

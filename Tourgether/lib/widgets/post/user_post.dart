@@ -1,3 +1,4 @@
+import 'package:TourGather/enums/page_movement_reason.dart';
 import 'package:TourGather/utilities/color_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -20,6 +21,29 @@ class UserPost extends StatelessWidget {
 
   final UserPostModel postData;
   final int index;
+
+  // 2023.09.19, jdk
+  // user_post_detail_screen에 들어갔다가 다시 나올때
+  // 설정된 post setting들을 default value로 clear하는 함수.
+  void clearPostSettings(UserPostProvider userPostProvider) {
+    Log.logger.d("jdk, clearPostSettings is executed!");
+    // detail screen을 나온 후, UserPostProvider의 세팅을 default로 변경한다.
+
+    // 선택한 post의 인덱스 초기화 (선택된 post가 없는 상태이므로 -1)
+    userPostProvider.selectedPostIndex = -1;
+
+    // 좋아요 상태 초기화
+    userPostProvider.isLikePressed = false;
+
+    // 선택한 post의 좋아요 수 초기화
+    userPostProvider.selectedPostLikeNum = 0;
+
+    // 선택한 post의 comment list 초기화
+    userPostProvider.userCommentList.clear();
+
+    // 선택한 post의 data model을 null로 초기화
+    userPostProvider.currentSelectedPost = null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,8 +83,13 @@ class UserPost extends StatelessWidget {
         userPostProvider.userCommentList = commentList;
         Log.logger.d("length : ${userPostProvider.userCommentList.length}");
 
+        // 2023.09.20, jdk
         // detail screen으로 이동, await을 통해서 사용자가 화면을 나오길 기다린다.
-        await Navigator.push(
+        // 화면에서 나온 후(직접 이동 혹은 게시글 삭제)에는 데이터를 전달받는데,
+        // 만약 특별한 사유가 없는 페이지 이동이라면 pageMoveResult는 null이 된다. (단순 이동)
+        // 삭제, 수정 등과 같이 특별한 이유가 있는 페이지 이동이라면 Map을 반환하여
+        // if condition 판단을 통해 이후에 실행할 동작을 구분하게 된다.
+        var pageMovementReason = await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => UserPostDetailScreen(
@@ -69,10 +98,20 @@ class UserPost extends StatelessWidget {
           ),
         );
 
-        // detail screen을 나온 후, UserPostProvider의 세팅을 default로 변경한다.
-        userPostProvider.isLikePressed = false;
-        userPostProvider.selectedPostLikeNum = 0;
-        userPostProvider.selectedPostIndex = -1;
+        if (pageMovementReason != null) {
+          switch (pageMovementReason['reason']) {
+            case PageMovementReason.delete:
+              userPostProvider.removePostFromListByIndex(index);
+              break;
+            case PageMovementReason.Edit:
+              // TODO : 필요할지 확실하지는 않음.
+              break;
+            default:
+              break;
+          }
+        }
+
+        clearPostSettings(userPostProvider); // 선택한 게시글의 setting들을 초기화함.
       },
       child: Container(
         decoration: BoxDecoration(

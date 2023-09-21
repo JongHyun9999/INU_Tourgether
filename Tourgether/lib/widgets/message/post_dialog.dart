@@ -371,6 +371,13 @@ Future<dynamic> showPostContent(
                           alertMessageType = AlertMessageType.postApiError;
                         }
 
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('성공적으로 등록했습니다.'),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+
                         Navigator.of(context).pop(alertMessageType);
                       },
                     ),

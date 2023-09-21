@@ -2,6 +2,8 @@ import 'package:TourGather/providers/gps_ui_provider.dart';
 import 'package:TourGather/providers/main_screen_ui_provider.dart';
 import 'package:TourGather/providers/user_info_provider.dart';
 import 'package:TourGather/providers/user_post_provider.dart';
+import 'package:TourGather/screens/nav/post_list/user_post_list_screen.dart';
+import 'package:TourGather/utilities/color_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:TourGather/providers/gps_provider.dart';
 import 'package:TourGather/screens/dev/location_setting_screen.dart';
@@ -10,18 +12,20 @@ import 'package:TourGather/screens/main_screen.dart';
 // import 'package:TourGather/models/MessageProduct.dart';
 // import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:TourGather/screens/auth/signin_screen.dart';
-import 'package:TourGather/screens/nav/user_post_list_screen.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 
 // import 'package:google_fonts/google_fonts.dart';
 
-void main() {
+// 2023.09.20, jdk
+// main 함수에 async를 걸어주면 로드하는 동안 데이터를 가져올 수 있음.
+// 이후에 Local DB를 사용하거나 API로 가져올 것이 있다면 여기를 이용하는게 좋을듯.
+Future<void> main() async {
   // 2023.08.06, jdk
   // Splash Screen이 Initialization 시간 동안 유지되도록 만드는 설정.
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  Future.delayed(Duration(seconds: 2), FlutterNativeSplash.remove);
+  // WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  // Future.delayed(Duration(seconds: 2), FlutterNativeSplash.remove);
   runApp(MyApp());
 }
 

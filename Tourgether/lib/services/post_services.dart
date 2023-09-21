@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:TourGather/utilities/my_timer.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'dart:convert' as convert;
@@ -24,6 +25,7 @@ class PostServices {
   static const String postGetMessageUrl = "/api/postGetMessage";
   static const String getUserCommentsUrl = "/api/getUserComments";
   static const String postUserCommentUrl = "/api/postUserComment";
+  static const String deleteUserPostUrl = "/api/deleteUserPost";
 
   static Future<bool> postUserContent(Map<String, dynamic> postData) async {
     Log.logger.d(
@@ -379,6 +381,10 @@ class PostServices {
       }
 
       List<UserComment> user_comments_list = jsonResponse.map((model) {
+        MyTimer myTimer = MyTimer();
+        String posted_time_added =
+            myTimer.addHoursToDateString(model['posted_time'], 9);
+        model['posted_time'] = myTimer.formatDateString(posted_time_added);
         return UserComment.fromJson(model);
       }).toList();
 
@@ -421,6 +427,36 @@ class PostServices {
       });
     } catch (error) {
       Log.logger.e("error", error: error);
+      return false;
+    }
+  }
+
+  // User의 Post를 제거하는 API를 실행하는 함수
+  static Future<bool> deleteUserPost(Map<String, dynamic> postData) async {
+    Log.logger.d(
+      "jdk, postUserContent : URL[${baseUrl + deleteUserPostUrl}]\npassed data : ${postData}",
+    );
+
+    // 서버로 보낼 데이터를 jsonEncode
+    String jsonData = jsonEncode(postData);
+
+    try {
+      return await http
+          .post(
+        Uri.parse(baseUrl + deleteUserPostUrl),
+        headers: headers,
+        body: jsonData,
+      )
+          .then((response) {
+        if (response.statusCode == 200) {
+          Log.logger.d("jdk, post가 성공적으로 제거되었음.");
+          return true;
+        } else {
+          throw Exception("jdk, post 제거에 실패했음.");
+        }
+      });
+    } catch (error) {
+      Log.logger.e("Error", error: error);
       return false;
     }
   }

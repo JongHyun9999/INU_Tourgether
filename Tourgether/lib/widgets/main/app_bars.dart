@@ -1,5 +1,7 @@
+import 'package:TourGather/providers/user_post_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 
 import '../../utilities/color_palette.dart';
 
@@ -59,7 +61,13 @@ Widget getBottomAppBar(BuildContext context, double bottomNavigationBarHeight) {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    onPressed: () {
+                    // 2023.09.20, jdk
+                    // 화면을 이동하기 전에 먼저 post list를 받아온다.
+                    onPressed: () async {
+                      await context
+                          .read<UserPostProvider>()
+                          .getUsersPostsList();
+
                       Navigator.pushNamed(
                         context,
                         "/userPostList",

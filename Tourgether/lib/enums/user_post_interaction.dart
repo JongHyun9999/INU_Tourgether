@@ -1,0 +1,4 @@
+enum UserPostInteraction {
+  edit,
+  delete,
+}
