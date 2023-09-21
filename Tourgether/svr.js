@@ -764,12 +764,12 @@ app.post('/update_user_map_visibility_status', async (req, res) => {
 app.post('/api/postGetMessage', async (req, res) => {
   console.log('/api/postGetMessage 호출됨');
   let conn = null;
-  console.log(req.body.last_date)
+  console.log(req.body.last_rid)
   try {
-    let QUERY_STR = `SELECT user_name, title, content, posted_time, liked, comments_num, gps FROM User_Posts WHERE posted_time >= '${req.body.last_date}';`;
+    let QUERY_STR = `SELECT rid, user_name, title, content, posted_time, liked, comments_num, gps FROM User_Posts WHERE rid > '${req.body.last_rid}';`;
     if (req.body.last_date === '1986-01-01 00:00:00') {
       console.log('첫 호출')
-      QUERY_STR = `SELECT user_name, title, content, posted_time, liked, comments_num, gps FROM User_Posts;`;
+      QUERY_STR = `SELECT rid, user_name, title, content, posted_time, liked, comments_num, gps FROM User_Posts;`;
     }
 
     conn = await new Promise((resolve, reject) => {
@@ -780,9 +780,13 @@ app.post('/api/postGetMessage', async (req, res) => {
     }).catch((err) => {
       throw err;
     })
-    const [rows] = await conn.promise().query(QUERY_STR);
 
-    // console.log(rows);
+    let [rows] = await conn.promise().query(QUERY_STR);
+    
+    
+
+
+    console.log(rows);
     console.log('Successfully fetched the users posts list. [/api/postGetMessage]');
     res.status(200).json(rows);
     // else res.status(404).json(null);

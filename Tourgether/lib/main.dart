@@ -1,5 +1,6 @@
 import 'package:TourGather/providers/gps_ui_provider.dart';
 import 'package:TourGather/providers/main_screen_ui_provider.dart';
+import 'package:TourGather/providers/near_message_info_provider.dart';
 import 'package:TourGather/providers/user_info_provider.dart';
 import 'package:TourGather/providers/user_post_provider.dart';
 import 'package:flutter/material.dart';
@@ -47,6 +48,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => UserInfoProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => NearMessageInfoProvider(),
         ),
       ],
       child: MaterialApp(
