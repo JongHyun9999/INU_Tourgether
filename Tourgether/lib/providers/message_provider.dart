@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 import 'package:TourGather/models/map/map_info.dart';
 import 'package:TourGather/models/message/messageProduct.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/material.dart';
 class MessageProvider with ChangeNotifier {
   // DB에서 post정보 받아오는 일회용 변수
   List<dynamic> jsoncontent = [];
+  List<dynamic> json_content = [];
 
   // 인덱스별 메세지들의 정보가 담긴 model 저장
   List<MessageProduct> message_info_list = [];
@@ -27,7 +29,11 @@ class MessageProvider with ChangeNotifier {
   Timer? timer;
 
   bool is_clicked = false;
+  int first_rid = 0;
   int last_rid = 0;
+  List<int> before_rid_list = [];
+  List<int> current_rid_list = [];
+  List<int> removed_rid_list = [];
 
   List<MessageProduct> adjacent_message_list = [];
 
@@ -43,6 +49,30 @@ class MessageProvider with ChangeNotifier {
   String last_date = DateTime(2000 - 12 - 02).toString().split('.')[0];
 
   // ==================== Method ========================
+  Future<void> updateMessageList() async {
+    Map<String, dynamic> postData = {
+      'first_rid': first_rid,
+      'last_rid': last_rid
+    };
+
+    json_content.clear();
+    json_content = await PostServices.postUpdateMessage(postData);
+    print('pjh, ${jsoncontent}');
+    for (int i = 0; i < json_content.length; i++) {
+      current_rid_list.add(json_content[i]['rid']);
+    }
+    checkIsRemoved();
+  }
+
+  void checkIsRemoved() {
+    Set<int> before_rid_set = Set.from(before_rid_list);
+    Set<int> current_rid_set = Set.from(current_rid_list);
+
+    removed_rid_list = before_rid_set.difference(current_rid_set).toList();
+
+    message_info_list.removeWhere((element) => removed_rid_list.contains(element.rid));
+  }
+
   // DB에서 메세지 리스트를 가지고 오는 함수
   Future<void> getMessageList() async {
     Map<String, dynamic> postData = {
@@ -72,6 +102,7 @@ class MessageProvider with ChangeNotifier {
 
       message_info_list_new.add(
         MessageProduct(
+            rid: jsoncontent[i]['rid'],
             image_path: 'image_path_testing',
             user_name: jsoncontent[i]['user_name'],
             title: jsoncontent[i]['title'],
@@ -89,6 +120,7 @@ class MessageProvider with ChangeNotifier {
             liked: jsoncontent[i]['liked'],
             comments_num: jsoncontent[i]['comments_num']),
       );
+
       if (i == jsoncontent.length - 1) {
         last_rid = jsoncontent[i]['rid'];
       }
@@ -100,17 +132,20 @@ class MessageProvider with ChangeNotifier {
     positioned_list.clear();
     print('생성자');
 
-    getMessageList().then((_) {
+    getMessageList().then((_) async {
       print('then 시작');
       copyNewToList();
 
       print(message_info_list.length);
       for (int i = 0; i < message_info_list.length; i++) {
+        if (first_rid == 0) first_rid = message_info_list[i].rid;
         print('pjh, 추가함, ${i}');
         print('pjh, ${message_info_list[i].content}');
         Widget positioned = MessageIcon(messageInfo: message_info_list[i]);
         positioned_list.add(positioned);
       }
+
+      updateMessageList().then((value) {});
 
       notifyListeners();
 
@@ -159,9 +194,34 @@ class MessageProvider with ChangeNotifier {
     });
   }
 
+  Timer _removeMessage() {
+    return Timer.periodic(const Duration(seconds: 5), (timer) async {
+      print('pjh, ====== ${timer.tick}번째 제거될 메세지 확인 =======');
+      getMessageList().then((_) {
+        copyNewToList();
+
+        for (int i = 0; i < message_info_list_new.length; i++) {
+          print('pjh, 새로운 메세지 추가');
+          Widget positioned =
+              MessageIcon(messageInfo: message_info_list_new[i]);
+          positioned_list.add(positioned);
+        }
+
+        if (message_info_list_new.length > 0) {
+          notifyListeners();
+        }
+        message_info_list_new.clear();
+        // notifyListeners();
+      }).catchError((err) {
+        print(err);
+      });
+    });
+  }
+
   void copyNewToList() {
     for (int i = 0; i < message_info_list_new.length; i++) {
       message_info_list.add(message_info_list_new[i]);
+      before_rid_list.add(message_info_list_new[i].rid);
     }
   }
 

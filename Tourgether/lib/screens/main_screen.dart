@@ -353,7 +353,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                                 Container(
                                   child: Text('hiiiiiiiiiiiiiiiiiiiiiiii',
                                   style: TextStyle(
-                                    fontSize: 500
+                                    fontSize: 50
                                   ),),
                                 )
                               ]);
