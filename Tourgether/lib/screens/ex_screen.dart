@@ -151,52 +151,10 @@ class _ExScreenState extends State<ExScreen> {
                           })
                       //color: Colors.amber,
                       ),
-                  // child: Column(
-                  //   mainAxisAlignment: MainAxisAlignment.center,
-                  //   crossAxisAlignment: CrossAxisAlignment.center,
-                  //   children: [
-                  //     Container(
-                  //       width: MediaQuery.of(context).size.width,
-                  //       //color: Colors.white,
-                  //       //child: Text("HIHIIHIHIH")
-                  //       child: PageView(
-                  //         controller: pageViewController,
-                  //         children: <Widget>[
-                  //           Container(
-                  //             width: 100,
-                  //             height: 100,
-                  //             child: Text("HI"),
-                  //             color: Colors.amber,
-                  //           ),
-                  //         ],
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
                 )
               ],
             ),
           )
-          // PageView.builder(
-          //   itemCount: 4,
-          //   itemBuilder: (_, index) {
-          //     Log.logger.d('hiiiiiiii');
-          //     return Center(
-          //       child: Container(
-          //         width: 100,
-          //         height: 100,
-          //         color: Colors.red,
-          //         child: Column(
-          //           children: [
-          //             Text(
-          //               "${context.read<NearMessageInfoProvider>().message_info_list[0].title}",
-          //             )
-          //           ],
-          //         ),
-          //       ),
-          //     );
-          //   },
-          // )
         ],
       ),
     );
