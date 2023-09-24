@@ -178,7 +178,7 @@ app.post('/api/upload', async (req, res) => {
 // 이후에는 /api router를 만들어서 기능을 분리하도록 한다.
 app.post('/api/postUserContent', async (req, res) => {
   const postData = req.body;
-  console.log('postData : ', postData);
+  //console.log('postData : ', postData);
 
   const user_name = postData.user_name;
   const title = postData.title;
@@ -249,7 +249,7 @@ app.get('/api/getUsersPostsList', async (req, res) => {
     // node.js에도 logger 도입 필요.
     // 또한, log나 error에 API 이름을 직접 드러내지 말고 간접적으로 에러 문구 바꾸기.
 
-    console.log(rows);
+    //console.log(rows);
     console.log('Successfully fetched the users posts list. [/api/getUsersPostsList]');
     res.status(200).json(rows);
   } catch (err) {
@@ -782,7 +782,6 @@ app.post('/api/postGetMessage', async (req, res) => {
     })
 
     const [rows] = await conn.promise().query(QUERY_STR);
-
     console.log(rows);
     console.log('Successfully fetched the users posts list. [/api/postGetMessage]');
     res.status(200).json(rows);
@@ -816,7 +815,7 @@ app.post('/api/postUpdateMessage', async (req, res) => {
 
     const [rows] = await conn.promise().query(QUERY_STR);
 
-    console.log(rows);
+    //console.log(rows);
     console.log('Successfully fetched the users posts list. [/api/postGetMessage]');
     res.status(200).json(rows);
     // else res.status(404).json(null);

@@ -334,7 +334,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                           // MessageScreen(),
                           Consumer<MessageProvider>(
                             builder: (context, messageProvider, child) {
-                              print('pjh, 다시 그릴게~');
+                              //print('pjh, 다시 그릴게~');
 
                               return Container(
                                   width: MapInfo.backgroundImageWidth,
@@ -344,23 +344,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                                           messageProvider.positioned_list));
                             },
                           ),
-                          Consumer<NearMessageInfoProvider>(builder:
-                              ((context, nearMessageInfoProvider, child) {
-                            print("nearMessageInfoProvider: ");
-                            print(nearMessageInfoProvider.isVisibleMessage);
-                            if (nearMessageInfoProvider.isVisibleMessage) {
-                              return Column(children: [
-                                Container(
-                                  child: Text('hiiiiiiiiiiiiiiiiiiiiiiii',
-                                  style: TextStyle(
-                                    fontSize: 50
-                                  ),),
-                                )
-                              ]);
-                            } else {
-                              return Container();
-                            }
-                          }))
                         ],
                       ),
                     ),
@@ -380,6 +363,65 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
               //   ),
               // ),
               // 경은이가 넣어야할 페이지
+              // Consumer<NearMessageInfoProvider>(
+              //   builder: ((_, nearMessageInfoProvider, __) {
+              //     print("JKE, nearMessageInfoProvider: ");
+              //     print("JKE" +
+              //         nearMessageInfoProvider.message_info_list.length
+              //             .toString());
+              //     print(nearMessageInfoProvider.isVisibleMessage);
+              //     if (nearMessageInfoProvider.isVisibleMessage) {
+              //       // 2023.09.23, JKE
+              //       // nearMessageInfoProvider에서 인접한 메세지 리스트를 받아서 위젯을 반환
+              //       // return Container(
+              //       //   width: 100,
+              //       //   height: 100,
+              //       //   color: Colors.red,
+              //       // );
+              //       return Center(
+              //         child: Container(
+              //           width: 100,
+              //           height: 100,
+              //           child: Stack(
+              //             children: [
+              //               Container(
+              //                 width: 100,
+              //                 height: 100,
+              //                 child: Column(
+              //                   mainAxisSize: MainAxisSize.max,
+              //                   mainAxisAlignment: MainAxisAlignment.center,
+              //                   crossAxisAlignment: CrossAxisAlignment.center,
+              //                   children: [
+              //                     PageView.builder(
+              //                       itemCount: nearMessageInfoProvider
+              //                           .message_info_list.length,
+              //                       itemBuilder: (_, index) {
+              //                         nearMessageInfoProvider
+              //                             .reverseVisibleMessage();
+              //                         return Container(
+              //                           width: 100,
+              //                           height: 100,
+              //                           child: Column(
+              //                             children: [
+              //                               Text(
+              //                                   "${nearMessageInfoProvider.message_info_list[index].title}")
+              //                             ],
+              //                           ),
+              //                         );
+              //                       },
+              //                     )
+              //                   ],
+              //                 ),
+              //               ),
+              //             ],
+              //           ),
+              //         ),
+              //       );
+              //     } else {
+              //       return Container();
+              //     }
+              //   }),
+              // )
             ],
           ),
         ),

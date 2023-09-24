@@ -5,7 +5,10 @@ import 'package:TourGather/models/message/messageProduct.dart';
 import 'package:TourGather/providers/gps_provider.dart';
 import 'package:TourGather/providers/message_provider.dart';
 import 'package:TourGather/providers/near_message_info_provider.dart';
+import 'package:TourGather/screens/ex_screen.dart';
+import 'package:TourGather/utilities/log.dart';
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
 
 class MessageIcon extends StatefulWidget {
@@ -54,10 +57,10 @@ class _MessageIconState extends State<MessageIcon>
   void messageClick(
       MessageProvider messageProvider, NearMessageInfoProvider nearProvider) {
     // 메세지 버튼 클릭시 수행 함수
-    print(
-        'pjh, title : ${message_info.title} \n pjh, content : ${message_info.content}');
+    //print('pjh, title : ${message_info.title} \n pjh, content : ${message_info.content}');
     messageProvider.getAdjacentMessage();
     nearProvider.getNearMessageList(messageProvider.adjacent_message_list);
+    // nearProvider.reverseVisibleMessage();
   }
 
   @override
@@ -76,7 +79,7 @@ class _MessageIconState extends State<MessageIcon>
         Provider.of<MessageProvider>(context, listen: false);
     checkDistance(gpsProvider, nearProvider);
 
-    Future.delayed(Durations.medium2, () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       _animationController?.forward();
     });
 
@@ -96,8 +99,17 @@ class _MessageIconState extends State<MessageIcon>
                   color: Colors.blueAccent,
                   shadows: [],
                 ),
-                onPressed: () {
+                onPressed: () async {
+                  //print("메시지 클릭됨");
                   messageClick(messageProvider, nearProvider);
+                  Log.logger.d("jdk, a message is cliked.");
+
+                  Navigator.of(context).push(
+                    PageRouteBuilder(
+                      opaque: false,
+                      pageBuilder: (_, __, ___) => ExScreen(),
+                    ),
+                  );
                 },
               ),
             )

@@ -5,6 +5,7 @@ import 'package:TourGather/models/map/map_info.dart';
 import 'package:TourGather/models/message/messageProduct.dart';
 import 'package:TourGather/providers/gps_provider.dart';
 import 'package:TourGather/services/post_services.dart';
+import 'package:TourGather/utilities/log.dart';
 import 'package:TourGather/widgets/message_icon.dart';
 import 'package:flutter/material.dart';
 
@@ -70,7 +71,8 @@ class MessageProvider with ChangeNotifier {
 
     removed_rid_list = before_rid_set.difference(current_rid_set).toList();
 
-    message_info_list.removeWhere((element) => removed_rid_list.contains(element.rid));
+    message_info_list
+        .removeWhere((element) => removed_rid_list.contains(element.rid));
   }
 
   // DB에서 메세지 리스트를 가지고 오는 함수
@@ -100,6 +102,7 @@ class MessageProvider with ChangeNotifier {
           (1 - (jsoncontent[i]['gps']['x'] - mapDown) / (mapUp! - mapDown!)) *
               backgroundImageHeight;
 
+      // Log.logger.d("JKE test" + jsoncontent[i]['posted_time']);
       message_info_list_new.add(
         MessageProduct(
             rid: jsoncontent[i]['rid'],
@@ -236,6 +239,7 @@ class MessageProvider with ChangeNotifier {
         adjacent_message_list.add(message_info_list[i]);
       }
     }
+    Log.logger.d("JKE 다시 테스트, ${message_info_list[0].posted_time}");
   }
 
   double calculateDistance(Map<String, dynamic> a, Map<String, dynamic> b) {
