@@ -1,15 +1,17 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 import 'package:TourGather/models/map/map_info.dart';
 import 'package:TourGather/models/message/messageProduct.dart';
+import 'package:TourGather/providers/gps_provider.dart';
 import 'package:TourGather/services/post_services.dart';
+import 'package:TourGather/widgets/message_icon.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:intl/intl.dart';
 
-class MessageProvider extends ChangeNotifier {
+class MessageProvider with ChangeNotifier {
   // DB에서 post정보 받아오는 일회용 변수
   List<dynamic> jsoncontent = [];
+  List<dynamic> json_content = [];
 
   // 인덱스별 메세지들의 정보가 담긴 model 저장
   List<MessageProduct> message_info_list = [];
@@ -25,10 +27,15 @@ class MessageProvider extends ChangeNotifier {
   };
 
   Timer? timer;
-  Timer? timer2;
-  AnimationController? _animationController;
 
   bool is_clicked = false;
+  int first_rid = 0;
+  int last_rid = 0;
+  List<int> before_rid_list = [];
+  List<int> current_rid_list = [];
+  List<int> removed_rid_list = [];
+
+  List<MessageProduct> adjacent_message_list = [];
 
   final double backgroundImageWidth = MapInfo.backgroundImageWidth;
   final double backgroundImageHeight = MapInfo.backgroundImageHeight;
@@ -39,17 +46,55 @@ class MessageProvider extends ChangeNotifier {
   final double? mapLeft = MapInfo.left_down_gps['y'];
   final double? mapRight = MapInfo.right_down_gps['y'];
 
-  final DateFormat dateFormat = DateFormat("YYYY-MM-DD HH:mm:ss");
   String last_date = DateTime(2000 - 12 - 02).toString().split('.')[0];
 
   // ==================== Method ========================
+  Future<void> updateMessageList() async {
+    Map<String, dynamic> postData = {
+      'first_rid': first_rid,
+      'last_rid': last_rid
+    };
+
+    json_content.clear();
+    json_content = await PostServices.postUpdateMessage(postData);
+    for (int i = 0; i < json_content.length; i++) {
+      current_rid_list.add(json_content[i]['rid']);
+    }
+    checkIsRemoved();
+  }
+
+  void checkIsRemoved() {
+    Set<int> before_rid_set = Set.from(before_rid_list);
+    Set<int> current_rid_set = Set.from(current_rid_list);
+
+    // 사라진 메세지들의 rid 계산
+    removed_rid_list = before_rid_set.difference(current_rid_set).toList();
+    print('pjh, 지워야할 메세지 ${removed_rid_list}');
+
+    List<int> index_to_removed = [];
+    for (int i = 0; i < removed_rid_list.length; i++) {
+      int rid = removed_rid_list[i];
+      if (message_info_list.contains(rid)) {
+        index_to_removed.add(i);
+      }
+    }
+
+    for (int i = index_to_removed.length - 1; i >= 0; i++) {
+      int index = index_to_removed[i];
+      message_info_list.removeAt(index);
+      positioned_list.removeAt(index);
+    }
+  }
+
   // DB에서 메세지 리스트를 가지고 오는 함수
   Future<void> getMessageList() async {
     Map<String, dynamic> postData = {
       'user_gps_x': current_position['latitude'],
       'user_gps_y': current_position['longitude'],
-      'last_date': last_date
+      'last_date': last_date,
+      'last_rid': last_rid
     };
+    print(postData['last_date']);
 
     jsoncontent = await PostServices.postGetMessage(postData);
     print('DB에서 post 받아옴 : ${jsoncontent.length}개');
@@ -68,31 +113,9 @@ class MessageProvider extends ChangeNotifier {
           (1 - (jsoncontent[i]['gps']['x'] - mapDown) / (mapUp! - mapDown!)) *
               backgroundImageHeight;
 
-      // print('저장되는 실제 gps : ${gps_point.latitude} , ${gps_point.longitude}');
-      // print(
-      //     '변경후 : ${jsoncontent[i]['gps']['x']} , ${jsoncontent[i]['gps']['y']}');
-
-      message_info_list.add(
-        MessageProduct(
-            image_path: 'image_path_testing',
-            user_name: jsoncontent[i]['user_name'],
-            title: jsoncontent[i]['title'],
-            content: jsoncontent[i]['content'],
-            department: '소속학과',
-            gps: {
-              'latitude': gps_point['latitude'],
-              'longitude': gps_point['longitude']
-            },
-            location_map: {
-              'x': jsoncontent[i]['gps']['y'],
-              'y': jsoncontent[i]['gps']['x']
-            },
-            posted_time: jsoncontent[i]['posted_time'],
-            liked: jsoncontent[i]['liked'],
-            comments_num: jsoncontent[i]['comments_num']),
-      );
       message_info_list_new.add(
         MessageProduct(
+            rid: jsoncontent[i]['rid'],
             image_path: 'image_path_testing',
             user_name: jsoncontent[i]['user_name'],
             title: jsoncontent[i]['title'],
@@ -110,121 +133,40 @@ class MessageProvider extends ChangeNotifier {
             liked: jsoncontent[i]['liked'],
             comments_num: jsoncontent[i]['comments_num']),
       );
+
+      if (i == jsoncontent.length - 1) {
+        last_rid = jsoncontent[i]['rid'];
+      }
     }
   }
 
   // 생성자.
-  MessageProvider(AnimationController animationController) {
-    _animationController = animationController;
+  MessageProvider() {
+    positioned_list.clear();
     print('생성자');
 
-    getMessageList().then((_) {
+    getMessageList().then((_) async {
+      print('then 시작');
+      copyNewToList();
+
+      print(message_info_list.length);
       for (int i = 0; i < message_info_list.length; i++) {
-        Positioned positioned = Positioned(
-          top: message_info_list[i].location_map['y'],
-          left: message_info_list[i].location_map['x'],
-          child: IconButton(
-            icon:
-                (calculateDistance(current_position, message_info_list[i].gps) <
-                        0.00018)
-                    ? Icon(
-                        Icons.mail,
-                        size: 50,
-                        color: Colors.blueAccent,
-                      )
-                    : Icon(
-                        Icons.brightness_1,
-                        size: 30,
-                        color: Colors.blueAccent,
-                      ),
-            onPressed: () {
-              print('${i} 메세지 눌림');
-            },
-          ),
-        );
+        if (first_rid == 0) first_rid = message_info_list[i].rid;
+        print('pjh, 추가함, ${i}');
+        print('pjh, ${message_info_list[i].content}');
+        Widget positioned = MessageIcon(messageInfo: message_info_list[i]);
         positioned_list.add(positioned);
       }
 
       notifyListeners();
-      // addStreamDistance();
-      message_info_list_new.clear();
 
-      timer = _startTimer();
-      timer2 = _addMessage();
+      message_info_list_new.clear();
+      // timer = _startTimer();
+      timer = _addMessage();
       last_date = DateTime.now().toString().split('.')[0];
-      print('마지막 측정 시간 : ${last_date}');
+      print('pjh, 마지막 측정 시간 : ${last_date}');
     }).catchError((err) {
       print(err);
-    });
-  }
-
-  // 현재 나와 최단거리인 메세지의 인덱스를 반환하는 함수
-  double calculateDistance(Map<String, dynamic> a, Map<String, dynamic> b) {
-    return sqrt(pow(a['latitude']! - b['latitude']!, 2) +
-        pow(a['longitude']! - b['longitude']!, 2));
-  }
-
-  List<int> getShortestDistance() {
-    List<int> distance_list = [];
-    for (int i = 0; i < message_info_list.length; i++) {
-      // print('조사 대상 ${message_info_list[i].gps}');
-      if (calculateDistance(
-              this.current_position, this.message_info_list[i].gps) <
-          0.00148) {
-        distance_list.add(i);
-      }
-    }
-    print(distance_list);
-
-    // double minDistance = distance_list.reduce(min);
-    // int minIndex = distance_list.indexOf(minDistance);
-
-    return distance_list;
-  }
-
-  // Stream<void> addStreamDistance() {
-  //   print('Stream 시작');
-  //   return Stream<void>.periodic(
-  //       const Duration(seconds: 5), (timer) => _startTimer());
-  // }
-
-  // 첫 빌드 후 주기적으로 가장 가까운 메세지의 크기 키우기.
-  Timer _startTimer() {
-    return Timer.periodic(const Duration(seconds: 5), (timer) {
-      List<int> shortest_index = getShortestDistance();
-
-      for (int i = 0; i < shortest_index.length; i++) {
-        print('제일 가까운 인덱스 : ${shortest_index[i]}');
-        positioned_list[shortest_index[i]] = Positioned(
-          top: message_info_list[shortest_index[i]].location_map['y'],
-          left: message_info_list[shortest_index[i]].location_map['x'],
-          child: ScaleTransition(
-            scale: Tween(begin: 1.0, end: 1.5).animate(CurvedAnimation(
-                parent: _animationController!, curve: Curves.elasticOut)),
-            child: IconButton(
-              icon: Icon(
-                Icons.mail,
-                size: 50,
-                color: Colors.blueAccent,
-              ),
-              onPressed: () {
-                if (!is_clicked) {
-                  is_clicked = true;
-                  _animationController!.forward();
-                } else {
-                  is_clicked = false;
-                  _animationController!.reverse();
-                }
-
-                print('${shortest_index[i]} 메세지 눌림');
-              },
-            ),
-          ),
-        );
-      }
-      _animationController!.forward();
-      is_clicked = true;
-      notifyListeners();
     });
   }
 
@@ -235,37 +177,104 @@ class MessageProvider extends ChangeNotifier {
   // 수정사항을 화면에 반영한다.
   // 리스트 사이즈가 커진다면 리스트 전체를 화면에 다시 그리는게 불필요한 작업같아 개선하고 싶음.
   // 추가적으로, 첫 로딩외에 주기적으로 새로 추가되는 메세지를 화면에 반영해주는 작업이 필요하다.
-
   // 첫 로딩후 5초마다 주기적인 추가 메세지 확인
   Timer _addMessage() {
-    return Timer.periodic(const Duration(seconds: 5), (timer) async {
-      print('====== ${timer.tick}번째 새로운 메세지 확인 =======');
+    return Timer.periodic(const Duration(seconds: 5), (timer) {
+      print('pjh, ====== ${timer.tick}번째 새로운 메세지 확인 =======');
       getMessageList().then((_) {
+        copyNewToList();
+
         for (int i = 0; i < message_info_list_new.length; i++) {
-          Positioned positioned = Positioned(
-            top: message_info_list[i].location_map['y'],
-            left: message_info_list[i].location_map['x'],
-            child: IconButton(
-              icon: Icon(
-                Icons.mail,
-                size: 50,
-                color: Colors.blueAccent,
-              ),
-              onPressed: () {
-                print('${i} 메세지 눌림');
-              },
-            ),
-          );
+          print('pjh, 새로운 메세지 추가');
+          Widget positioned =
+              MessageIcon(messageInfo: message_info_list_new[i]);
           positioned_list.add(positioned);
         }
-        notifyListeners();
-        message_info_list_new.clear();
-        last_date = DateTime.now().toString().split('.')[0];
-        // print(last_date);
+
+        updateMessageList().then((_) {
+          if (message_info_list_new.length > 0) {
+            notifyListeners();
+          }
+
+          message_info_list_new.clear();
+          last_date =
+              DateTime.now().add(Duration(seconds: 5)).toString().split('.')[0];
+          print('pjh, 현재 시간 ${last_date}');
+        });
+
+        // if (message_info_list_new.length > 0) {
+        //   notifyListeners();
+        // }
+
+        // message_info_list_new.clear();
+        // last_date = DateTime.now().add(Duration(seconds: 5)).toString().split('.')[0];
+        // print('pjh, 현재 시간 ${last_date}');
       }).catchError((err) {
         print(err);
       });
     });
+  }
+
+  Timer _removeMessage() {
+    return Timer.periodic(const Duration(seconds: 5), (timer) async {
+      print('pjh, ====== ${timer.tick}번째 제거될 메세지 확인 =======');
+      getMessageList().then((_) {
+        copyNewToList();
+
+        for (int i = 0; i < message_info_list_new.length; i++) {
+          print('pjh, 새로운 메세지 추가');
+          Widget positioned =
+              MessageIcon(messageInfo: message_info_list_new[i]);
+          positioned_list.add(positioned);
+        }
+
+        if (message_info_list_new.length > 0) {
+          notifyListeners();
+        }
+        message_info_list_new.clear();
+        // notifyListeners();
+      }).catchError((err) {
+        print(err);
+      });
+    });
+  }
+
+  void copyNewToList() {
+    for (int i = 0; i < message_info_list_new.length; i++) {
+      message_info_list.add(message_info_list_new[i]);
+      before_rid_list.add(message_info_list_new[i].rid);
+    }
+  }
+
+  void getAdjacentMessage() {
+    // 메세지 위젯 중 특정 위젯 클릭시 발동되며,
+    // 인접한 메세지들을 찾아준다.
+    adjacent_message_list.clear();
+    for (int i = 0; i < message_info_list.length; i++) {
+      double distance =
+          calculateDistance(this.current_position, message_info_list[i].gps);
+      if (distance < 0.001) {
+        adjacent_message_list.add(message_info_list[i]);
+      }
+    }
+  }
+
+  double calculateDistance(Map<String, dynamic> a, Map<String, dynamic> b) {
+    return sqrt(pow(a['latitude']! - b['latitude']!, 2) +
+        pow(a['longitude']! - b['longitude']!, 2));
+  }
+
+  // =============================================
+  // proxyprovier를 위한 update 함수
+  void update(GPSProvider gpsProvider) {
+    // pjh. 프로바이더 생성시에도 update가 호출되는데,
+    // 아직 gps가 들어오지 않았을수 있기 때문에 null일 경우 pass.
+    if (gpsProvider.latitude == null) return;
+
+    current_position['latitude'] = gpsProvider.latitude;
+    current_position['longitude'] = gpsProvider.longitude;
+    print('update 실행');
+    return;
   }
 
   @override

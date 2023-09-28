@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 class MessageProduct with ChangeNotifier {
+  final int rid;
   final String image_path;
   final String user_name;
   final String title;
@@ -14,7 +15,8 @@ class MessageProduct with ChangeNotifier {
   final int comments_num;
 
   MessageProduct(
-      {required this.image_path,
+      {required this.rid,
+      required this.image_path,
       required this.user_name,
       required this.title,
       required this.content,

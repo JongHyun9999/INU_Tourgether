@@ -764,12 +764,13 @@ app.post('/update_user_map_visibility_status', async (req, res) => {
 app.post('/api/postGetMessage', async (req, res) => {
   console.log('/api/postGetMessage 호출됨');
   let conn = null;
-  // console.log(req.body)
+  console.log(req.body.last_rid)
   try {
-    let QUERY_STR = `SELECT user_name, title, content, posted_time, liked, comments_num, gps FROM User_Posts WHERE posted_time >= '${req.body.last_date}';`;
-    if (req.body.last_date === '2000-12-02 00:00:00') {
-      QUERY_STR = `SELECT user_name, title, content, posted_time, liked, comments_num, gps FROM User_Posts;`;
-    }
+    let QUERY_STR = `SELECT rid, user_name, title, content, posted_time, liked, comments_num, gps FROM User_Posts WHERE rid > '${req.body.last_rid}' ORDER BY rid asc;`;
+    // if (req.body.last_rid === 0) {
+    //   console.log('첫 호출')
+    //   QUERY_STR = `SELECT rid, user_name, title, content, posted_time, liked, comments_num, gps FROM User_Posts;`;
+    // }
 
     conn = await new Promise((resolve, reject) => {
       pool.getConnection((err, connection) => {
@@ -779,9 +780,10 @@ app.post('/api/postGetMessage', async (req, res) => {
     }).catch((err) => {
       throw err;
     })
+
     const [rows] = await conn.promise().query(QUERY_STR);
 
-    // console.log(rows);
+    console.log(rows);
     console.log('Successfully fetched the users posts list. [/api/postGetMessage]');
     res.status(200).json(rows);
     // else res.status(404).json(null);
@@ -789,6 +791,39 @@ app.post('/api/postGetMessage', async (req, res) => {
     console.log(err);
     res.status(404).json({
       error: "An error occurred while /api/postGetMessage"
+    });
+  } finally {
+    if (conn) conn.release();
+  }
+})
+
+
+app.post('/api/postUpdateMessage', async (req, res) => {
+  console.log('/api/postUpdateMessage 호출됨');
+  let conn = null;
+  console.log(req.body.first_rid + ' ~ ' + req.body.last_rid)
+  try {
+    let QUERY_STR = `SELECT rid FROM User_Posts WHERE rid >= '${req.body.first_rid}' AND rid <= '${req.body.last_rid}';`;
+
+    conn = await new Promise((resolve, reject) => {
+      pool.getConnection((err, connection) => {
+        if (err) reject(err);
+        resolve(connection);
+      });
+    }).catch((err) => {
+      throw err;
+    })
+
+    const [rows] = await conn.promise().query(QUERY_STR);
+
+    // console.log(rows);
+    console.log('Successfully fetched the users posts list. [/api/postUpdateMessage]');
+    res.status(200).json(rows);
+    // else res.status(404).json(null);
+  } catch (err) {
+    console.log(err);
+    res.status(404).json({
+      error: "An error occurred while /api/postUpdateMessage"
     });
   } finally {
     if (conn) conn.release();

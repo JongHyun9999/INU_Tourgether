@@ -139,15 +139,15 @@ class GPSProvider with ChangeNotifier {
               _streamInterval = _endTime!.difference(_startTime!);
               _gpsModel.currentPosition = newPosition;
 
-              logger.d(
-                "latitude : ${_gpsModel.currentPosition!.latitude}\nheight ratio : ${(37.380826 - _gpsModel.currentPosition!.latitude) / 0.012444}",
-              );
+              // logger.d(
+              //   "latitude : ${_gpsModel.currentPosition!.latitude}\nheight ratio : ${(37.380826 - _gpsModel.currentPosition!.latitude) / 0.012444}",
+              // );
               heightRatio =
                   (37.381506 - _gpsModel.currentPosition!.latitude) / 0.013024;
 
-              logger.d(
-                "longitude : ${_gpsModel.currentPosition!.longitude}\nwidth ratio : ${(126.640 - _gpsModel.currentPosition!.longitude) / 0.016231}",
-              );
+              // logger.d(
+              //   "longitude : ${_gpsModel.currentPosition!.longitude}\nwidth ratio : ${(126.640 - _gpsModel.currentPosition!.longitude) / 0.016231}",
+              // );
               widthRatio =
                   (126.64023 - _gpsModel.currentPosition!.longitude) / 0.016461;
 

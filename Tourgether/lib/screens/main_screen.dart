@@ -1,8 +1,7 @@
-import 'dart:async';
-
 import 'package:TourGather/models/map/map_info.dart';
 import 'package:TourGather/providers/main_screen_ui_provider.dart';
 import 'package:TourGather/providers/message_provider.dart';
+import 'package:TourGather/providers/near_message_info_provider.dart';
 import 'package:TourGather/widgets/main/app_bars.dart';
 import 'package:TourGather/widgets/main/blinking_user.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +32,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   final double backgroundImageHeight = 1800;
   // final double backgroundImageWidth = 2043;
   // final double backgroundImageHeight = 1903;
+  final double circleRadius = 150;
 
   bool isListeningGPSPositionStream = false;
   late double currentLatitudeForPost;
@@ -43,8 +43,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   TransformationController _transformationController =
       TransformationController();
-
-  late AnimationController _animationController;
 
   @override
   void initState() {
@@ -61,11 +59,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<GPSProvider>(context, listen: false).startGPSCallback();
     });
-
-    _animationController = AnimationController(
-      duration: Duration(milliseconds: 500),
-      vsync: this,
-    );
   }
 
   @override
@@ -81,6 +74,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         Provider.of<MainScreenUIProvider>(context, listen: false);
 
     bool showPostThing = false;
+
     return Scaffold(
       drawer: const NavBar(),
       extendBodyBehindAppBar: true,
@@ -108,8 +102,13 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
               : null,
       body: MultiProvider(
         providers: [
-          ChangeNotifierProvider(
-              create: (context) => MessageProvider(_animationController)),
+          ChangeNotifierProxyProvider<GPSProvider, MessageProvider>(
+            create: (context) => MessageProvider(),
+            update: (BuildContext context, gpsProvider,
+                MessageProvider? messageProvider) {
+              return messageProvider!..update(gpsProvider);
+            },
+          ),
         ],
         child: Center(
           child: Stack(
@@ -267,17 +266,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                               fit: BoxFit.cover,
                             ),
                           ),
-                          // MessageScreen(),
-                          Consumer<MessageProvider>(
-                            builder: (context, messageProvider, child) {
-                              return Container(
-                                  width: MapInfo.backgroundImageWidth,
-                                  height: MapInfo.backgroundImageHeight,
-                                  child: Stack(
-                                      children:
-                                          messageProvider.positioned_list));
-                            },
-                          ),
                           // ------------------------------------------
                           // 2023.07.29, jdk
                           // Map Image 위에 아이콘을 표시하기 위하여
@@ -288,24 +276,48 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                           // ------------------------------------------
                           Consumer<GPSProvider>(
                             builder: (context, gpsProvider, child) {
-                              print(gpsProvider.latitude);
-                              print(gpsProvider.longitude);
                               // Log.logger.d(gpsProvider.userWidthPosition);
                               // Log.logger.d(gpsProvider.userHeightPosition);
 
                               return (gpsProvider.isListeningGPSPositionStream)
-                                  ? Positioned(
-                                      left: gpsProvider.userWidthPosition,
-                                      top: gpsProvider.userHeightPosition,
-                                      child: IconButton(
-                                        icon: BlinkingIcon(
-                                          iconData: Icons.circle,
+                                  ? Container(
+                                      width: MapInfo.backgroundImageWidth,
+                                      height: MapInfo.backgroundImageHeight,
+                                      child: Stack(children: [
+                                        Positioned(
+                                          left: gpsProvider.userWidthPosition -
+                                              5 * circleRadius / 6,
+                                          top: gpsProvider.userHeightPosition -
+                                              5 * circleRadius / 6,
+                                          child: Container(
+                                            padding:
+                                                EdgeInsets.all(circleRadius),
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  Colors.grey.withOpacity(0.1),
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                color: Colors.redAccent,
+                                                width:
+                                                    1.0, // Adjust the width of the border as needed
+                                              ),
+                                            ),
+                                          ),
                                         ),
-                                        onPressed: () {
-                                          print("Touched!");
-                                        },
-                                        color: Colors.blueAccent,
-                                      ),
+                                        Positioned(
+                                          left: gpsProvider.userWidthPosition,
+                                          top: gpsProvider.userHeightPosition,
+                                          child: IconButton(
+                                            icon: BlinkingIcon(
+                                              iconData: Icons.circle,
+                                            ),
+                                            onPressed: () {
+                                              print("Touched!");
+                                            },
+                                            color: Colors.blueAccent,
+                                          ),
+                                        ),
+                                      ]),
                                     )
                                   // GPS를 받고 있지 않을 경우 중앙에 transparent로 표시
                                   // 이후에 변경하기.
@@ -319,6 +331,36 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                                     );
                             },
                           ),
+                          // MessageScreen(),
+                          Consumer<MessageProvider>(
+                            builder: (context, messageProvider, child) {
+                              print('pjh, 다시 그릴게~');
+
+                              return Container(
+                                  width: MapInfo.backgroundImageWidth,
+                                  height: MapInfo.backgroundImageHeight,
+                                  child: Stack(
+                                      children:
+                                          messageProvider.positioned_list));
+                            },
+                          ),
+                          Consumer<NearMessageInfoProvider>(builder:
+                              ((context, nearMessageInfoProvider, child) {
+                            print("nearMessageInfoProvider: ");
+                            print(nearMessageInfoProvider.isVisibleMessage);
+                            if (nearMessageInfoProvider.isVisibleMessage) {
+                              return Column(children: [
+                                Container(
+                                  child: Text('hiiiiiiiiiiiiiiiiiiiiiiii',
+                                  style: TextStyle(
+                                    fontSize: 50
+                                  ),),
+                                )
+                              ]);
+                            } else {
+                              return Container();
+                            }
+                          }))
                         ],
                       ),
                     ),
@@ -337,7 +379,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
               //     ),
               //   ),
               // ),
-              // MessageScreen(),
+              // 경은이가 넣어야할 페이지
             ],
           ),
         ),

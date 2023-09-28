@@ -23,6 +23,7 @@ class PostServices {
   static const String addUserUrl = "/api/addUser";
   static const String checkDupNameUrl = "/api/checkDupName";
   static const String postGetMessageUrl = "/api/postGetMessage";
+  static const String postUpdateMessageUrl = "/api/postUpdateMessage";
   static const String getUserCommentsUrl = "/api/getUserComments";
   static const String postUserCommentUrl = "/api/postUserComment";
   static const String deleteUserPostUrl = "/api/deleteUserPost";
@@ -344,6 +345,35 @@ class PostServices {
 
         //   }
         // }
+
+        return jsonResponse;
+      });
+    } catch (error) {
+      Log.logger.e("error", error: error);
+      return false;
+    }
+  }
+
+  static Future<dynamic> postUpdateMessage(Map<String, dynamic> postData) async {
+    print('postUpdateMessage 호출');
+    Log.logger.d(
+        "postUserContent : URL[${baseUrl + postUpdateMessageUrl}]\npassed data : ${postData}");
+    String jsonData = jsonEncode(postData);
+
+    try {
+      return await http
+          .post(
+        Uri.parse(baseUrl + postUpdateMessageUrl),
+        headers: headers,
+        body: jsonData,
+      )
+          .then((response) {
+        var jsonResponse = convert.jsonDecode(response.body);
+        if (jsonResponse is! List) {
+          jsonResponse = [jsonResponse];
+          Log.logger.d("converted to List");
+          print('배열로 만듬');
+        }
 
         return jsonResponse;
       });
