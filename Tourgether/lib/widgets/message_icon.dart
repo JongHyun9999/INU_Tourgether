@@ -76,7 +76,7 @@ class _MessageIconState extends State<MessageIcon>
         Provider.of<MessageProvider>(context, listen: false);
     checkDistance(gpsProvider, nearProvider);
 
-    Future.delayed(Durations.medium2, () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       _animationController?.forward();
     });
 

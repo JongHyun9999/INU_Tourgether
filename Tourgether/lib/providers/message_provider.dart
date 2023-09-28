@@ -57,7 +57,6 @@ class MessageProvider with ChangeNotifier {
 
     json_content.clear();
     json_content = await PostServices.postUpdateMessage(postData);
-    print('pjh, ${jsoncontent}');
     for (int i = 0; i < json_content.length; i++) {
       current_rid_list.add(json_content[i]['rid']);
     }
@@ -68,9 +67,23 @@ class MessageProvider with ChangeNotifier {
     Set<int> before_rid_set = Set.from(before_rid_list);
     Set<int> current_rid_set = Set.from(current_rid_list);
 
+    // 사라진 메세지들의 rid 계산
     removed_rid_list = before_rid_set.difference(current_rid_set).toList();
+    print('pjh, 지워야할 메세지 ${removed_rid_list}');
 
-    message_info_list.removeWhere((element) => removed_rid_list.contains(element.rid));
+    List<int> index_to_removed = [];
+    for (int i = 0; i < removed_rid_list.length; i++) {
+      int rid = removed_rid_list[i];
+      if (message_info_list.contains(rid)) {
+        index_to_removed.add(i);
+      }
+    }
+
+    for (int i = index_to_removed.length - 1; i >= 0; i++) {
+      int index = index_to_removed[i];
+      message_info_list.removeAt(index);
+      positioned_list.removeAt(index);
+    }
   }
 
   // DB에서 메세지 리스트를 가지고 오는 함수
@@ -145,8 +158,6 @@ class MessageProvider with ChangeNotifier {
         positioned_list.add(positioned);
       }
 
-      updateMessageList().then((value) {});
-
       notifyListeners();
 
       message_info_list_new.clear();
@@ -168,7 +179,7 @@ class MessageProvider with ChangeNotifier {
   // 추가적으로, 첫 로딩외에 주기적으로 새로 추가되는 메세지를 화면에 반영해주는 작업이 필요하다.
   // 첫 로딩후 5초마다 주기적인 추가 메세지 확인
   Timer _addMessage() {
-    return Timer.periodic(const Duration(seconds: 5), (timer) async {
+    return Timer.periodic(const Duration(seconds: 5), (timer) {
       print('pjh, ====== ${timer.tick}번째 새로운 메세지 확인 =======');
       getMessageList().then((_) {
         copyNewToList();
@@ -180,14 +191,24 @@ class MessageProvider with ChangeNotifier {
           positioned_list.add(positioned);
         }
 
-        if (message_info_list_new.length > 0) {
-          notifyListeners();
-        }
-        message_info_list_new.clear();
-        last_date =
-            DateTime.now().add(Duration(seconds: 5)).toString().split('.')[0];
-        print('pjh, 현재 시간 ${last_date}');
-        // notifyListeners();
+        updateMessageList().then((_) {
+          if (message_info_list_new.length > 0) {
+            notifyListeners();
+          }
+
+          message_info_list_new.clear();
+          last_date =
+              DateTime.now().add(Duration(seconds: 5)).toString().split('.')[0];
+          print('pjh, 현재 시간 ${last_date}');
+        });
+
+        // if (message_info_list_new.length > 0) {
+        //   notifyListeners();
+        // }
+
+        // message_info_list_new.clear();
+        // last_date = DateTime.now().add(Duration(seconds: 5)).toString().split('.')[0];
+        // print('pjh, 현재 시간 ${last_date}');
       }).catchError((err) {
         print(err);
       });

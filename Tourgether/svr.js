@@ -801,7 +801,7 @@ app.post('/api/postGetMessage', async (req, res) => {
 app.post('/api/postUpdateMessage', async (req, res) => {
   console.log('/api/postUpdateMessage 호출됨');
   let conn = null;
-  console.log(req.body.first_rid, req.body.last_rid)
+  console.log(req.body.first_rid + ' ~ ' + req.body.last_rid)
   try {
     let QUERY_STR = `SELECT rid FROM User_Posts WHERE rid >= '${req.body.first_rid}' AND rid <= '${req.body.last_rid}';`;
 
@@ -816,14 +816,14 @@ app.post('/api/postUpdateMessage', async (req, res) => {
 
     const [rows] = await conn.promise().query(QUERY_STR);
 
-    console.log(rows);
-    console.log('Successfully fetched the users posts list. [/api/postGetMessage]');
+    // console.log(rows);
+    console.log('Successfully fetched the users posts list. [/api/postUpdateMessage]');
     res.status(200).json(rows);
     // else res.status(404).json(null);
   } catch (err) {
     console.log(err);
     res.status(404).json({
-      error: "An error occurred while /api/postGetMessage"
+      error: "An error occurred while /api/postUpdateMessage"
     });
   } finally {
     if (conn) conn.release();
