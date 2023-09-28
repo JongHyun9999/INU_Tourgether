@@ -390,7 +390,6 @@ class PostServices {
 
       // 2023.09.06, jdk
       // 전달받은 comment 데이터를 정렬해야 함.
-
       return user_comments_list;
     } catch (error) {
       Log.logger
