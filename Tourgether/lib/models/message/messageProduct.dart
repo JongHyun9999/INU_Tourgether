@@ -10,7 +10,7 @@ class MessageProduct with ChangeNotifier {
   final String department;
   final Map<String, dynamic> gps;
   final Map<String, dynamic> location_map;
-  final String posted_time;
+  late String posted_time;
   final int liked;
   final int comments_num;
 

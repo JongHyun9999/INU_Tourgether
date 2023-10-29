@@ -61,7 +61,7 @@ Widget getBottomAppBar(BuildContext context, double bottomNavigationBarHeight) {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    // 2023.09.20, jdk
+                    // jdk
                     // 화면을 이동하기 전에 먼저 post list를 받아온다.
                     onPressed: () async {
                       await context

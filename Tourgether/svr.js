@@ -245,7 +245,7 @@ app.get('/api/getUsersPostsList', async (req, res) => {
 
     const [rows] = await conn.promise().query(QUERY_STR);
 
-    // 2023.08.04, jdk
+    // jdk
     // node.js에도 logger 도입 필요.
     // 또한, log나 error에 API 이름을 직접 드러내지 말고 간접적으로 에러 문구 바꾸기.
 

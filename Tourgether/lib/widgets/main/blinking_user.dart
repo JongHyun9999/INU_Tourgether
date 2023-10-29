@@ -42,6 +42,7 @@ class _BlinkingIconState extends State<BlinkingIcon> {
           opacity: value,
           child: Icon(
             widget.iconData,
+            color: Color.fromARGB(255, 240, 6, 6),
             size: 32.0, // Adjust the size as needed
           ),
         );

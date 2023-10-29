@@ -62,42 +62,42 @@ class MainScreenUIProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void changeCurrentScaleValue(double newScaleValue) {
-    _currentScaleValue = newScaleValue;
-  }
+  // void changeCurrentScaleValue(double newScaleValue) {
+  //   _currentScaleValue = newScaleValue;
+  // }
 
-  void compareNewScaleValueWithPrev(double newScaleValue) {
-    // Scale 값이 다르다면 새로운 Scale 값으로 currentScaleValue를 지정한다.
-    if (_currentScaleValue != newScaleValue) {
-      print("scale value is changed");
-      print("prev : ${_currentScaleValue}");
-      _currentScaleValue = newScaleValue;
-      print("new : ${newScaleValue}");
-      notifyListeners();
-    }
-  }
+  // void compareNewScaleValueWithPrev(double newScaleValue) {
+  //   // Scale 값이 다르다면 새로운 Scale 값으로 currentScaleValue를 지정한다.
+  //   if (_currentScaleValue != newScaleValue) {
+  //     print("scale value is changed");
+  //     print("prev : ${_currentScaleValue}");
+  //     _currentScaleValue = newScaleValue;
+  //     print("new : ${newScaleValue}");
+  //     notifyListeners();
+  //   }
+  // }
 
-  void changeMapPosition(double newMapPositionX, double newMapPositionY) {
-    _currentMapPositionX = newMapPositionX;
-    _currentMapPositionY = newMapPositionY;
-  }
+  // void changeMapPosition(double newMapPositionX, double newMapPositionY) {
+  //   _currentMapPositionX = newMapPositionX;
+  //   _currentMapPositionY = newMapPositionY;
+  // }
 
-  // 새로운 Position이 이전의 Position과 같은지 비교하는 함수.
-  bool compareNewPositionWithPrev(
-    double newMapPositionX,
-    double newMapPositionY,
-  ) {
-    print("newPosX : ${newMapPositionX}");
-    print("newPosY : ${newMapPositionY}");
+  // // 새로운 Position이 이전의 Position과 같은지 비교하는 함수.
+  // bool compareNewPositionWithPrev(
+  //   double newMapPositionX,
+  //   double newMapPositionY,
+  // ) {
+  //   print("newPosX : ${newMapPositionX}");
+  //   print("newPosY : ${newMapPositionY}");
 
-    print("currentPosX : ${currentMapPositionX}");
-    print("currentPosY : ${currentMapPositionY}");
+  //   print("currentPosX : ${currentMapPositionX}");
+  //   print("currentPosY : ${currentMapPositionY}");
 
-    bool isEqual = (_currentMapPositionX == newMapPositionX) &&
-        (_currentMapPositionY == newMapPositionY);
+  //   bool isEqual = (_currentMapPositionX == newMapPositionX) &&
+  //       (_currentMapPositionY == newMapPositionY);
 
-    print("isEqual : $isEqual");
+  //   print("isEqual : $isEqual");
 
-    return isEqual;
-  }
+  //   return isEqual;
+  // }
 }

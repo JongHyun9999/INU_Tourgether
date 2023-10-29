@@ -21,7 +21,7 @@ class UserPostModel {
     required this.comments_num,
   });
 
-  // 2023.07.09, jdk
+  // jdk
   // API를 통해 전달받은 데이터를 Json으로 변경하는 factory 메서드.
   UserPostModel.fromJson(Map<String, dynamic> json)
       : rid = json['rid'],

@@ -177,8 +177,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                         //   Log.logger.d("scaleValue is equal");
                         // }
 
-                        mainScreenUIProvider
-                            .compareNewScaleValueWithPrev(newScaleValue);
+                        // mainScreenUIProvider
+                        //     .compareNewScaleValueWithPrev(newScaleValue);
 
                         // // 새롭게 들어온 Map의 X, Y 데이터가 이전의 데이터와 같은지 비교하는 부분.
                         // // 만약 데이터가 같다면 사용자가 Map을 한 번만 터치한 것으로 판단할 수 있다.
@@ -224,8 +224,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                         //   newMapPositionY,
                         // );
                       },
-                      scaleEnabled: false,
-                      maxScale: 1.0,
+                      scaleEnabled: true,
+                      maxScale: 2.0,
                       minScale: 0.25,
                       // 2023.07.27, jdk
                       // 지도 위치 조정 과정 확인 필요
@@ -262,7 +262,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                           */
                           Positioned(
                             child: Image(
-                              image: AssetImage("images/inu-map.png"),
+                              image: AssetImage("images/test-map4.png"),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -344,23 +344,23 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                                           messageProvider.positioned_list));
                             },
                           ),
-                          Consumer<NearMessageInfoProvider>(builder:
-                              ((context, nearMessageInfoProvider, child) {
-                            print("nearMessageInfoProvider: ");
-                            print(nearMessageInfoProvider.isVisibleMessage);
-                            if (nearMessageInfoProvider.isVisibleMessage) {
-                              return Column(children: [
-                                Container(
-                                  child: Text('hiiiiiiiiiiiiiiiiiiiiiiii',
-                                  style: TextStyle(
-                                    fontSize: 50
-                                  ),),
-                                )
-                              ]);
-                            } else {
-                              return Container();
-                            }
-                          }))
+                          // Consumer<NearMessageInfoProvider>(builder:
+                          //     ((context, nearMessageInfoProvider, child) {
+                          //   print("nearMessageInfoProvider: ");
+                          //   print(nearMessageInfoProvider.isVisibleMessage);
+                          //   if (nearMessageInfoProvider.isVisibleMessage) {
+                          //     return Column(children: [
+                          //       Container(
+                          //         child: Text('hiiiiiiiiiiiiiiiiiiiiiiii',
+                          //         style: TextStyle(
+                          //           fontSize: 50
+                          //         ),),
+                          //       )
+                          //     ]);
+                          //   } else {
+                          //     return Container();
+                          //   }
+                          // }))
                         ],
                       ),
                     ),

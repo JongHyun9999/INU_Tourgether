@@ -39,8 +39,8 @@ Widget? showFloatingActionButton(
             }
           : () {
               // true로 하면 설정 불가능. 업데이트되지 않기 때문에 true설정하면 실행 불가.
-              Provider.of<MainScreenUIProvider>(context, listen: false)
-                  .changeAppBarsVisibility();
+              // Provider.of<MainScreenUIProvider>(context, listen: false)
+              //     .changeAppBarsVisibility();
             },
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(
@@ -216,7 +216,7 @@ Future<dynamic> showPostContent(
 
   // 다이얼로그 열기
   return showDialog(
-    barrierDismissible: false,
+    barrierDismissible: true,
     context: context,
     builder: (BuildContext context) {
       final mainScreenUIProvider =

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:TourGather/models/gps/gps_model.dart';
 import 'package:logger/logger.dart';
-
 import '../utilities/log.dart';
 
 // 2023.07.10 jdk
